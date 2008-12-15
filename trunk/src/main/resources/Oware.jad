@@ -7,7 +7,7 @@ MIDlet-Vendor: Irving Bunton
 MIDlet-Version: @MIDLETVERS@
 MIDlet-Permissions-Opt: javax.microedition.io.HttpConnection@PERMISSIONS@
 MIDlet-Data-Size: 3000
-MIDlet-Icon: /icons/rss.png
+MIDlet-Icon: /owareicon32x32.png
 MIDlet-Description: Oware Game
 MicroEdition-Configuration: @JCLDCVERS@
 MicroEdition-Profile: @JMIDPVERS@
