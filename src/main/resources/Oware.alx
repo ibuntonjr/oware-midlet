@@ -1,0 +1,37 @@
+<loader version='1.0'>
+    <application id="Oware">
+		<name >
+			Oware
+		</name>
+
+		<description>
+			Oware Game
+		</description>
+
+		<version>
+			@MIDLETVERS@
+		</version>
+
+		<vendor>
+			Irving Bunton
+		</vendor>
+
+        <copyright >
+            Copyright (c) 2006 Tommi Laukkanen
+        </copyright>
+
+		<requires>
+			net_rim_cldc
+		</requires>
+
+		<fileset Java='1.5'>
+            <directory >
+                substanceofcode
+            </directory>
+
+			<files>
+				@BUILDPREFIX@Oware_@FMIDLETVERSROOT@.cod
+			</files>
+		</fileset>
+	</application>
+</loader>
