@@ -1,0 +1,21 @@
+MIDlet-1: Oware, /owareicon16x16.png, net.sf.yinlight.boardgame.oware.midlet.OwareMIDlet
+MIDlet-Vendor: Irving Bunton
+MIDlet-Info-URL: http://www.code.google.com/p/oware
+MIDlet-Name: Oware
+MIDlet-Icon: /owareicon16x16.png
+MIDlet-Description: Oware Game
+MIDlet-Version: @MIDLETVERS@
+MIDlet-Permissions-Opt: javax.microedition.io.HttpConnection@PERMISSIONS@
+MIDlet-Data-Size: 3000
+MicroEdition-Configuration: @JCLDCVERS@
+MicroEdition-Profile: @JMIDPVERS@
+Program-Version: @PROGVERS@
+novice: @NOVICE@
+jlomicro-level: FINEST
+jlomicro-handlers: FormHandler
+jlomicro-ConsoleHandler-formatter: SimpleFormatter
+jlomicro-FormHandler-limit: 1000
+jlomicro-FormHandler-formatter: SimpleFormatter
+jlomicro-RecStoreHandler-limit: 1000
+jlomicro-RecStoreHandler-formatter: SimpleFormatter
+jlogmicro-com-substanceofcode-utils-SortUtil-level: OFF
