@@ -85,6 +85,7 @@ public class BoundInputStream extends InputStream {
     }
     catch (final IOException ignored) {
       //
+			ignored.printStackTrace();
     }
   }
 
