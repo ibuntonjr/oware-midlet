@@ -1,4 +1,8 @@
 /** GPL >= 2.0
+	* FIX arc piece shape and size OwareScreen, no vibrate,flashBacklight for 1.0 for GameApp
+	* FIX game menu
+	* FIX no getGraphics for GameScreen 1.0 for GameScreen
+	* FIX no suppress keys for 1.0 for GameApp
  * Based upon jtReversi game written by Jataka Ltd.
  *
  * This software was modified 2008-12-07.  The original file was Reversi.java
@@ -32,13 +36,20 @@ package net.sf.yinlight.boardgame.oware.midlet;
 
 import javax.microedition.lcdui.Choice;
 import javax.microedition.lcdui.ChoiceGroup;
+import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
+import javax.microedition.lcdui.List;
+import javax.microedition.lcdui.TextField;
+import net.eiroca.j2me.app.Application;
 import net.eiroca.j2me.app.BaseApp;
 import net.eiroca.j2me.game.GameApp;
 import net.eiroca.j2me.game.GameScreen;
 import net.eiroca.j2me.game.tpg.GameMinMax;
 import net.sf.yinlight.boardgame.oware.game.ui.OwareScreen;
+import net.sf.yinlight.boardgame.oware.game.OwareGame;
+import com.substanceofcode.rssreader.presentation.FeatureForm;
+
 
 //#ifdef DLOGGING
 import net.sf.jlogmicro.util.logging.Logger;
@@ -46,6 +57,7 @@ import net.sf.jlogmicro.util.logging.LogManager;
 import net.sf.jlogmicro.util.logging.Level;
 import net.sf.jlogmicro.util.logging.FormHandler;
 import net.sf.jlogmicro.util.logging.RecStoreHandler;
+import net.sf.jlogmicro.util.presentation.RecStoreLoggerForm;
 //#endif
 
 /**
@@ -58,6 +70,8 @@ public class OwareMIDlet extends GameApp {
   final public static int MSG_NAME = GameApp.MSG_USERDEF + MSG_OFFSET++; // 0
   final public static short MSG_MENU_MAIN_UNDO = (short)(GameApp.MSG_USERDEF + MSG_OFFSET++);
   final public static short MSG_MENU_MAIN_REDO = (short)(GameApp.MSG_USERDEF + MSG_OFFSET++);
+  final public static short MSG_MENU_MAIN_PAUSE = (short)(GameApp.MSG_USERDEF + MSG_OFFSET++);
+  final public static short MSG_MENU_MAIN_LOGGING = (short)(GameApp.MSG_USERDEF + MSG_OFFSET++);
   final public static int MSG_GAMEMODE = GameApp.MSG_USERDEF + MSG_OFFSET++;
   final public static int MSG_GAMEMODE1 = GameApp.MSG_USERDEF + MSG_OFFSET++;
   final public static int MSG_GAMEMODE2 = GameApp.MSG_USERDEF + MSG_OFFSET++;
@@ -83,12 +97,23 @@ public class OwareMIDlet extends GameApp {
 
   public static final short GA_UNDO = (short)GameApp.GA_USERDEF + 0;
   public static final short GA_REDO = (short)GameApp.GA_USERDEF + 1;
+	//#ifdef DMIDP10
+  public static final short GA_PAUSE = (short)GameApp.GA_USERDEF + 2;
+	//#endif
+	//#ifdef DLOGGING
+  public static final short GA_LOGGING = (short)GameApp.GA_USERDEF + 2;
+	//#endif
 
   public static String[] playerNames;
+  private boolean first = true;
+  private byte[] bsavedRec = new byte[0];
 
   protected ChoiceGroup opPlayers;
   protected ChoiceGroup opLevel;
   protected ChoiceGroup opDept;
+	//#ifdef DLOGGING
+  protected TextField opLogLevel;
+	//#endif
 
 	/* How many human players. */
   public static int gsPlayer = 1;
@@ -103,14 +128,20 @@ public class OwareMIDlet extends GameApp {
 	//#ifdef DLOGGING
   private boolean fineLoggable;
   private boolean finestLoggable;
+  private boolean traceLoggable;
+	final public LogManager logManager;
 	private Logger logger;
 	//#endif
 
   public OwareMIDlet() {
     super();
 		//#ifdef DLOGGING
-		LogManager.getLogManager().readConfiguration(this);
-		logger = Logger.getLogger("OwareMIDlet");
+		logManager = LogManager.getLogManager();
+		logManager.readConfiguration(this);
+		logger = Logger.getLogger(logManager, "OwareMIDlet", null);
+		fineLoggable = logger.isLoggable(Level.FINE);
+		finestLoggable = logger.isLoggable(Level.FINEST);
+		traceLoggable = logger.isLoggable(Level.TRACE);
 		//#endif
     BaseApp.menu = new short[][] {
         {
@@ -127,17 +158,32 @@ public class OwareMIDlet extends GameApp {
             GameApp.ME_MAINMENU, GameApp.MSG_MENU_MAIN_HELP, GameApp.GA_HELP, 5
         }, {
             GameApp.ME_MAINMENU, GameApp.MSG_MENU_MAIN_ABOUT, GameApp.GA_ABOUT, 6
+				//#ifdef DLOGGING
+        }, {
+            GameApp.ME_MAINMENU, OwareMIDlet.MSG_MENU_MAIN_LOGGING, OwareMIDlet.GA_LOGGING, 6
+        }, {
+            GameApp.ME_MAINMENU, OwareMIDlet.MSG_MENU_MAIN_LOGGING, OwareMIDlet.GA_LOGGING, 6
+				//#endif
         }
     };
-    GameApp.hsName = "OwareMIDlet";
+    GameApp.hsName = "Oware";
   }
 
   public void init() {
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("init");}
+		//#endif
 		try {
 			super.init();
 			OwareMIDlet.playerNames = new String[] {
-					BaseApp.messages[OwareMIDlet.MSG_NAMEPLAYER1], BaseApp.messages[OwareMIDlet.MSG_NAMEPLAYER2]
-			};
+					BaseApp.messages[OwareMIDlet.MSG_NAMEPLAYER1], BaseApp.messages[OwareMIDlet.MSG_NAMEPLAYER2]};
+			if (first) {
+				first = false;
+				bsavedRec = ((OwareScreen)game).getSavedGameRecord();
+			}
+			if (bsavedRec.length > 0) {
+				prepGameMenu(true);
+			}
 		} catch (Throwable e) {
 			e.printStackTrace();
 			//#ifdef DLOGGING
@@ -147,8 +193,19 @@ public class OwareMIDlet extends GameApp {
   }
 
   public GameScreen getGameScreen() {
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("getGameScreen");}
+		//#endif
 		try {
-			return new OwareScreen(this);
+			OwareScreen ows = new OwareScreen(this);
+			//#ifdef DMIDP10
+			Command cPause = BaseApp.newCommand(OwareMIDlet.MSG_MENU_MAIN_PAUSE, Command.STOP, 1, OwareMIDlet.GA_PAUSE);
+			ows.addCommand(cPause);
+			//#ifdef DLOGGING
+			if (finestLoggable) {logger.finest("getGameScreen cPause=" + cPause);}
+			//#endif
+			//#endif
+			return ows;
 		} catch (Throwable e) {
 			e.printStackTrace();
 			//#ifdef DLOGGING
@@ -158,9 +215,22 @@ public class OwareMIDlet extends GameApp {
 		}
   }
 
+	//#ifdef DMIDP10
+  /**
+   * Handle the action
+   */
+  public boolean handleAction(final int action, final Displayable d, final Command cmd) {
+		if ((d == GameApp.game) && (action == GA_PAUSE)) {
+			doGamePause();
+			return true;
+		}
+    return false;
+  }
+	//#endif
+
   protected Displayable getOptions() {
 		try {
-			final Form form = new Form(BaseApp.messages[GameApp.MSG_MENU_MAIN_OPTIONS]);
+			final Form form = new FeatureForm(BaseApp.messages[GameApp.MSG_MENU_MAIN_OPTIONS]);
 			opPlayers = new ChoiceGroup(BaseApp.messages[OwareMIDlet.MSG_GAMEMODE], Choice.EXCLUSIVE);
 			opPlayers.append(BaseApp.messages[OwareMIDlet.MSG_GAMEMODE1], null);
 			opPlayers.append(BaseApp.messages[OwareMIDlet.MSG_GAMEMODE2], null);
@@ -171,13 +241,26 @@ public class OwareMIDlet extends GameApp {
 			/* FIX
 			opLevel.append(BaseApp.messages[OwareMIDlet.MSG_AILEVEL4], null);
 			*/
-			opDept = new ChoiceGroup(BaseApp.messages[OwareMIDlet.MSG_AILEVEL], Choice.POPUP);
+			opDept = new ChoiceGroup(BaseApp.messages[OwareMIDlet.MSG_AILEVEL],
+			//#ifdef DMIDP20
+					Choice.POPUP
+			//#else
+					Choice.EXCLUSIVE
+			//#endif
+					);
 			for (int i = 1; i <= 14; i++) {
 				opDept.append(Integer.toString(i), null);
 			}
+			//#ifdef DLOGGING
+			opLogLevel = new TextField("Logging level",
+							logger.getParent().getLevel().getName(), 20, TextField.ANY);
+			//#endif
 			form.append(opPlayers);
 			form.append(opLevel);
 			form.append(opDept);
+			//#ifdef DLOGGING
+			form.append(opLogLevel);
+			//#endif
 			BaseApp.setup(form, BaseApp.cBACK, BaseApp.cOK);
 			return form;
 		} catch (Throwable e) {
@@ -190,11 +273,18 @@ public class OwareMIDlet extends GameApp {
   }
 
   public void doShowOptions() {
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("doShowOptions");}
+		//#endif
 		try {
 			super.doShowOptions();
 			opPlayers.setSelectedIndex(OwareMIDlet.gsPlayer - 1, true);
 			opLevel.setSelectedIndex(OwareMIDlet.gsLevel - 1, true);
 			opDept.setSelectedIndex(OwareMIDlet.gsDept - 1, true);
+			//#ifdef DLOGGING
+			opLogLevel.setString(
+							logger.getParent().getLevel().getName());
+			//#endif
 		} catch (Throwable e) {
 			e.printStackTrace();
 			//#ifdef DLOGGING
@@ -203,12 +293,39 @@ public class OwareMIDlet extends GameApp {
 		}
   }
 
+	//#ifdef DLOGGING
+  /**
+   * Show is in the record store log file.
+	 * FIX do other loggers.
+	 *
+   * @author Irv Bunton
+   */
+  public void doShowLogging() {
+		if (finestLoggable) {logger.finest("doShowLogging");}
+		try {
+			Form logf = new RecStoreLoggerForm(logManager, this, BaseApp.midlet);
+			BaseApp.setup(logf, BaseApp.cBACK, null);
+			BaseApp.show(null, logf, true);
+		} catch (Throwable e) {
+			e.printStackTrace();
+			logger.severe("doShowLogging error", e);
+		}
+  }
+	//#endif
+
   public void doApplyOptions() {
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("doApplyOptions");}
+		//#endif
 		try {
 			OwareMIDlet.gsPlayer = opPlayers.getSelectedIndex() + 1;
 			OwareMIDlet.gsLevel = opLevel.getSelectedIndex() + 1;
 			OwareMIDlet.gsDept = opDept.getSelectedIndex() + 1;
 			((OwareScreen) GameApp.game).updateSkillInfo();
+			//#ifdef DLOGGING
+			String logLevel = opLogLevel.getString().toUpperCase();
+			logger.getParent().setLevel(Level.parse(logLevel));
+			//#endif
 			super.doApplyOptions();
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -218,7 +335,21 @@ public class OwareMIDlet extends GameApp {
 		}
   }
 
+  /**
+   * Pause the game
+   */
+  public void doGamePause() {
+		super.doGamePause();
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("doGamePause");}
+		//#endif
+		prepGameMenu(true);
+	}
+
   public void doGameAbort() {
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("doGameAbort");}
+		//#endif
 		try {
 			super.doGameAbort();
 			GameMinMax.cancel(false);
@@ -231,17 +362,87 @@ public class OwareMIDlet extends GameApp {
 		}
   }
 
+	public List getGameMenu() {
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("getGameMenu bsavedRec=" + bsavedRec);}
+		//#endif
+		List gameMenu = Application.getMenu(GameApp.game.name, GameApp.ME_MAINMENU, GameApp.GA_CONTINUE, BaseApp.cEXIT);
+		return gameMenu;
+	}
+
+  protected void prepGameMenu(boolean canContinue) {
+		try {
+			//#ifdef DLOGGING
+			if (finestLoggable) {logger.finest("prepGameMenu canContinue=" + canContinue);}
+			//#endif
+			boolean canUndo = false;
+			boolean canRedo = false;
+			if (canContinue) {
+				Application.insertMenuItem(gameMenu, GA_CONTINUE);
+				if (GameApp.game != null) {
+					OwareScreen osc = (OwareScreen)GameApp.game;
+					if (OwareScreen.table != null) {
+						if (OwareScreen.table.checkLastTable()) {
+							Application.insertMenuItem(gameMenu, GA_UNDO);
+							canUndo = true;
+						}
+						if (OwareScreen.table.checkLastRedoTable()) {
+							Application.insertMenuItem(gameMenu, GA_REDO);
+							canUndo = true;
+						}
+					}
+				}
+			} else {
+				Application.deleteMenuItem(gameMenu, GA_CONTINUE);
+			}
+			if (!canUndo) {
+				Application.deleteMenuItem(gameMenu, GA_UNDO);
+			}
+			if (!canRedo) {
+				Application.deleteMenuItem(gameMenu, GA_REDO);
+			}
+			//#ifdef DLOGGING
+			if (finestLoggable) {logger.finest("prepGameMenu canUndo,canRedo=" + canUndo + "," + canRedo);}
+			//#endif
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("prepGameMenu error", e);
+			//#endif
+		}
+	}
+
   public void processGameAction(final int action) {
 		try {
+			//#ifdef DLOGGING
+			if (finestLoggable) {logger.finest("processGameAction action=" + action);}
+			//#endif
 			switch (action) {
-				case GA_STARTUP: // Continue
+				case GA_STARTUP: // Startup
 					doStartup();
 					break;
 				case GA_CONTINUE: // Continue
-					doGameResume();
+					if (bsavedRec.length > 0) {
+						((OwareScreen)game).bsavedRec = bsavedRec;
+						bsavedRec = new byte[0];
+						doGameStart();
+					} else {
+						doGameResume();
+					}
 					break;
 				case GA_NEWGAME: // New game
+					if (bsavedRec.length > 0) {
+						bsavedRec = new byte[0];
+					}
 					doGameStart();
+					break;
+				case GA_UNDO: // Undo last move
+					((OwareScreen)GameApp.game).table.undoTable();
+					doGameResume();
+					break;
+				case GA_REDO: // Redo last move
+					((OwareScreen)GameApp.game).table.redoTable();
+					doGameResume();
 					break;
 				case GA_OPTIONS:
 					doShowOptions();
@@ -255,6 +456,11 @@ public class OwareMIDlet extends GameApp {
 				case GA_APPLYOPTIONS:
 					doApplyOptions();
 					break;
+					//#ifdef DLOGGING
+				case GA_LOGGING:
+					doShowLogging();
+					break;
+					//#endif
 				default:
 					break;
 			}
