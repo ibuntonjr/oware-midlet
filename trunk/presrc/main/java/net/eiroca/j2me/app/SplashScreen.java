@@ -16,7 +16,11 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+// Expand to define logging define
+@DLOGDEF@
 package net.eiroca.j2me.app;
+// Expand to define MIDP define
+@DMIDPVERS@
 
 import java.util.Timer;
 import javax.microedition.lcdui.Canvas;
@@ -25,6 +29,11 @@ import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 import net.eiroca.j2me.util.ScheduledWaekup;
 import net.eiroca.j2me.util.SchedulerNotify;
+
+//#ifdef DLOGGING
+import net.sf.jlogmicro.util.logging.Logger;
+import net.sf.jlogmicro.util.logging.Level;
+//#endif
 
 /**
 	Show splash screen (actually a canvas)
@@ -37,13 +46,24 @@ public class SplashScreen extends Canvas implements SchedulerNotify {
   private Timer timer;
   private Image splashImage;
 
+  //#ifdef DLOGGING
+  private Logger logger = Logger.getLogger("SplashScreen");
+  private boolean fineLoggable = logger.isLoggable(Level.FINE);
+  private boolean finerLoggable = logger.isLoggable(Level.FINER);
+  private boolean finestLoggable = logger.isLoggable(Level.FINEST);
+  //#endif
   public SplashScreen(final String image, final Displayable next, final int time) {
     this.next = next;
     this.time = time;
+		//#ifdef DMIDP20
     setFullScreenMode(true);
+		//#endif
     if (image != null) {
       splashImage = BaseApp.createImage(image);
     }
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("constructor image,time=" + image + "," + time);}
+		//#endif
     show();
   }
 
