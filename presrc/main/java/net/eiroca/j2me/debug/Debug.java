@@ -23,6 +23,8 @@ import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.StringItem;
 import net.eiroca.j2me.app.BaseApp;
+import com.substanceofcode.rssreader.presentation.FeatureForm;
+
 
 /**
 	* Support debugging
@@ -40,7 +42,7 @@ public class Debug {
   }
 
   public void showMessageScreen(final Command back) {
-    final Form f = new Form("Debug messages");
+    final Form f = new FeatureForm("Debug messages");
     DebugMessage msg;
     StringItem si;
     for (int i = messages.size() - 1; i >= 0; i--) {
