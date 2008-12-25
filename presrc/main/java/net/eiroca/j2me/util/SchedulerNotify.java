@@ -22,6 +22,6 @@ package net.eiroca.j2me.util;
 	*/
 public interface SchedulerNotify {
 
-  public void wakeup();
+  void wakeup();
 
 }
