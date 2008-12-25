@@ -108,6 +108,7 @@ public class ScoreManager {
     }
     catch (final IOException e) {
       //
+			e.printStackTrace();
     }
     BaseApp.writeData(rs, baos);
     BaseApp.close(rs, null, dos);
@@ -138,6 +139,7 @@ public class ScoreManager {
       }
       catch (final IOException e) {
         //
+				e.printStackTrace();
       }
     }
     BaseApp.close(rs, dis, null);
@@ -152,7 +154,6 @@ public class ScoreManager {
       scores[dif].removeElementAt(scores[dif].size() - 1);
     }
     saveScoreList();
-    return;
   }
 
 }
