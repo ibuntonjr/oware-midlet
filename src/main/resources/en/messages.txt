@@ -23,6 +23,8 @@ Backlight
 Oware
 Undo
 Redo
+Pause
+Logging
 Game Mode
 player vs A.I.
 player vs player
