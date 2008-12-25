@@ -23,8 +23,8 @@ package net.eiroca.j2me.game.tpg;
 	*/
 public interface GameMove {
 
-  public int getPoint();
+  int getPoint();
 
-  public void setPoint(int point);
+  void setPoint(int point);
 
 }
