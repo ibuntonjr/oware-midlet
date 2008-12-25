@@ -36,10 +36,6 @@ public class MinimaxTimerTask extends TimerTask {
   protected GameTable startTable;
   protected GameMinMax gMiniMax;
 
-  public MinimaxTimerTask() {
-    //
-  }
-
   public boolean cancel() {
     GameMinMax.cancel(true);
     return true;
