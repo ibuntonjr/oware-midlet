@@ -23,6 +23,7 @@
 package net.eiroca.j2me.game;
 
 import javax.microedition.lcdui.Graphics;
+import javax.microedition.lcdui.Image;
 //#ifdef DMIDP20
 import javax.microedition.lcdui.game.GameCanvas;
 //#else
@@ -42,9 +43,10 @@ Canvas
 {
 
   protected final GameApp midlet;
-  protected final Graphics screen;
-  protected final int screenWidth;
-  protected final int screenHeight;
+  protected Graphics screen;
+  protected Image simage;
+  protected int screenWidth;
+  protected int screenHeight;
   protected final boolean fullScreenMode;
 
   protected boolean active = false;
@@ -53,37 +55,104 @@ Canvas
   public Score score;
 
   public GameScreen(final GameApp aMidlet, final boolean suppressKeys, final boolean fullScreen) {
+		//#ifdef DMIDP20
     super(suppressKeys);
+		//#else
+    super();
+		//#endif
     midlet = aMidlet;
     fullScreenMode = fullScreen;
+		//#ifdef DMIDP20
     setFullScreenMode(fullScreenMode);
+		//#endif
     score = new Score();
-    screen = getGraphics();
-    screenWidth = screen.getClipWidth();
-    screenHeight = screen.getClipHeight();
+    screen = initGraphics();
+	}
+
+  /**
+   * Initialize graphics portion only. This is for MIDP 1.0 devices which
+	 * do not get screen info until paint.  It is also used by MIDP 2.x
+	 * to be consistent.  So, we allow it to be called from 2 places.
+   */
+	public Graphics initGraphics(int x, int y) {
+		//#ifdef DMIDP20
+		Graphics cscreen = getGraphics();
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("initGraphics cscreen=" + cscreen);}
+		//#endif
+		//#else
+		simage = Image.createImage(x, y);
+		Graphics cscreen = simage.getGraphics();
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("initGraphics simage,cscreen=" + simage + "," + cscreen);}
+		//#endif
+		//#endif
+    screenWidth = x;
+    screenHeight = y;
+		return cscreen;
   }
+
+  /**
+   * Initialize graphics portion only. This is for MIDP 1.0 devices which
+	 * do not get screen info until paint.  It is also used by MIDP 2.x
+	 * to be consistent.  So, we allow it to be called from 2 places.
+   */
+	public Graphics initGraphics() {
+		//#ifdef DMIDP20
+		Graphics cscreen = getGraphics();
+		return initGraphics(cscreen.getClipWidth(), cscreen.getClipHeight());
+		//#else
+		return initGraphics(super.getWidth(), super.getHeight());
+		//#endif
+	}
+
+	//#ifdef DMIDP10
+  /**
+   * Initialize graphics portion only. This is for MIDP 1.0 devices which
+	 * do not get screen info until paint.  So, we allow it to be called from
+	 * 2 places.
+   */
+	public void sizeChanged(int x, int y) {
+		screen = initGraphics(x, y);
+  }
+	//#endif
 
   public void init() {
     active = true;
   }
 
   public void show() {
+		//#ifdef DMIDP20
     setFullScreenMode(fullScreenMode);
-	//#ifdef DCLDCV11
-    animationThread = new GameThread(this, "GameScreen");
-	//#else
-    animationThread = new GameThread(this);
-	//#endif
+		//#endif
+		synchronized(this) {
+			//#ifdef DCLDCV11
+			animationThread = new GameThread(this, "GameScreen");
+			//#else
+			animationThread = new GameThread(this);
+			//#endif
+		}
     animationThread.start();
   }
 
   abstract public boolean tick();
 
+  /**
+   * Executed when hidden.  Stop animation thread, turn off full screen.
+   */
   public void hide() {
-    if (animationThread != null) {
-      animationThread.stopped = true;
-      animationThread = null;
+		GameThread canimationThread = null;
+		synchronized(this) {
+			canimationThread = animationThread;
+		}
+    if (canimationThread != null) {
+      canimationThread.stopped = true;
+			synchronized(this) {
+				animationThread = null;
+			}
+			//#ifdef DMIDP20
       setFullScreenMode(false);
+			//#endif
     }
   }
 
@@ -93,13 +162,13 @@ Canvas
     score.endGame();
   }
 
-  public void wakeUp(int tries) {
-	  animationThread.wakeUp(tries);
+  public void wakeup(int tries) {
+		synchronized(this) {
+			if (animationThread != null) {
+				animationThread.wakeup(tries);
+			}
+		}
   }
-
-  abstract public byte[] saveRecordStore();
-
-  abstract public boolean loadRecordStore(final byte[] b);
 
   public final boolean isActive() {
     return active;
