@@ -2,6 +2,9 @@
  *
  * Copyright (C) 2006-2008 eIrOcA (eNrIcO Croce & sImOnA Burzio)
  *
+ * This software was modified 2008-12-14.  The original file was
+ * in mobilesuite.sourceforge.net project.
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -16,6 +19,8 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+// Expand to define MIDP define
+@DMIDPVERS@
 // Expand to define logging define
 @DLOGDEF@
 package net.eiroca.j2me.game;
@@ -48,7 +53,9 @@ public class GameUIMessage extends Canvas {
   public GameUIMessage(final String[] msg, final Displayable next) {
     super();
     this.msg = msg;
+		//#ifdef DMIDP20
     setFullScreenMode(true);
+		//#endif
     this.next = next;
   }
 
