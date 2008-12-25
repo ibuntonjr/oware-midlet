@@ -23,12 +23,14 @@ package net.eiroca.j2me.game.tpg;
 	*/
 public interface GameTable {
 
-  public GameTable copyFrom();
+  GameTable copyFrom();
 
-  public GameMove getEmptyMove();
+  GameMove getEmptyMove();
 
-  public byte[] toByteArray();
+  byte[] toByteArray();
 
-  public int tableStoreSize();
+  int tableMaxStoreSize();
+
+  int tableStoreSize();
 
 }
