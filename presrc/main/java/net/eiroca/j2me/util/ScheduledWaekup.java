@@ -1,6 +1,9 @@
 /** GPL >= 2.0
  * Copyright (C) 2006-2008 eIrOcA (eNrIcO Croce & sImOnA Burzio)
  *
+ * This software was modified 2008-12-14.  The original file was
+ * in mobilesuite.sourceforge.net project.
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
