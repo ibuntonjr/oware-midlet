@@ -73,6 +73,10 @@ public final class OwareMove implements GameMove {
     return (row == r.row) && (col == r.col);
   }
 
+	public int hashCode() {
+		return row + col + getPoint();
+	}
+
   /**
    * Get the value of point.
    * @return Value of point.
