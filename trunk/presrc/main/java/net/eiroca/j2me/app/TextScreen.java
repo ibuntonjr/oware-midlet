@@ -23,10 +23,12 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
 
+import com.substanceofcode.rssreader.presentation.FeatureForm;
+
 /**
 	* Show text screen (form).
 	*/
-public class TextScreen extends Form implements CommandListener {
+public class TextScreen extends FeatureForm implements CommandListener {
 
   private final Displayable next;
 
