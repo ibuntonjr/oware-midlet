@@ -1,0 +1,22 @@
+RELEASE = 
+DTESTDEF = D${RELEASE}TEST
+DTESTUIDEF = D${RELEASE}TESTUI
+DLOGDEF = D${RELEASE}LOGGING
+jlogmicro.jad = JLogMicro.jad
+#Don't delete jlogmicro by giving bogus directory
+log.subdir = nojlogmicro
+#DLOGDEF = DNOLOGGING
+#add.jars = true
+#ext.jar = ../../../JLogMicro/bin/JLogMicro.jar
+#Compile test ui
+#testui.presrc = ../testpresrc
+#testui.presrc = C:/opt/WTK2.5.1/apps/RSSReader/mobile-rss-reader/testpresrc
+#Copy from src copy.jar.src = true
+#Copy from src jarsrc = ../../../JLogMicro/src
+#jar.presrc = ../../../JLogMicro/jlogmicro/presrc
+jar.presrc = C:/opt/WTK2.5.1/apps/JLogMicro/jlogmicro/presrc
+#need.test.res = true
+#res.test.dir = ../testdata
+res.test.todir = 
+obfuscate = no
+#keep.obfuscate = true
