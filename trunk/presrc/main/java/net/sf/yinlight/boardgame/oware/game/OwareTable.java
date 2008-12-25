@@ -1,4 +1,5 @@
 /** GPL >= 2.0
+	* FIX empty move
  * Based upon jtReversi game written by Jataka Ltd.
  *
  * This software was modified 2008-12-07.  The original file was ReversiTable.java
@@ -27,6 +28,8 @@
 @DTESTDEF@
 package net.sf.yinlight.boardgame.oware.game;
 
+import java.util.Stack;
+import net.eiroca.j2me.app.BaseApp;
 import net.eiroca.j2me.game.tpg.GameMove;
 import net.eiroca.j2me.game.tpg.GameTable;
 
@@ -49,17 +52,22 @@ public final class OwareTable implements GameTable {
   public final static int NBR_COL = 6;
   public final static int NBR_PLAYERS = 2;
   public final static int NBR_ATTRIBUTES = 2;
+  public final static int NBR_MAX_STACK = 3;
   private final static int TABLE_STORE_SIZE = (NBR_ATTRIBUTES * OwareTable.NBR_COL * OwareTable.NBR_ROW) + (NBR_PLAYERS * 1) + (NBR_PLAYERS * 3) + 1;
   public final static int WINNING_SCORE = 25;
   protected byte[][] board;
   protected byte[] point;
   protected OwareMove[] lastMove;
   protected int passNum;
+	// FIX save stack
+  protected Stack prevTbls = new Stack();
+  protected Stack redoTbls = new Stack();
 
   //#ifdef DLOGGING
   private Logger logger = Logger.getLogger("OwareTable");
   private boolean fineLoggable = logger.isLoggable(Level.FINE);
   private boolean finestLoggable = logger.isLoggable(Level.FINEST);
+  private boolean traceLoggable = logger.isLoggable(Level.TRACE);
   //#endif
 
   public static byte getPlayerItem(final byte player) {
@@ -89,22 +97,34 @@ public final class OwareTable implements GameTable {
 		//#ifdef DLOGGING
 		if (finestLoggable) {logger.finest("constructor byteArray.length=" + byteArray.length);}
 		//#endif
-		board = new byte[3][NBR_COL * NBR_ROW];
+		board = new byte[NBR_ATTRIBUTES][NBR_COL * NBR_ROW];
     point = new byte[NBR_PLAYERS];
 		lastMove = new OwareMove[NBR_PLAYERS];
 		try {
 			int coffset = offset;
 			passNum = byteArray[coffset++];
+			//#ifdef DLOGGING
+			if (finestLoggable) {logger.finest("passNum,coffset=" + passNum + "," + coffset);}
+			//#endif
 			for (int i = 0; i < NBR_PLAYERS; i++) {
 				point[i] = byteArray[coffset++];
+				//#ifdef DLOGGING
+				if (finestLoggable) {logger.finest("point[i],coffset=" + point[i] + "," + coffset);}
+				//#endif
 			}
 			for (int i = 0; i < NBR_PLAYERS; i++) {
 				lastMove[i] = new OwareMove(byteArray[coffset++],
 						byteArray[coffset++]);
 				lastMove[i].setPoint(byteArray[coffset++]);
+				//#ifdef DLOGGING
+				if (finestLoggable) {logger.finest("lastMove[i].getPoint(),coffset=" + lastMove[i].getPoint() + "," + coffset);}
+				//#endif
 			}
-			for (int i = 0; i < NBR_ATTRIBUTES; i++) {
-				System.arraycopy(byteArray, coffset+=(NBR_COL * NBR_ROW), board[i], 0, NBR_COL * NBR_ROW);
+			for (int i = 0; i < NBR_ATTRIBUTES; i++, coffset+=(NBR_COL * NBR_ROW)) {
+				System.arraycopy(byteArray, coffset, board[i], 0, NBR_COL * NBR_ROW);
+				//#ifdef DLOGGING
+				if (finestLoggable) {logger.finest("coffset=" + coffset);}
+				//#endif
 			}
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -118,6 +138,8 @@ public final class OwareTable implements GameTable {
     board = new byte[NBR_ATTRIBUTES][NBR_COL * NBR_ROW];
     point = new byte[NBR_PLAYERS];
     lastMove = new OwareMove[NBR_PLAYERS];
+		BaseApp.copyInto(table.prevTbls, prevTbls);
+		BaseApp.copyInto(table.redoTbls, redoTbls);
 		//#ifdef DLOGGING
 		if (finestLoggable) {logger.finest("constructor board[0].length,board[1].length,board[1].length=" + board[0].length + "," + board[1].length);}
 		//#endif
@@ -149,7 +171,7 @@ public final class OwareTable implements GameTable {
     }
   }
 
-  public void copyDataFrom(final GameTable table) {
+  private void copyDataFromMain(final GameTable table) {
 		try {
 			final OwareTable rtable = (OwareTable) table;
 			for (int i = 0; i < NBR_ATTRIBUTES; i++) {
@@ -162,7 +184,23 @@ public final class OwareTable implements GameTable {
 			for (int i = 0; i < NBR_PLAYERS; i++) {
 				lastMove[i] = new OwareMove(rtable.lastMove[i]);
 				lastMove[i].setPoint(rtable.lastMove[i].getPoint());
+				//#ifdef DLOGGING
+				if (traceLoggable) {logger.trace("copyDataFromMain i,lastMove[i].row,lastMove[i].col,lastMove[i].getPoint()=" + i + "," + lastMove[i].row + "," + lastMove[i].col + "," + lastMove[i].getPoint());}
+				//#endif
 			}
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("copyDataFrom error", e);
+			//#endif
+		}
+  }
+
+  public void copyDataFrom(final GameTable table) {
+		try {
+			copyDataFromMain(table);
+			BaseApp.copyInto(((OwareTable)table).prevTbls, prevTbls);
+			BaseApp.copyInto(((OwareTable)table).redoTbls, redoTbls);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			//#ifdef DLOGGING
@@ -179,6 +217,66 @@ public final class OwareTable implements GameTable {
   public GameMove getEmptyMove() {
     return new OwareMove(0, 0);
   }
+
+	public void saveLastTable(OwareTable ot) {
+		synchronized(this) {
+			if (prevTbls.size() >= NBR_MAX_STACK) {
+				prevTbls.removeElementAt(NBR_MAX_STACK - 1);
+			}
+			if (redoTbls.size() > 0) {
+				redoTbls.removeAllElements();
+			}
+			prevTbls.push(new OwareTable(ot));
+		}
+	}
+
+	public OwareTable popLastTable() {
+		synchronized(this) {
+			if (prevTbls.size() > 0) {
+				return (OwareTable)prevTbls.pop();
+			} else {
+				return null;
+			}
+		}
+	}
+
+	public OwareTable undoTable() {
+		return unwindTable(prevTbls, redoTbls);
+	}
+
+	public OwareTable redoTable() {
+		return unwindTable(redoTbls, prevTbls);
+	}
+
+	private OwareTable unwindTable(Stack removeTbls, Stack addTbls) {
+		synchronized(this) {
+			//#ifdef DLOGGING
+			if (finestLoggable) {logger.finest("unwindTable removeTbls.size(),addTbls.size()=" + removeTbls.size() + "," + addTbls.size());}
+			//#endif
+			if (removeTbls.size() == 0) {
+				return null;
+			}
+			if (addTbls.size() >= NBR_MAX_STACK) {
+				addTbls.removeElementAt(NBR_MAX_STACK - 1);
+			}
+			OwareTable lastTbl = (OwareTable)removeTbls.pop();
+			addTbls.push(lastTbl);
+			copyDataFromMain(lastTbl);
+			return lastTbl;
+		}
+	}
+
+	public boolean checkLastTable() {
+		synchronized(this) {
+			return ((prevTbls.size() > 0) && (redoTbls.size() < NBR_MAX_STACK));
+		}
+	}
+
+	public boolean checkLastRedoTable() {
+		synchronized(this) {
+			return ((redoTbls.size() > 0) && (prevTbls.size() < NBR_MAX_STACK));
+		}
+	}
 
   /**
    * Get the player for the coordinates
@@ -303,6 +401,10 @@ public final class OwareTable implements GameTable {
     passNum = v;
   }
 
+  public int tableMaxStoreSize() {
+		return TABLE_STORE_SIZE;
+	}
+
   public int tableStoreSize() {
 		return TABLE_STORE_SIZE;
 	}
@@ -313,30 +415,32 @@ public final class OwareTable implements GameTable {
     return byteArray;
   }
 
-  public void toByteArray(final byte[] byteArray, final int offset) {
-	try {
+  public int toByteArray(final byte[] byteArray, final int offset) {
 		int coffset = offset;
-		byteArray[coffset++] = (byte) passNum;
-		for (int i = 0; i < NBR_PLAYERS; i++) {
-			byteArray[coffset++] = point[i];
+		try {
+			byteArray[coffset++] = (byte) passNum;
+			for (int i = 0; i < NBR_PLAYERS; i++) {
+				byteArray[coffset++] = point[i];
+			}
+			for (int i = 0; i < NBR_PLAYERS; i++) {
+				byteArray[coffset++] = (byte)lastMove[i].row;
+				byteArray[coffset++] = (byte)lastMove[i].col;
+				byteArray[coffset++] = (byte)lastMove[i].getPoint();
+			}
+			for (int i = 0; i < NBR_ATTRIBUTES; i++, coffset+=board[0].length) {
+				System.arraycopy(board[i], 0, byteArray, coffset, board[i].length);
+			}
+			//#ifdef DLOGGING
+			if (finestLoggable) {logger.finest("toByteArray offset,coffset=" + offset + "," + coffset);}
+			//#endif
+			return (coffset - offset);
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("toByteArray error TABLE_STORE_SIZE,byteArray.length,offset,coffset=" + TABLE_STORE_SIZE + "," + byteArray.length + "," + offset + "," + coffset, e);
+			//#endif
+			return 0;
 		}
-		for (int i = 0; i < NBR_PLAYERS; i++) {
-			byteArray[coffset++] = (byte)lastMove[i].row;
-			byteArray[coffset++] = (byte)lastMove[i].col;
-			byteArray[coffset++] = (byte)lastMove[i].getPoint();
-		}
-		for (int i = 0; i < NBR_ATTRIBUTES; i++) {
-			System.arraycopy(board[i], 0, byteArray, coffset+=board[i].length, board[i].length);
-		}
-		//#ifdef DLOGGING
-		if (finestLoggable) {logger.finest("toByteArray coffset=" + coffset);}
-		//#endif
-	} catch (Throwable e) {
-		e.printStackTrace();
-		//#ifdef DLOGGING
-		logger.severe("toByteArray error", e);
-		//#endif
-	}
   }
 
   /**
