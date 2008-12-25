@@ -58,6 +58,7 @@ public class Settings {
     }
     catch (final Exception e) {
       //
+			e.printStackTrace();
     }
   }
 
@@ -122,10 +123,12 @@ public class Settings {
       }
       catch (final RecordStoreException e) {
         //
+				e.printStackTrace();
       }
     }
     catch (final IOException e) {
       //
+			e.printStackTrace();
     }
     return false;
   }
