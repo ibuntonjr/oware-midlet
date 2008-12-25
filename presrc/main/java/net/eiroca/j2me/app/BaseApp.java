@@ -1,4 +1,5 @@
 /**
+	FIX reduce code for getImage
  * Copyright (C) 2006-2008 eIrOcA (eNrIcO Croce & sImOnA Burzio)
  * Copyright (C) 2002 Eugene Morozov (xonixboy@hotmail.com)
  *
@@ -37,6 +38,12 @@
  * IN THE SOFTWARE.
  *
  */
+// Expand to define MIDP define
+@DMIDPVERS@
+// Expand to define test define
+@DTESTDEF@
+// Expand to define logging define
+@DLOGDEF@
 package net.eiroca.j2me.app;
 
 import java.io.ByteArrayInputStream;
@@ -76,6 +83,18 @@ import javax.microedition.midlet.MIDletStateChangeException;
 import javax.microedition.rms.RecordListener;
 import javax.microedition.rms.RecordStore;
 import javax.microedition.rms.RecordStoreException;
+import javax.microedition.rms.InvalidRecordIDException;
+import net.eiroca.j2me.game.GameApp;
+import net.eiroca.j2me.rms.Settings;
+import com.substanceofcode.rssreader.presentation.FeatureForm;
+import com.substanceofcode.rssreader.presentation.FeatureList;
+import com.substanceofcode.rssreader.presentation.FeatureMgr;
+
+
+//#ifdef DLOGGING
+import net.sf.jlogmicro.util.logging.Logger;
+import net.sf.jlogmicro.util.logging.Level;
+//#endif
 
 /**
   * Perform application tasks, standard commands.  Store messages, menus, and
@@ -91,7 +110,6 @@ public abstract class BaseApp extends MIDlet implements CommandListener
   public static final String sCR = "\n";
   public static final char CR = '\n';
   public static final char LF = '\r';
-  public static final String APP_LOCALE = "en";
 
   /*
    * Mathematics
@@ -858,6 +876,7 @@ public abstract class BaseApp extends MIDlet implements CommandListener
         }
       }
       catch (final RecordStoreException e) {
+				e.printStackTrace();
         //
       }
     }
@@ -876,6 +895,7 @@ public abstract class BaseApp extends MIDlet implements CommandListener
       }
       catch (final RecordStoreException ex) {
         //
+				ex.printStackTrace();
       }
     }
     BaseApp.recordStores.clear();
@@ -887,14 +907,29 @@ public abstract class BaseApp extends MIDlet implements CommandListener
    * @return
    */
   public static DataInputStream readRecord(final RecordStore rs, final int recordID) {
+		//#ifdef DLOGGING
+		Logger logger = Logger.getLogger("BaseApp");
+		logger.finest("readRecord rs,recordID=" + rs + "," + recordID);
+		//#endif
     DataInputStream dis = null;
     if (rs != null) {
       try {
         final byte[] data = rs.getRecord(recordID);
         dis = new DataInputStream(new ByteArrayInputStream(data));
       }
+      catch (final InvalidRecordIDException e) {
+        //
+				e.printStackTrace();
+				//#ifdef DLOGGING
+				logger.severe("readRecord rs,recordID=" + rs + "," + recordID, e);
+				//#endif
+      }
       catch (final RecordStoreException e) {
         //
+				e.printStackTrace();
+				//#ifdef DLOGGING
+				logger.severe("readRecord rs,recordID=" + rs + "," + recordID, e);
+				//#endif
       }
     }
     return dis;
@@ -917,6 +952,7 @@ public abstract class BaseApp extends MIDlet implements CommandListener
       }
       catch (final RecordStoreException e) {
         //
+				e.printStackTrace();
       }
     }
     try {
@@ -924,6 +960,7 @@ public abstract class BaseApp extends MIDlet implements CommandListener
     }
     catch (final IOException e) {
       //
+			e.printStackTrace();
     }
   }
 
@@ -939,6 +976,7 @@ public abstract class BaseApp extends MIDlet implements CommandListener
       }
       catch (final IOException e) {
         //
+				e.printStackTrace();
       }
     }
     if (os != null) {
@@ -947,6 +985,7 @@ public abstract class BaseApp extends MIDlet implements CommandListener
       }
       catch (final IOException e) {
         //
+				e.printStackTrace();
       }
     }
     if (rs != null) {
@@ -955,6 +994,7 @@ public abstract class BaseApp extends MIDlet implements CommandListener
       }
       catch (final RecordStoreException e) {
         //
+				e.printStackTrace();
       }
     }
   }
@@ -976,6 +1016,7 @@ public abstract class BaseApp extends MIDlet implements CommandListener
       }
     }
     catch (final RecordStoreException e) {
+			e.printStackTrace();
     }
   }
 
@@ -1003,6 +1044,16 @@ public abstract class BaseApp extends MIDlet implements CommandListener
 	*/
   public static final int MD_MENUIC = 3;
 
+  /**
+	* Index into index definition which holds indexes to menu definitions active
+	*/
+  public static final int ID_MENU_IX = 0;
+
+  /**
+	* Index into index definition which holds indexes to list entry active
+	*/
+  public static final int ID_MENU_LIST = 1;
+
   private static final String DIR_SEP = "/";
 
   public static Command cBACK;
@@ -1012,10 +1063,20 @@ public abstract class BaseApp extends MIDlet implements CommandListener
   public static int background = 0x00000000;
   public static int foreground = 0x00FFFFFF;
   public static short[][] menu;
+  public static int INVALID_INDEX = 1000;
+  public static Vector menuShown;
+  public static Vector menuCombined;
+  public static int beginSpecial = 0;
+  public static int endSpecial = 0;
+  public static final String FONT_SIZE_KEY = "font-size";
+  public static Settings settings = null;
   public static String[] messages;
   public static Image[] icons;
 
-  public static int pSpecial;
+	/* UNDO REMOVE?
+  public static int NOT_SPECIAL = 1000;
+  public static int pSpecial = NOT_SPECIAL;
+	*/
 
   private static char LINESEP = BaseApp.CR;
   private static char STRIP = BaseApp.LF;
@@ -1023,6 +1084,13 @@ public abstract class BaseApp extends MIDlet implements CommandListener
 
   private static int BUF_SIZE = 40;
 
+  /**
+   * Take the resource name and see if it is in the local sub directory.
+	 * If not, use the main directory.
+   *
+   * @param res
+   * @return    InputStream
+   */
   public static InputStream getInputStream(final String res) {
     StringBuffer sb = new StringBuffer(BaseApp.BUF_SIZE);
     String basepath;
@@ -1044,6 +1112,54 @@ public abstract class BaseApp extends MIDlet implements CommandListener
     }
     return in;
   }
+
+	//#ifdef DMIDP10
+  /**
+   * Take the resource name and see if it is in the local sub directory.
+	 * If not, use the main directory.
+   *
+   * @param res
+   * @return    Image
+   */
+  public static Image createImage(final String res) {
+		//#ifdef DLOGGING
+		Logger logger = Logger.getLogger("BaseApp");
+		logger.finest("createImage res=" + res);
+		//#endif
+		Image im = null;
+		try {
+			StringBuffer sb = new StringBuffer(BaseApp.BUF_SIZE);
+			String basepath;
+			sb.append(BaseApp.DIR_SEP);
+			if (BaseApp.resPrefix != null) {
+				sb.append(BaseApp.resPrefix).append(BaseApp.DIR_SEP);
+			}
+			basepath = sb.toString();
+			final String locale = Device.getLocale();
+			if (locale != null) {
+				sb.append(locale).append(BaseApp.DIR_SEP);
+			}
+			sb.append(res);
+			try {
+				im = Image.createImage(sb.toString());
+			}
+			catch (final IOException e) {
+				logger.warning("createImage res not present =" + res);
+			}
+			if (im == null) {
+				sb = new StringBuffer(basepath).append(res);
+				im = Image.createImage(sb.toString());
+			}
+		}
+    catch (final IOException e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("createImage missing error for " + res, e);
+			//#endif
+		}
+    return im;
+  }
+	//#endif
 
   public static String readLine(final InputStream in) throws IOException {
     String res = null;
@@ -1080,6 +1196,10 @@ public abstract class BaseApp extends MIDlet implements CommandListener
    * @return
    */
   public static Pair[] readPairs(final String res, final char sep) {
+		//#ifdef DLOGGING
+		Logger logger = Logger.getLogger("BaseApp");
+		logger.finest("readPairs res,sep=" + res + "," + sep);
+		//#endif
     final Vector s = new Vector();
     Pair p;
     String line;
@@ -1108,12 +1228,20 @@ public abstract class BaseApp extends MIDlet implements CommandListener
       while (true);
     }
     catch (final IOException e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("readPairs missing error for " + res, e);
+			//#endif
       s.removeAllElements();
     }
     final Pair[] out = new Pair[s.size()];
-    for (int i = 0; i < s.size(); i++) {
-      out[i] = (Pair) s.elementAt(i);
-    }
+		try {
+			s.copyInto(out);
+		} catch (Throwable e) {
+			for (int i = 0; i < s.size(); i++) {
+				out[i] = (Pair) s.elementAt(i);
+			}
+		}
     return out;
   }
 
@@ -1157,12 +1285,17 @@ public abstract class BaseApp extends MIDlet implements CommandListener
    * @return
    */
   public static String[] readStrings(final String res) {
+		//#ifdef DLOGGING
+		Logger logger = Logger.getLogger("BaseApp");
+		logger.finest("readStrings res=" + res);
+		//#endif
     final Vector s = new Vector();
     String line;
     try {
-			final String locale = APP_LOCALE;
-			String localeDir = (locale == "") ? "" : "/" + locale + "/";
-      final InputStream in = BaseApp.getInputStream(localeDir + res);
+      final InputStream in = BaseApp.getInputStream(res);
+      if (in == null) {
+				throw new IOException("File not in jar file " + res);
+			}
       do {
         line = BaseApp.readLine(in);
         if (line == null) {
@@ -1175,12 +1308,25 @@ public abstract class BaseApp extends MIDlet implements CommandListener
       while (true);
     }
     catch (final IOException e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("readStrings missing error for " + res, e);
+			//#endif
       s.removeAllElements();
+			//#ifdef DTEST
+			for (int i = 0; i < GameApp.MSG_USERDEF * 10; i++) {
+          s.addElement("No file found line " + i);
+			}
+			//#endif
     }
     final String[] out = new String[s.size()];
-    for (int i = 0; i < s.size(); i++) {
-      out[i] = s.elementAt(i).toString();
-    }
+		try {
+			s.copyInto(out);
+		} catch (Throwable e) {
+			for (int i = 0; i < s.size(); i++) {
+				out[i] = s.elementAt(i).toString();
+			}
+		}
     return out;
   }
 
@@ -1191,12 +1337,15 @@ public abstract class BaseApp extends MIDlet implements CommandListener
    * @return
    */
   public static String readString(final String res) {
+		//#ifdef DLOGGING
+		Logger logger = Logger.getLogger("BaseApp");
+		logger.finest("readString res=" + res);
+		//#endif
     final StringBuffer sb = new StringBuffer(1024);
     int ch;
+		InputStream in = null;
     try {
-			final String locale = APP_LOCALE;
-			String localeDir = (locale == "") ? "" : "/" + locale + "/";
-      final InputStream in = BaseApp.getInputStream(localeDir + res);
+      in = BaseApp.getInputStream(res);
       do {
         ch = in.read();
         if (ch == -1) {
@@ -1208,7 +1357,22 @@ public abstract class BaseApp extends MIDlet implements CommandListener
       return sb.toString();
     }
     catch (final IOException e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("readString missing error for " + res, e);
+			//#endif
       return null;
+		} finally {
+			if (in != null) {
+				try {
+					in.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+					//#ifdef DLOGGING
+					logger.severe("readString close error for " + res, e);
+					//#endif
+				}
+			}
     }
   }
 
@@ -1222,23 +1386,56 @@ public abstract class BaseApp extends MIDlet implements CommandListener
    * @return
    */
   public static Image[] splitImages(final String res, final int count, final int width, final int height) {
+		//#ifdef DLOGGING
+		Logger logger = Logger.getLogger("BaseApp");
+		logger.finest("createImage res,count,width,height=" + res + "," + count + "," + width + "," + height);
+		//#endif
     final Image[] images = new Image[count];
     try {
       Graphics g;
+			//#ifdef DMIDP20
       final InputStream in = BaseApp.getInputStream(res);
+      if (in == null) {
+				throw new IOException("File not in jar file " + res);
+			}
       final Image image = Image.createImage(in);
+			//#else
+      final Image image = BaseApp.createImage(res);
+			//#endif
       for (int i = 0; i < count; i++) {
         images[i] = Image.createImage(width, height);
         g = images[i].getGraphics();
         g.drawImage(image, -i * width, 0, 0);
       }
     }
+		//#ifdef DMIDP20
     catch (final IOException ex) {
-      System.err.println("missing " + res);
+      System.err.println("splitImages missing " + res);
+			ex.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("splitImages missing error for " + res, ex);
+			//#endif
+    }
+		//#endif
+		catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("splitImages error", e);
+			//#endif
     }
     return images;
   }
 
+	public static void copyInto(Vector from, Vector to) {
+		final int fin = from.size();
+		Object[] ofrom = new Object[fin];
+		from.copyInto(ofrom);
+		for (int i = 0; i < fin; i++) {
+			to.addElement(ofrom[i]);
+		}
+	}
+
+	//#ifdef DMIDP20
   /**
    * Load an Image from a resource file
    *
@@ -1246,17 +1443,36 @@ public abstract class BaseApp extends MIDlet implements CommandListener
    * @return
    */
   public static Image createImage(final String res) {
+		//#ifdef DLOGGING
+		Logger logger = Logger.getLogger("BaseApp");
+		logger.finest("createImage res=" + res);
+		//#endif
     Image image = null;
     try {
       final InputStream in = BaseApp.getInputStream(res);
+      if (in == null) {
+				throw new IOException("File not in jar file " + res);
+			}
       image = Image.createImage(in);
     }
     catch (final IOException ex) {
       System.err.println("missing " + res);
+			ex.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("createImage missing error for " + res, ex);
+			//#endif
+    }
+		catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("createImage error", e);
+			//#endif
     }
     return image;
   }
+	//#endif
 
+	//#ifdef DMIDP20
   /**
    * Load a tile from a resource file
    *
@@ -1282,6 +1498,7 @@ public abstract class BaseApp extends MIDlet implements CommandListener
     }
     return ok;
   }
+	//#endif
 
   /**
    * @param cl
@@ -1290,7 +1507,7 @@ public abstract class BaseApp extends MIDlet implements CommandListener
    * @return
    */
   public static Displayable getTextForm(final int title, final String textRes) {
-    final Form form = new Form(BaseApp.messages[title]);
+    final Form form = new FeatureForm(BaseApp.messages[title]);
     final String msg = BaseApp.readString(textRes);
     if (msg != null) {
       form.append(msg);
@@ -1307,7 +1524,7 @@ public abstract class BaseApp extends MIDlet implements CommandListener
    * @return
    */
   public static Displayable getTextForm(final int title, final String textRes, final Object[] o) {
-    final Form form = new Form(BaseApp.messages[title]);
+    final Form form = new FeatureForm(BaseApp.messages[title]);
     final String msg = BaseApp.readString(textRes);
     if (msg != null) {
       form.append(BaseApp.format(msg, o));
@@ -1516,20 +1733,17 @@ public abstract class BaseApp extends MIDlet implements CommandListener
    * @param cmd
    * @param d
    * @param i
-   * @author Irv Bunton
    */
-  public void process(final Command cmd, final Displayable d, final Item i) {
+  public void process(final Command cmd, final Displayable d, final Item i) {
     // if cmd is list selection, we change cmd to actual command
     Object at = null;
-    if (cmd == List.SELECT_COMMAND) {
-      if ((d != null) && (d instanceof List)) {
-        final List list = (List) d;
-        final int index = list.getSelectedIndex();
-        at = BaseApp.listItems.get(list + "#" + index);
-        if (at == null) {
-          at = BaseApp.listItems.get(list);
-        }
-      }
+    if ((cmd == List.SELECT_COMMAND) && (d != null) && (d instanceof List)) {
+			final List list = (List) d;
+			final int index = list.getSelectedIndex();
+			at = BaseApp.listItems.get(list + "#" + index);
+			if (at == null) {
+				at = BaseApp.listItems.get(list);
+			}
     }
     if ((at == null) && (cmd != null)) {
       at = BaseApp.commands.get(cmd);
@@ -1549,6 +1763,8 @@ public abstract class BaseApp extends MIDlet implements CommandListener
             processed = true;
             break;
           }
+					default:
+						break;
         }
       }
     }
@@ -1563,12 +1779,41 @@ public abstract class BaseApp extends MIDlet implements CommandListener
    * @param c2 Second command
    */
   public static void setup(final Displayable d, final Command c1, final Command c2) {
-    d.setCommandListener(BaseApp.midlet);
-    if (c1 != null) {
-      d.addCommand(c1);
+		//#ifdef DLOGGING
+		Logger logger = Logger.getLogger("BaseApp");
+		logger.finest("setup d,c1,c2,is FeatureForm,is FeatureList=" +
+				((d == null) ? "null" : d.getClass().getName()) + "," +
+				((c1 == null) ? "null" : c1.getLabel()) + "," +
+				((c2 == null) ? "null" : c2.getLabel()) + "," +
+				((d == null) ? "null" : String.valueOf(d instanceof FeatureForm)) + "," +
+				((d == null) ? "null" : String.valueOf(d instanceof FeatureList)));
+			;
+		//#endif
+		try {
+			if ((d instanceof FeatureForm) || (d instanceof FeatureList)) {
+				d.setCommandListener(BaseApp.midlet);
+			} else {
+				FeatureMgr featureMgr = new FeatureMgr(d);
+				if (d instanceof CommandListener) {
+					featureMgr.setCommandListener((CommandListener)d, false);
+				} else {
+					featureMgr.setCommandListener(BaseApp.midlet, false);
+				}
+				d.setCommandListener(featureMgr);
+			}
+			if (c1 != null) {
+				d.addCommand(c1);
+			}
+			if (c2 != null) {
+				d.addCommand(c2);
+			}
     }
-    if (c2 != null) {
-      d.addCommand(c2);
+    catch (Throwable ex) {
+      System.err.println("setup error");
+			ex.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("setup error", ex);
+			//#endif
     }
   }
 
@@ -1682,6 +1927,17 @@ public abstract class BaseApp extends MIDlet implements CommandListener
     BaseApp.display.setCurrent(anAlert, aNext);
   }
 
+	//#ifdef DMIDP20
+  /**
+   * Set the current display
+   *
+   * @param aDisplay
+   */
+	public static void setDisplayItem(Item aItem) {
+    BaseApp.display.setCurrentItem(aItem);
+  }
+	//#endif
+
   /**
    * Retrieves the system property, and returns it, or def if it is null.
    *
@@ -1694,6 +1950,7 @@ public abstract class BaseApp extends MIDlet implements CommandListener
       sValue = System.getProperty(sName);
     }
     catch (final Exception e) {
+			e.printStackTrace();
     }
     return (sValue == null ? def : sValue);
   }
@@ -1704,6 +1961,7 @@ public abstract class BaseApp extends MIDlet implements CommandListener
       sValue = getAppProperty(sName);
     }
     catch (final Exception e) {
+			e.printStackTrace();
     }
     return (sValue == null ? def : sValue);
   }
