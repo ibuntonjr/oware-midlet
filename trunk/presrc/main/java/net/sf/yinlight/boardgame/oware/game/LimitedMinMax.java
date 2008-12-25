@@ -2,6 +2,9 @@
  * Copyright (C) 2002-2004 Salamon Andras
  * Copyright (C) 2006-2008 eIrOcA (eNrIcO Croce & sImOnA Burzio)
  *
+ * This software was modified 2008-12-14.  The original file was
+ * GameMinMax.java in mobilesuite.sourceforge.net project.
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
