@@ -1,7 +1,8 @@
 /** GPL >= 2.0
  *
  * This software was modified 2008-12-09.  The original file was alphabet.c
- * in http://oware.ivorycity.com/.
+ * in http://oware.ivorycity.com/. Also, some code was taken from 
+ * GameMinMax.java in mobilesuite.sourceforge.net project.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,11 +45,10 @@ public final class OwareMinMax extends GameMinMax {
 	/* Array of heuristics.  Each elmement is a different skill level. */
 	static private OwareHeuristic[] heuristics = new OwareHeuristic[256];
 	static private int gheuristic = 0;
-	private boolean gcancel = false;
 
 	//#ifdef DLOGGING
 	private Logger logger = Logger.getLogger("OwareMinMax");
-	private boolean fineLoggable = logger.isLoggable(Level.FINE);
+	private boolean finerLoggable = logger.isLoggable(Level.FINER);
 	private boolean finestLoggable = logger.isLoggable(Level.FINEST);
 	//#endif
 
@@ -71,7 +71,7 @@ public final class OwareMinMax extends GameMinMax {
 		try {
 
 			//#ifdef DLOGGING
-			if (finestLoggable) {logger.finest("alphabetaPly start depth,player,heuristic,bestmax,bestmin=" + depth + "," + player + "," + heuristic + "," + bestmax + "," + bestmin);}
+			if (finerLoggable) {logger.finer("alphabetaPly start depth,player,heuristic,bestmax,bestmin=" + depth + "," + player + "," + heuristic + "," + bestmax + "," + bestmin);}
 			//#endif
 
 			if (GameMinMax.cancelled) {
@@ -86,32 +86,52 @@ public final class OwareMinMax extends GameMinMax {
 			//#ifdef DLOGGING
 			if (finestLoggable) {logger.finest("alphabetaPly 2 depth,player,heuristic,bestmax,bestmin,pMoves.length=" + depth + "," + player + "," + heuristic + "," + bestmax + "," + bestmin + "," + pMoves.length);}
 			//#endif
+			int result = bestmin;
 			for (int i = 0; (i < pMoves.length); ++i)
 			{
-				int result;
 				OwareTable testTable = new OwareTable(table);
 
+				if (GameMinMax.cancelled) {
+					return null;
+				}
+
 				if (!OwareGame.turn(table, player, (OwareMove)pMoves[i], testTable)) {
+					//#ifdef DLOGGING
+					if (finestLoggable) {logger.finest("alphabetaPly turn continue i,row,col=" + i + ",(" + pMoves[i].row + "," + pMoves[i].col + ")");}
+					//#endif
 					continue; /*An illegal move*/
 				}
+				//#ifdef DLOGGING
+				if (finestLoggable) {logger.finest("alphabetaPly turn process i,row,col=" + i + ",(" + pMoves[i].row + "," + pMoves[i].col + ")");}
+				//#endif
 
 				if (bestmove == null) {
 					bestmove = new OwareMove(pMoves[i]);
+					bestmove.setPoint(0);
 				}
 
-				if( (depth==0) || OwareGame.isGameEnded(testTable)) {
-					result = OwareMinMax.heuristics[heuristic].getResult(player, testTable);
+				if( (depth<=0) || OwareGame.isGameEnded(testTable)) {
+					int tmpResult = OwareMinMax.heuristics[heuristic].getResult(player, testTable);
+					if (tmpResult > (byte)result) {
+						bestmove = new OwareMove(pMoves[i]);
+						bestmove.setPoint(tmpResult);
+						result = tmpResult;
+					}
 				} else {
 					//#ifdef DLOGGING
-					if (finestLoggable) {logger.finest("alphabetaPly recursive depth - 1,player,heuristic,bestmax,bestmin=" + (depth - 1) + "," + player + "," + heuristic + "," + bestmax + "," + bestmin);}
+					if (finerLoggable) {logger.finer("alphabetaPly recursive i,row,col,depth - 1,player,heuristic,bestmax,bestmin=" + i + ",(" + pMoves[i].row + "," + pMoves[i].col + ")," + (depth - 1) + "," + player + "," + heuristic + "," + bestmax + "," + bestmin);}
 					//#endif
 
-					OwareMove tmpmove = alphabetaPly( depth - 1, testTable, player, g, heuristic, bestmax, bestmin);
+					OwareMove tmpmove = alphabetaPly( depth - 1, testTable,
+							(byte) (1 - player), g, heuristic, bestmax, bestmin);
 					if (tmpmove == null) {
 						continue;
 					}
-					bestmove = tmpmove;
-					result = bestmove.getPoint();
+					if (-tmpmove.getPoint() > result) {
+						bestmove = new OwareMove(pMoves[i]);
+						bestmove.setPoint(-tmpmove.getPoint());
+						result = bestmove.getPoint();
+					}
 				}
 
 				// FIX?
@@ -158,7 +178,7 @@ public final class OwareMinMax extends GameMinMax {
 			return null;
 			//#ifdef DLOGGING
 		} finally {
-			if (finestLoggable) {logger.finest("alphabetaPly return bestmove.row,bestmove.col,bestmove.getPoint(),depth,player,bestmax,bestmin=" + ((bestmove == null) ? "bestmove is null" : (bestmove.row + "," + bestmove.col + "," + bestmove.getPoint())) + "," + depth + "," + player + "," + bestmax + "," + bestmin);}
+			if (finerLoggable) {logger.finer("alphabetaPly return bestmove.row,bestmove.col,bestmove.getPoint(),depth,player,bestmax,bestmin=(" + ((bestmove == null) ? "bestmove is null" : (bestmove.row + "," + bestmove.col + ")," + bestmove.getPoint())) + "," + depth + "," + player + "," + bestmax + "," + bestmin);}
 			//#endif
 		}
 	}
@@ -166,10 +186,9 @@ public final class OwareMinMax extends GameMinMax {
   public GameMove minimax(final int depth, final GameTable state, final byte player, final TwoPlayerGame tpg, final boolean alphabeta, final int alpha, final boolean order, final boolean kill, final GameMove killerMove) {
 		OwareMove bestmove = null;
 		try {
-			int result;
 			OwareTable testTable = new OwareTable((OwareTable)state);
 			//#ifdef DLOGGING
-			if (finestLoggable) {logger.finest("minimax start depth,player=" + depth + "," + player);}
+			if (finerLoggable) {logger.finer("OwareMinMax minimax start depth,player=" + depth + "," + player);}
 			//#endif
 			if (depth == 0) {
 				return null;
@@ -198,7 +217,7 @@ public final class OwareMinMax extends GameMinMax {
 			return null;
 			//#ifdef DLOGGING
 		} finally {
-			if (finestLoggable) {logger.finest("minimax return bestmove.row,bestmove.col,bestmove.getPoint(),depth,player=" + ((bestmove == null) ? "bestmove is null" : (bestmove.row + "," + bestmove.col + "," + bestmove.getPoint())) + "," + depth + "," + player);}
+			if (finerLoggable) {logger.finer("minimax return bestmove.row,bestmove.col,bestmove.getPoint(),depth,player=(" + ((bestmove == null) ? "bestmove is null" : (bestmove.row + "," + bestmove.col + ")," + bestmove.getPoint())) + "," + depth + "," + player);}
 			//#endif
 		}
 	}
