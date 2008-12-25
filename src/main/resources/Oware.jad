@@ -11,13 +11,17 @@ MIDlet-Icon: /owareicon32x32.png
 MIDlet-Description: Oware Game
 MicroEdition-Configuration: @JCLDCVERS@
 MicroEdition-Profile: @JMIDPVERS@
-english-add-new-feed: Add new feed
-english-back: Back
-jlomicro-level: FINEST
-jlomicro-handlers: ConsoleHandler
+oware-graphics: @GRAPHICS@
 jlomicro-ConsoleHandler-formatter: SimpleFormatter
-jlomicro-FormHandler-limit: 1000
+jlomicro-FileHandler-formatter: SimpleFormatter
+jlomicro-FileHandler-limit: 1000
+jlomicro-FileHandler-name: file:///root1/testdata/log1.txt
+jlomicro-FormHandler-append: true
 jlomicro-FormHandler-formatter: SimpleFormatter
-jlomicro-RecStoreHandler-limit: 1000
+jlomicro-FormHandler-limit: 1000
+jlomicro-FormHandler-name: Log
+jlomicro-RecStoreHandler-append: true
 jlomicro-RecStoreHandler-formatter: SimpleFormatter
-jlomicro-com-substanceofcode-utils-SortUtil-level: OFF
+jlomicro-RecStoreHandler-limit: 1000
+jlomicro-handlers: ConsoleHandler RecStoreHandler
+jlomicro-level: TRACE
