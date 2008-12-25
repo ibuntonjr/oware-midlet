@@ -99,14 +99,7 @@ public abstract class TwoPlayerGame {
    * @param player Player.
    * @return Goodness of the position.
    */
-  public int getTblPoint(final GameTable t, final byte player) {
-		GameTable g = getTable();
-		byte p = getPlayer();
-    setTable(t, player, true);
-    int point = getPoint();
-    setTable(g, p, true);
-    return point;
-  }
+  public abstract int getTblPoint(final GameTable t, final byte player);
 
   /**
    * List of possible moves.
