@@ -178,7 +178,13 @@ public final class OwareGame extends TwoPlayerGame {
 			if (changed) {
 				if (animated) {
 					tables = new GameTable[vTables.size()];
-					vTables.copyInto(tables);
+					try {
+						vTables.copyInto(tables);
+					} catch (Throwable e) {
+						for (int i = 0; i < vTables.size(); ++i) {
+							tables[i] = (GameTable) vTables.elementAt(i);
+						}
+					}
 				}
 				else {
 					tables = new GameTable[1];
@@ -258,6 +264,8 @@ public final class OwareGame extends TwoPlayerGame {
 									numSecondFreeNeighbours += 1;
 							}
 							break;
+						default:
+							break;
 					}
 				}
 			}
@@ -267,14 +275,12 @@ public final class OwareGame extends TwoPlayerGame {
 			if (finestLoggable) {logger.finest("eval pointFirstPlayer,pointSecondPlayer,numFirstPlayer,numSecondPlayer,rTable.getPassNum()=" + pointFirstPlayer + "," + pointSecondPlayer + "," + numFirstPlayer + "," + numSecondPlayer + "," + rTable.getPassNum());}
 			//#endif
 			point = pointFirstPlayer - pointSecondPlayer;
-			if (lazyProcess) {
-				if (isGameEnded()) {
-					if (point > 0) {
-						point += GameMinMax.MAX_POINT;
-					}
-					else if (point < 0) {
-						point -= GameMinMax.MAX_POINT;
-					}
+			if (lazyProcess && isGameEnded()) {
+				if (point > 0) {
+					point += GameMinMax.MAX_POINT;
+				}
+				else if (point < 0) {
+					point -= GameMinMax.MAX_POINT;
 				}
 			}
 			if (rPlayer == 1) {
@@ -314,7 +320,8 @@ public final class OwareGame extends TwoPlayerGame {
 
   public int getTblPoint(final GameTable table, final byte player) {
     if (!(table instanceof OwareTable)) { return 0; }
-    return (0 - player) * (((OwareTable)rTable).getPoint((byte)0) - ((OwareTable)rTable).getPoint((byte)1));
+    return (((OwareTable)rTable).getPoint(player) -
+				((OwareTable)rTable).getPoint((byte)(1 - player)));
   }
 
   public boolean hasPossibleMove(final GameTable table, final byte player) {
@@ -396,7 +403,13 @@ public final class OwareGame extends TwoPlayerGame {
 				moves.addElement(new OwareMove(OwareTable.NBR_ROW, OwareTable.NBR_COL));
 			}
 			final GameMove[] retMoves = new OwareMove[moves.size()];
-		  moves.copyInto(retMoves);
+			try {
+				moves.copyInto(retMoves);
+			} catch (Throwable e) {
+				for (int m = 0; m < moves.size(); ++m) {
+					retMoves[m] = (GameMove) moves.elementAt(m);
+				}
+			}
 			return retMoves;
 		} catch (Throwable e) {
 			e.printStackTrace();
