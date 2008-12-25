@@ -23,11 +23,13 @@ import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Gauge;
 import net.eiroca.j2me.app.BaseApp;
+import com.substanceofcode.rssreader.presentation.FeatureForm;
+
 
 /**
 	* Game UI settings such as vibrate, audio, backlight, 
 	*/
-public class GameUISettings extends Form {
+public class GameUISettings extends FeatureForm {
 
   public static ChoiceGroup stVibrate = null;
   public static ChoiceGroup stBackLight = null;
