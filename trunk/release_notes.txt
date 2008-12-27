@@ -1,1 +1,6 @@
-1.0 2008-12-24 Alpha 1 Version
+1.0 2008-12-27 Alpha 2 Version
++ Handle grand slam variations.  
++ Don't allow move if opponent has no seeds.  
++ Support changes in max holes captured.
++ Fix redo
++ Fix JAR URL
