@@ -256,6 +256,7 @@ public final class OwareTable implements GameTable {
 			if (removeTbls.size() == 0) {
 				return null;
 			}
+			
 			if (addTbls.size() >= NBR_MAX_STACK) {
 				addTbls.removeElementAt(NBR_MAX_STACK - 1);
 			}
@@ -268,12 +269,18 @@ public final class OwareTable implements GameTable {
 
 	public boolean checkLastTable() {
 		synchronized(this) {
+			//#ifdef DLOGGING
+			if (traceLoggable) {logger.trace("checkLastTable prevTbls.size(),redoTbls.size()=" + "," + prevTbls.size() + "," + redoTbls.size());}
+			//#endif
 			return ((prevTbls.size() > 0) && (redoTbls.size() < NBR_MAX_STACK));
 		}
 	}
 
 	public boolean checkLastRedoTable() {
 		synchronized(this) {
+			//#ifdef DLOGGING
+			if (traceLoggable) {logger.trace("checkLastRedoTable redoTbls.size(),prevTbls.size()=" + "," + redoTbls.size() + "," + prevTbls.size());}
+			//#endif
 			return ((redoTbls.size() > 0) && (prevTbls.size() < NBR_MAX_STACK));
 		}
 	}
