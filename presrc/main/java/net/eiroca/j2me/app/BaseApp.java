@@ -44,6 +44,9 @@
 @DTESTDEF@
 // Expand to define logging define
 @DLOGDEF@
+//#ifdef DLARGEMEM
+//#define DREGULARMEM
+//#endif
 package net.eiroca.j2me.app;
 
 import java.io.ByteArrayInputStream;
@@ -429,7 +432,7 @@ public abstract class BaseApp extends MIDlet implements CommandListener
     return maxWidth;
   }
 
-	//#ifdef LARGE_APP
+	//#ifdef DLARGEMEM
   /**
    * Remove any tag
    *
@@ -450,6 +453,15 @@ public abstract class BaseApp extends MIDlet implements CommandListener
         plainText.append(BaseApp.CR);
       }
       htmlEndIndex = htmlText.indexOf(">", htmlStartIndex);
+			// If we have unmatched '<' without '>' stop or we
+			// get into infinate loop.
+			if (htmlEndIndex < 0) {
+				//#ifdef DLOGGING
+				if (finerLoggable) {logger.finer("No end > for htmlStartIndex,htmlText=" + htmlStartIndex + "," + htmlText);}
+				if (finerLoggable) {logger.finer("plainText=" + plainText);}
+				//#endif
+				break;
+			}
       htmlText = htmlText.substring(htmlEndIndex + 1);
       htmlStartIndex = htmlText.indexOf("<", 0);
     }
@@ -679,7 +691,7 @@ public abstract class BaseApp extends MIDlet implements CommandListener
     return sb.toString();
   }
 
-	//#ifdef LARGE_APP
+	//#ifdef DLARGEMEM
   /*
    * URL
    */
@@ -779,7 +791,7 @@ public abstract class BaseApp extends MIDlet implements CommandListener
    * Vector
    */
 
-	//#ifdef LARGE_APP
+	//#ifdef DLARGEMEM
   /**
    * Quick Sort
    */
@@ -1144,7 +1156,9 @@ public abstract class BaseApp extends MIDlet implements CommandListener
 				im = Image.createImage(sb.toString());
 			}
 			catch (final IOException e) {
+				//#ifdef DLOGGING
 				logger.warning("createImage res not present =" + res);
+				//#endif
 			}
 			if (im == null) {
 				sb = new StringBuffer(basepath).append(res);
@@ -1966,7 +1980,7 @@ public abstract class BaseApp extends MIDlet implements CommandListener
     return (sValue == null ? def : sValue);
   }
 
-	//#ifdef LARGE_APP
+	//#ifdef DLARGEMEM
   /**
    * Checks to see if a given class/interface exists in this Java
    * implementation.
