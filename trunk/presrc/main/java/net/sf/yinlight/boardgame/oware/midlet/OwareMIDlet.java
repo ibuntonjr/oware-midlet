@@ -48,7 +48,9 @@ import net.eiroca.j2me.game.GameScreen;
 import net.eiroca.j2me.game.tpg.GameMinMax;
 import net.sf.yinlight.boardgame.oware.game.ui.OwareScreen;
 import net.sf.yinlight.boardgame.oware.game.OwareGame;
+import net.sf.yinlight.boardgame.oware.game.OwareTable;
 import com.substanceofcode.rssreader.presentation.FeatureForm;
+import com.substanceofcode.rssreader.presentation.FeatureMgr;
 
 
 //#ifdef DLOGGING
@@ -83,6 +85,13 @@ public class OwareMIDlet extends GameApp {
   final public static int MSG_AILEVEL4 = GameApp.MSG_USERDEF + MSG_OFFSET++; // 10
   final public static int MSG_NAMEPLAYER1 = GameApp.MSG_USERDEF + MSG_OFFSET++;
   final public static int MSG_NAMEPLAYER2 = GameApp.MSG_USERDEF + MSG_OFFSET++;
+  final public static int MSG_MAX_HOLES = GameApp.MSG_USERDEF + MSG_OFFSET++;
+  final public static int MSG_GRAND_SLAM = GameApp.MSG_USERDEF + MSG_OFFSET++;
+  final public static int MSG_GRAND_SLAM1 = GameApp.MSG_USERDEF + MSG_OFFSET++;
+  final public static int MSG_GRAND_SLAM2 = GameApp.MSG_USERDEF + MSG_OFFSET++;
+  final public static int MSG_GRAND_SLAM3 = GameApp.MSG_USERDEF + MSG_OFFSET++;
+  final public static int MSG_GRAND_SLAM4 = GameApp.MSG_USERDEF + MSG_OFFSET++;
+  final public static int MSG_GRAND_SLAM5 = GameApp.MSG_USERDEF + MSG_OFFSET++;
   final public static int MSG_GOODLUCK = GameApp.MSG_USERDEF + MSG_OFFSET++;
   final public static int MSG_THINKING = GameApp.MSG_USERDEF + MSG_OFFSET++;
   final public static int MSG_INVALIDMOVE = GameApp.MSG_USERDEF + MSG_OFFSET++;
@@ -95,13 +104,14 @@ public class OwareMIDlet extends GameApp {
   final public static int MSG_PASS = GameApp.MSG_USERDEF + MSG_OFFSET++;
   final public static int MSG_LEVELPREFIX = GameApp.MSG_USERDEF + MSG_OFFSET++;
 
-  public static final short GA_UNDO = (short)GameApp.GA_USERDEF + 0;
-  public static final short GA_REDO = (short)GameApp.GA_USERDEF + 1;
+  public static short ACTION_OFFSET = 0;
+  public static final int GA_UNDO = GameApp.GA_USERDEF + 0;
+  public static final int GA_REDO = GameApp.GA_USERDEF + 1;
 	//#ifdef DMIDP10
-  public static final short GA_PAUSE = (short)GameApp.GA_USERDEF + 2;
+  public static final int GA_PAUSE = GameApp.GA_USERDEF + 2;
 	//#endif
 	//#ifdef DLOGGING
-  public static final short GA_LOGGING = (short)GameApp.GA_USERDEF + 2;
+  public static final int GA_LOGGING = GameApp.GA_USERDEF + 3;
 	//#endif
 
   public static String[] playerNames;
@@ -111,6 +121,8 @@ public class OwareMIDlet extends GameApp {
   protected ChoiceGroup opPlayers;
   protected ChoiceGroup opLevel;
   protected ChoiceGroup opDept;
+  protected ChoiceGroup opMaxHoles;
+  protected ChoiceGroup opGrandSlam;
 	//#ifdef DLOGGING
   protected TextField opLogLevel;
 	//#endif
@@ -124,6 +136,8 @@ public class OwareMIDlet extends GameApp {
   public static int gsLevel = gsLevelDifficult;
 	/* Dept.  Number of moves that the AI tests. */
   public static int gsDept = 3;
+  public static int gsMaxHoles = OwareTable.NBR_COL;
+  public static int gsGrandSlam = 1;
 
 	//#ifdef DLOGGING
   private boolean fineLoggable;
@@ -149,9 +163,9 @@ public class OwareMIDlet extends GameApp {
         }, {
             GameApp.ME_MAINMENU, GameApp.MSG_MENU_MAIN_NEWGAME, GameApp.GA_NEWGAME, 1
         }, {
-            GameApp.ME_MAINMENU, OwareMIDlet.MSG_MENU_MAIN_UNDO, OwareMIDlet.GA_UNDO, 2
+            GameApp.ME_MAINMENU, OwareMIDlet.MSG_MENU_MAIN_UNDO, (short)OwareMIDlet.GA_UNDO, 2
         }, {
-            GameApp.ME_MAINMENU, OwareMIDlet.MSG_MENU_MAIN_REDO, OwareMIDlet.GA_REDO, 3
+            GameApp.ME_MAINMENU, OwareMIDlet.MSG_MENU_MAIN_REDO, (short)OwareMIDlet.GA_REDO, 3
         }, {
             GameApp.ME_MAINMENU, GameApp.MSG_MENU_MAIN_OPTIONS, GameApp.GA_OPTIONS, 4
         }, {
@@ -160,9 +174,9 @@ public class OwareMIDlet extends GameApp {
             GameApp.ME_MAINMENU, GameApp.MSG_MENU_MAIN_ABOUT, GameApp.GA_ABOUT, 6
 				//#ifdef DLOGGING
         }, {
-            GameApp.ME_MAINMENU, OwareMIDlet.MSG_MENU_MAIN_LOGGING, OwareMIDlet.GA_LOGGING, 6
+            GameApp.ME_MAINMENU, OwareMIDlet.MSG_MENU_MAIN_LOGGING, (short)OwareMIDlet.GA_LOGGING, 6
         }, {
-            GameApp.ME_MAINMENU, OwareMIDlet.MSG_MENU_MAIN_LOGGING, OwareMIDlet.GA_LOGGING, 6
+            GameApp.ME_MAINMENU, OwareMIDlet.MSG_MENU_MAIN_LOGGING, (short)OwareMIDlet.GA_LOGGING, 6
 				//#endif
         }
     };
@@ -231,26 +245,25 @@ public class OwareMIDlet extends GameApp {
   protected Displayable getOptions() {
 		try {
 			final Form form = new FeatureForm(BaseApp.messages[GameApp.MSG_MENU_MAIN_OPTIONS]);
-			opPlayers = new ChoiceGroup(BaseApp.messages[OwareMIDlet.MSG_GAMEMODE], Choice.EXCLUSIVE);
-			opPlayers.append(BaseApp.messages[OwareMIDlet.MSG_GAMEMODE1], null);
-			opPlayers.append(BaseApp.messages[OwareMIDlet.MSG_GAMEMODE2], null);
-			opLevel = new ChoiceGroup(BaseApp.messages[OwareMIDlet.MSG_AILEVEL], Choice.EXCLUSIVE);
-			opLevel.append(BaseApp.messages[OwareMIDlet.MSG_AILEVEL1], null);
-			opLevel.append(BaseApp.messages[OwareMIDlet.MSG_AILEVEL2], null);
-			opLevel.append(BaseApp.messages[OwareMIDlet.MSG_AILEVEL3], null);
+			opPlayers = FeatureMgr.createChoiceGroup(OwareMIDlet.MSG_GAMEMODE,
+					Choice.EXCLUSIVE, new int[] {
+			OwareMIDlet.MSG_GAMEMODE1, OwareMIDlet.MSG_GAMEMODE2});
+			opLevel = FeatureMgr.createChoiceGroup(OwareMIDlet.MSG_AILEVEL,
+					Choice.EXCLUSIVE,
+					new int[] { OwareMIDlet.MSG_AILEVEL1,
+			OwareMIDlet.MSG_AILEVEL2, OwareMIDlet.MSG_AILEVEL3});
 			/* FIX
 			opLevel.append(BaseApp.messages[OwareMIDlet.MSG_AILEVEL4], null);
 			*/
-			opDept = new ChoiceGroup(BaseApp.messages[OwareMIDlet.MSG_AILEVEL],
-			//#ifdef DMIDP20
-					Choice.POPUP
-			//#else
-					Choice.EXCLUSIVE
-			//#endif
-					);
-			for (int i = 1; i <= 14; i++) {
-				opDept.append(Integer.toString(i), null);
-			}
+			opDept = FeatureMgr.createNumRange(OwareMIDlet.MSG_AILEVEL, 14);
+			opMaxHoles = FeatureMgr.createNumRange(OwareMIDlet.MSG_MAX_HOLES,
+					OwareTable.NBR_COL);
+			opGrandSlam = FeatureMgr.createChoiceGroup(
+					OwareMIDlet.MSG_GRAND_SLAM,
+					Choice.EXCLUSIVE,
+					new int[] { OwareMIDlet.MSG_GRAND_SLAM1,
+			OwareMIDlet.MSG_GRAND_SLAM2, OwareMIDlet.MSG_GRAND_SLAM2,
+			OwareMIDlet.MSG_GRAND_SLAM3, OwareMIDlet.MSG_GRAND_SLAM4});
 			//#ifdef DLOGGING
 			opLogLevel = new TextField("Logging level",
 							logger.getParent().getLevel().getName(), 20, TextField.ANY);
@@ -258,6 +271,8 @@ public class OwareMIDlet extends GameApp {
 			form.append(opPlayers);
 			form.append(opLevel);
 			form.append(opDept);
+			form.append(opMaxHoles);
+			form.append(opGrandSlam);
 			//#ifdef DLOGGING
 			form.append(opLogLevel);
 			//#endif
@@ -281,6 +296,8 @@ public class OwareMIDlet extends GameApp {
 			opPlayers.setSelectedIndex(OwareMIDlet.gsPlayer - 1, true);
 			opLevel.setSelectedIndex(OwareMIDlet.gsLevel - 1, true);
 			opDept.setSelectedIndex(OwareMIDlet.gsDept - 1, true);
+			opMaxHoles.setSelectedIndex(OwareMIDlet.gsMaxHoles - 1, true);
+			opGrandSlam.setSelectedIndex(OwareMIDlet.gsGrandSlam, true);
 			//#ifdef DLOGGING
 			opLogLevel.setString(
 							logger.getParent().getLevel().getName());
@@ -321,6 +338,8 @@ public class OwareMIDlet extends GameApp {
 			OwareMIDlet.gsPlayer = opPlayers.getSelectedIndex() + 1;
 			OwareMIDlet.gsLevel = opLevel.getSelectedIndex() + 1;
 			OwareMIDlet.gsDept = opDept.getSelectedIndex() + 1;
+			OwareMIDlet.gsMaxHoles = opMaxHoles.getSelectedIndex() + 1;
+			OwareMIDlet.gsGrandSlam = opGrandSlam.getSelectedIndex();
 			((OwareScreen) GameApp.game).updateSkillInfo();
 			//#ifdef DLOGGING
 			String logLevel = opLogLevel.getString().toUpperCase();
@@ -388,7 +407,7 @@ public class OwareMIDlet extends GameApp {
 						}
 						if (OwareScreen.table.checkLastRedoTable()) {
 							Application.insertMenuItem(gameMenu, GA_REDO);
-							canUndo = true;
+							canRedo = true;
 						}
 					}
 				}
