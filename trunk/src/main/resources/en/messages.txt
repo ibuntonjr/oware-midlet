@@ -35,6 +35,13 @@ Hard
 hard
 Red
 Blue
+Max holes eaten(captured from)
+Grand Slam variation
+Grand Slam illegal
+Grand Slam legal, but no capture
+Grand Slam legal, but remaining stones go to opponent
+Grand Slam legal, but last hole (house) is not captured
+Grand Slam legal, but first hole (house) is not captured
 Good Luck
 Thinking
 Invalid Move
