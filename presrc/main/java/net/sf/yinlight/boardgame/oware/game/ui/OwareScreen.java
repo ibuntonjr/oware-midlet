@@ -280,6 +280,8 @@ public final class OwareScreen extends GameScreen
 				}
 				OwareScreen.turnNum = 1;
 				OwareScreen.table = new OwareTable();
+				OwareScreen.rgame.setMaxHoles(OwareMIDlet.gsMaxHoles);
+				OwareScreen.rgame.setGrandSlam(OwareMIDlet.gsGrandSlam);
 			}
 			updateSkillInfo();
 			setMessage(BaseApp.messages[OwareMIDlet.MSG_GOODLUCK]);
@@ -927,8 +929,8 @@ public final class OwareScreen extends GameScreen
 			logger.severe("processMove error", e);
 			//#endif
 			return false;
-			//#ifdef DLOGGING
 		} finally {
+			//#ifdef DLOGGING
 			if (finerLoggable) {logger.finer("processMove return move.row,move.col,OwareScreen.actPlayer,startForeThinking,tables.length=" + move.row + "," + move.col + "," + OwareScreen.actPlayer + "," + startForeThinking + "," + ((tables == null) ? "tables is null" : String.valueOf(tables.length)));}
 			//#endif
 			super.wakeup(3);
