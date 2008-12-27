@@ -37,6 +37,8 @@ import java.util.Hashtable;
 
 import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
+import javax.microedition.lcdui.Choice;
+import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
@@ -324,5 +326,30 @@ public class FeatureMgr implements CommandListener, Runnable {
     public void setBackground(boolean background) {
         this.background = background;
     }
+
+	public static ChoiceGroup createChoiceGroup(int msgNbr, int choiceType,
+			int[] choiceMsgNbrs) {
+		ChoiceGroup choiceGrp = new ChoiceGroup(BaseApp.messages[msgNbr],
+					choiceType);
+
+		for (int i = 0; i < choiceMsgNbrs.length; i++) {
+			choiceGrp.append(BaseApp.messages[choiceMsgNbrs[i]], null);
+		}
+		return choiceGrp;
+	}
+
+	public static ChoiceGroup createNumRange(int msgNbr, int nbr) {
+		ChoiceGroup numRange = new ChoiceGroup(BaseApp.messages[msgNbr],
+			//#ifdef DMIDP20
+					Choice.POPUP
+			//#else
+					Choice.EXCLUSIVE
+			//#endif
+					);
+			for (int i = 1; i <= nbr; i++) {
+				numRange.append(Integer.toString(i), null);
+			}
+			return numRange;
+	}
 
 }
