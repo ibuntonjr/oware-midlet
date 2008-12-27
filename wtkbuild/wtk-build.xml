@@ -29,6 +29,7 @@
 	<property name="dist.midp20.cldc11" value="${target}/dist/midp20_cldc11" />
 	<property name="dist.midp20.jsr75" value="${target}/dist/midp20_jsr75" />
 	<property name="dist.midp20.cldc11.jsr75" value="${target}/dist/midp20_cldc11_jsr75" />
+	<property name="dist.midp20.cldc11.jsr75.largemem" value="${target}/dist/midp20_cldc11_jsr75.largemem" />
 	<property name="dist.midp20.jsr75_jsr238" value="${target}/dist/midp20_jsr75_jsr238" />
 	<property name="build" value="${target}/build" />
 	<property name="build.midp10" value="${target}/build/midp10" />
@@ -36,6 +37,7 @@
 	<property name="build.midp20.cldc11" value="${target}/build/midp20_cldc11" />
 	<property name="build.midp20.jsr75" value="${target}/build/midp20_jsr75" />
 	<property name="build.midp20.cldc11.jsr75" value="${target}/build/midp20_cldc11_jsr75" />
+	<property name="build.midp20.cldc11.jsr75.largemem" value="${target}/build/midp20_cldc11_jsr75.largemem" />
 	<property name="build.midp20.jsr75.jsr238" value="${target}/build/midp20_jsr75.jsr238" />
 	<property name="classes" value="${target}/classes" />
 	<property name="tmppreprocess" value="${target}/tmppreprocess" />
@@ -656,15 +658,11 @@
 			<move todir="${op.dir}/presrc" >
 				<fileset dir="${op.dir}/${svn.src}/presrc" />
 			</move>
-			<move todir="${op.dir}/testpresrc" >
-				<fileset dir="${op.dir}/${svn.src}/testpresrc" />
-			</move>
-			<move todir="${op.dir}/compatpresrc" >
-				<fileset dir="${op.dir}/${svn.src}/compatpresrc" />
-			</move>
+			<!-- undo
 			<move todir="${op.dir}/testdata" >
 				<fileset dir="${op.dir}/${svn.src}/testdata" />
 			</move>
+			-->
 			<!-- undo
 			<move todir="${op.dir}/translations" >
 				<fileset dir="${op.dir}/${svn.src}/translations" />
@@ -676,17 +674,16 @@
 			<move todir="${op.dir}/wtkbuild" >
 				<fileset dir="${op.dir}/${svn.src}/wtkbuild" />
 			</move>
-			<copy todir="${dist}" file="${op.dir}/${svn.src}/Oware.alx" />
 			<copy todir="${dist}" file="${op.dir}/${svn.src}/gpl.txt" />
 			<move todir="${op.dir}" >
 				<fileset file="${op.dir}/${svn.src}/release_notes.txt" />
 				<fileset file="${op.dir}/${svn.src}/gpl.txt" />
-				<fileset file="${op.dir}/${svn.src}/Oware.alx" />
-				<fileset file="${op.dir}/${svn.src}/build.xml" />
 			</move>
+			<!-- undo
 			<move todir="${op.dir}/nbproject" >
 				<fileset dir="${op.dir}/${svn.src}/nbproject" />
 			</move>
+			-->
 			<delete dir="${op.dir}/${svn.src}" />
 			</then>
 		</if>
@@ -1047,6 +1044,16 @@
 		</antcall>
 	</target>
 
+	<target name="dist.midp.2.0.cldc.1.1.jsr75.largemem" unless="no.2.0.cldc.1.1.jsr75.largemem" >
+		<antcall target="dist.version" inheritAll="true" >
+			<param name="wtk.properties" value="wtk2.0large.cldc1.1.jsr75.properties${wtk.template}" />
+			<param name="dist.vers" value="${dist.midp20.cldc11.jsr75.largemem}" />
+			<param name="build.vers" value="${build.midp20.cldc11.jsr75.largemem}" />
+			<param name="no.test" value="true" />
+			<param name="no.staging" value="true" />
+		</antcall>
+	</target>
+
 	<target name="log.midp.2.0.cldc.1.1.jsr75" unless="no.2.0.cldc.1.1.jsr75" >
 		<property name="obfuscate" value="yes" />
 		<property file="${basedir}/test.properties${test.template}" />
@@ -1149,6 +1156,10 @@
 			<param name="release.buildno" value="true" />
 		</antcall>
 		<antcall target="dist.midp.2.0.cldc.1.1.jsr75" >
+			<param name="build.number" value="${build.number}" />
+			<param name="release.buildno" value="true" />
+		</antcall>
+		<antcall target="dist.midp.2.0.cldc.1.1.jsr75.largemem" >
 			<param name="build.number" value="${build.number}" />
 			<param name="release.buildno" value="true" />
 		</antcall>
