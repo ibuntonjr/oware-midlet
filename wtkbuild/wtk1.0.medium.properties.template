@@ -13,6 +13,6 @@ DMEMSIZEDEF = DMEDIUMMEM
 JMIDPVERS = MIDP-1.0
 JCLDCVERS = CLDC-1.0
 file.prefix = midp10_
-bin = ../bin10
+bin = ${target}/bin10
 MIDLETVERS = ${MIDLETVERSROOT}
 SUFFIXVERS = 1.0
