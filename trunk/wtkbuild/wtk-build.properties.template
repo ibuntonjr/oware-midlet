@@ -59,7 +59,7 @@ wtk.workspace.proj = /DOCUME~1/irvb/j2mewtk/2.5.2/apps
 midlet.home = ${wtk.workspace.proj}/apps/${project.name}
 prc.creater = OURI
 prc.longname = RSS/News/Blog Reader
-MIDLETURL_ROOT = http://oware.googlecode.com/files
+MIDLETURL_ROOT = http://oware-midlet.googlecode.com/files
 MIDLETVERSROOT = 0.1
 separator = /
 #Need vers with '_' to allow uploading to sites that get confused by to
@@ -114,6 +114,4 @@ res.todir =
 #Compile test ui
 #testui.presrc = ../testpresrc
 docs = ../docs
-jadsrc = ../jadsrc
-alxsrc = ../alxsrc
 debug = debug
