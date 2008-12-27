@@ -20,6 +20,8 @@
 @DMIDPVERS@
 // Expand to define CLDC define
 @DCLDCVERS@
+// Expand to define logging define
+@DLOGDEF@
 package net.eiroca.j2me.game;
 
 import javax.microedition.lcdui.Graphics;
@@ -28,6 +30,11 @@ import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.game.GameCanvas;
 //#else
 import javax.microedition.lcdui.Canvas;
+//#endif
+
+//#ifdef DLOGGING
+import net.sf.jlogmicro.util.logging.Logger;
+import net.sf.jlogmicro.util.logging.Level;
 //#endif
 
 /**
@@ -53,6 +60,13 @@ Canvas
   protected GameThread animationThread;
   public String name;
   public Score score;
+
+  //#ifdef DLOGGING
+  private Logger logger = Logger.getLogger("GameScreen");
+  private boolean fineLoggable = logger.isLoggable(Level.FINE);
+  private boolean finerLoggable = logger.isLoggable(Level.FINER);
+  private boolean finestLoggable = logger.isLoggable(Level.FINEST);
+  //#endif
 
   public GameScreen(final GameApp aMidlet, final boolean suppressKeys, final boolean fullScreen) {
 		//#ifdef DMIDP20
