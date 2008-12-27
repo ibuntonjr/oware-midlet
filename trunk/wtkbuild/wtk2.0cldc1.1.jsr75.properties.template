@@ -14,6 +14,6 @@ DCLDCVERS = DCLDCV11
 JMIDPVERS = MIDP-2.0 
 JCLDCVERS = CLDC-1.1
 file.prefix = midp20_cldc11_jsr75_
-bin = ../bin20cldc11jsr75
+bin = ${target}/bin20cldc11jsr75
 MIDLETVERS = ${MIDLETVERSROOT}
 SUFFIXVERS =  2.0-cldc1.1-jsr75
