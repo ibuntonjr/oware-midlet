@@ -56,6 +56,13 @@ public final class OwareGame extends TwoPlayerGame {
   protected boolean squareErase;
   protected byte rPlayer;
   protected OwareTable rTable;
+  protected static int maxHoles = OwareTable.NBR_COL;
+  protected static int grandSlam = 0;
+  public static final int GRAND_SLAM_ILLEGAL = 0;
+  public static final int GRAND_SLAM_LEGAL_NO_CAPTURE = 1;
+  public static final int GRAND_SLAM_LEGAL_OPPONENT = 2;
+  public static final int GRAND_SLAM_LEGAL_LAST = 3;
+  public static final int GRAND_SLAM_LEGAL_FIRST = 4;
   protected int[][] tableIntArray = new int[OwareTable.NBR_ROW][OwareTable.NBR_COL];
 
 	//#ifdef DLOGGING
@@ -77,7 +84,8 @@ public final class OwareGame extends TwoPlayerGame {
    * @return    GameTable[]
    * @author Irv Bunton
    */
-  private static GameTable[] _turn(final OwareTable table, final byte player, final OwareMove move, final OwareTable newTable, final boolean animated
+  private static GameTable[] _turn(final OwareTable table, final byte player, final OwareMove move, final OwareTable newTable, final boolean animated,
+			boolean captureAll, boolean noCapture, int captureIx
 			//#ifdef DLOGGING
 			,Logger logger
 			//#endif
@@ -87,7 +95,7 @@ public final class OwareGame extends TwoPlayerGame {
 			final int row = move.row;
 			final int col = move.col;
 			//#ifdef DLOGGING
-			logger.finest("_turn start row,col,player,OwareTable.getPlayerItem(player),table.getItem(row, col),table.getSeeds(row, col)=" + row + "," + col + "," + player + "," + OwareTable.getPlayerItem(player) + "," + table.getItem(row, col) + "," + table.getSeeds(row, col));
+			logger.finest("_turn start row,col,player,OwareTable.getPlayerItem(player),table.getItem(row, col),table.getSeeds(row, col),captureAll,captureIx=" + row + "," + col + "," + player + "," + OwareTable.getPlayerItem(player) + "," + table.getItem(row, col) + "," + table.getSeeds(row, col) + "," + captureAll + "," + captureIx);
 			//#endif
 			/* If the cup is not for the current player, we are not allowed to
 				 do anything with it.  Also, if there are no seeds, you cannot
@@ -152,26 +160,100 @@ public final class OwareGame extends TwoPlayerGame {
 			//#ifdef DLOGGING
 			logger.finest("_turn finished for crow,ccol,lastRow,lastCol,seeds=" + crow + "," + ccol + "," + lastRow + "," + lastCol + "," + seeds);
 			//#endif
-			/* Score points. */
-			if (lastRow != row) {
+			/* Score points/capture. */
+			int holesCaptured = 0;
+			int lastCaptureCol = lastCol;
+			if ((captureAll || (captureIx >= 0)) && (lastRow != row)) {
 				// Move in the opposite direction this time
 				crow = lastRow;
 				ccol = lastCol;
 				int dir = (crow == 0) ? 1 : -1;
 				for (; (ccol >= 0) && (ccol < OwareTable.NBR_COL); ccol += dir) {
-					if ((newTable.getSeeds(crow, ccol) == 2) ||
-						(newTable.getSeeds(crow, ccol) == 3)) {
+					final int cseeds = newTable.getSeeds(crow, ccol);
+					if ((cseeds == 2) || (cseeds == 3)) {
+						if ((captureIx >= 0) && (captureIx == ccol)) {
+							continue;
+						}
 						newTable.setPoint(player, (byte)(newTable.getPoint(player) +
 								newTable.getSeeds(crow, ccol)));
 						//#ifdef DLOGGING
 						logger.finest("_turn capturing crow,ccol,dir,newTable.getSeeds(crow, ccol=" + crow + "," + ccol + "," + dir + "," + newTable.getSeeds(crow, ccol));
 						//#endif
 						newTable.setSeeds(crow, ccol, (byte)0);
+						lastCaptureCol = ccol;
+						if (++holesCaptured > maxHoles) {
+							//#ifdef DLOGGING
+							logger.finest("_turn capturing over max crow,ccol,holesCaptured=" + crow + "," + ccol + "," + holesCaptured);
+							//#endif
+							break;
+						}
 					} else {
 						break;
 					}
 				}
 			}
+
+			boolean emptyHoles = allEmptyHoles(newTable, player);
+
+			if (captureAll && changed && (holesCaptured > 0) && emptyHoles) {
+					switch (grandSlam) {
+					case GRAND_SLAM_ILLEGAL:
+					default:
+						//#ifdef DLOGGING
+						logger.finest("_turn return illegal grand slam player=" + player);
+						//#endif
+						return null;
+					case GRAND_SLAM_LEGAL_NO_CAPTURE:
+						//#ifdef DLOGGING
+						logger.finest("_turn return legal grand slam no capture player=" + player);
+						//#endif
+						return _turn(table, player, move, newTable, animated, false, true,
+							-1	
+							//#ifdef DLOGGING
+							,logger
+							//#endif
+							);
+					case GRAND_SLAM_LEGAL_OPPONENT:
+						crow = player;
+						ccol = 0;
+						for (; ccol < OwareTable.NBR_COL; ccol++) {
+							newTable.setPoint((byte)(1 - player),
+										(byte)(newTable.getPoint((byte)(1 - player)) +
+										newTable.getSeeds(crow, ccol)));
+								//#ifdef DLOGGING
+								logger.finest("_turn capturing opponent crow,ccol,newTable.getSeeds(crow, ccol=" + crow + "," + ccol + "," + newTable.getSeeds(crow, ccol));
+								//#endif
+								newTable.setSeeds(crow, ccol, (byte)0);
+						}
+						break;
+					case GRAND_SLAM_LEGAL_LAST:
+						//#ifdef DLOGGING
+						logger.finest("_turn return legal grand slam take last player=" + player);
+						//#endif
+						return _turn(table, player, move, newTable, animated, false, false,
+							lastCaptureCol	
+							//#ifdef DLOGGING
+							,logger
+							//#endif
+							);
+					case GRAND_SLAM_LEGAL_FIRST:
+						//#ifdef DLOGGING
+						logger.finest("_turn return legal grand slam take first player=" + player);
+						//#endif
+						return _turn(table, player, move, newTable, animated, false, false,
+								lastCol
+							//#ifdef DLOGGING
+							,logger
+							//#endif
+							);
+					}
+			} else if (allEmptyHoles(newTable, 1 - player)) {
+					//#ifdef DLOGGING
+					logger.finest("_turn return illegal opponent has no seeds player=" + player);
+					//#endif
+					return null;
+			}
+			
 			if (animated) {
 				vTables.addElement(new OwareTable(newTable));
 			}
@@ -206,6 +288,43 @@ public final class OwareGame extends TwoPlayerGame {
 		}
   }
 
+	public static boolean allEmptyHoles(OwareTable newTable, int player) {
+		int crow = 1 - player;
+		int ccol = 0;
+		for (; (ccol >= 0) && (ccol < OwareTable.NBR_COL); ccol++) {
+			if (newTable.getSeeds(crow, ccol) > 0) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+  /**
+   * Use the table to determine if a move is possible, then create the
+	 * simulation of the move and put it into newTable (table is not modified)
+	 * and return an array.  If animated, return 
+   *
+   * @param table
+   * @param player
+   * @param move
+   * @param newTable
+   * @param animated
+   * @param animated
+   * @return    GameTable[]
+   * @author Irv Bunton
+   */
+  private static GameTable[] _turn(final OwareTable table, final byte player, final OwareMove move, final OwareTable newTable, final boolean animated
+			//#ifdef DLOGGING
+			,Logger logger
+			//#endif
+			) {
+		return _turn(table, player, move, newTable, animated, true, false, -1
+			//#ifdef DLOGGING
+			,logger
+			//#endif
+			);
+	}
+
   /*
    * Take the turn for the given move for the given player.
 	 *
@@ -215,7 +334,7 @@ public final class OwareGame extends TwoPlayerGame {
    */
   public GameTable[] animatedTurn(final GameTable table, final byte player, final GameMove move, final GameTable newt) {
 		try {
-			return _turn((OwareTable) table, player, (OwareMove) move, (OwareTable) newt, true
+			return _turn((OwareTable) table, player, (OwareMove) move, (OwareTable) newt, true, true, false, -1
 		//#ifdef DLOGGING
 				, logger
 		//#endif
@@ -443,20 +562,39 @@ public final class OwareGame extends TwoPlayerGame {
 		return rPlayer;
 	}
 
-  static public boolean turn(final OwareTable table, final byte player, final OwareMove move, final OwareTable newt) {
-    return OwareGame._turn(table, player, move, newt, false
+  public static boolean turn(final OwareTable table, final byte player, final OwareMove move, final OwareTable newt) {
 		//#ifdef DLOGGING
-				,Logger.getLogger("OwareGame")
+		Logger logger = Logger.getLogger("OwareGame");
 		//#endif
-				) != null;
-  }
-
-  public boolean turn(final GameTable table, final byte player, final GameMove move, final GameTable newt) {
-    return OwareGame._turn((OwareTable) table, player, (OwareMove) move, (OwareTable) newt, false
+    return OwareGame._turn(table, player, move, newt, false, true, false, -1
 		//#ifdef DLOGGING
 				, logger
 		//#endif
 				) != null;
   }
+
+  public boolean turn(final GameTable table, final byte player, final GameMove move, final GameTable newt) {
+    return OwareGame._turn((OwareTable) table, player, (OwareMove) move, (OwareTable) newt, false, true, false, -1
+		//#ifdef DLOGGING
+				, logger
+		//#endif
+				) != null;
+  }
+
+	public void setMaxHoles(int maxHoles) {
+			OwareGame.maxHoles = maxHoles;
+	}
+
+	public int getMaxHoles() {
+			return (OwareGame.maxHoles);
+	}
+
+	public void setGrandSlam(int grandSlam) {
+			OwareGame.grandSlam = grandSlam;
+	}
+
+	public int getGrandSlam() {
+			return (OwareGame.grandSlam);
+	}
 
 }
