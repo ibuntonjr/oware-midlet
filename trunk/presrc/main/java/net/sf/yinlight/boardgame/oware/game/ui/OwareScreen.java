@@ -89,6 +89,7 @@ public final class OwareScreen extends GameScreen
   public int sely;
   public static final int INVALID_KEY_CODE = -2000;
   public int keyCode = INVALID_KEY_CODE;
+  public int[] pointerPress = new int[] {-1, -1};
   private boolean preCalculateMoves = false;
   private Image cup1Image = null;
   //undo private Image cup2Image;
@@ -426,7 +427,10 @@ public final class OwareScreen extends GameScreen
 			boolean onBoard, Image cupImage, int lastMovePoint) {
 		try {
 			final int x = off_x + col * sizex + piece_offx;
-			final int y = off_y + row * sizey + piece_offy;
+			int y = off_y + row * sizey + piece_offy;
+			if (y < 0) {
+				y = off_y;
+			}
 			int lastMove = onBoard ? lastMovePoint : (byte)0;
 			int seeds = onBoard ? OwareScreen.table.getSeeds(row, col) : 0;
 			if (onBoard && (seeds == 0)) {
@@ -584,6 +588,32 @@ public final class OwareScreen extends GameScreen
 		}
 	}
 
+  /**
+   * This is just a quick procedure to prevent a hang due to something
+	 * taking too long.
+	 *
+   * @param keyCode
+   */
+  public void pointerPressed(final int x, final int y) {
+		synchronized(this) {
+			if ((this.pointerPress[0] == -1) && (this.pointerPress[1] == -1)) {
+				this.pointerPress[0] = x;
+				this.pointerPress[1] = y;
+				featureMgr.wakeup(3);
+			}
+		}
+	}
+
+  /**
+   * This is just a quick procedure to prevent a hang due to something
+	 * taking too long.
+	 *
+   * @param keyCode
+   */
+  public void pointerDragged(final int x, final int y) {
+		pointerPressed(x, y);
+	}
+
   public void procKeyPressed(final int keyCode) {
 		try {
 			if (gameEnded) {
@@ -650,6 +680,31 @@ public final class OwareScreen extends GameScreen
 		}
   }
 
+  public void procPointerPressed(final int x, final int y) {
+		try {
+			if (gameEnded) {
+				midlet.doGameStop();
+			}
+			else {
+				if ((off_x < x) && (x < ((OwareTable.NBR_COL * sizex) - off_x)) &&
+				    (off_y < y) && (y < ((OwareTable.NBR_ROW * sizex) - off_y))) {
+						selx = (selx  - off_x) / OwareTable.NBR_COL;
+						sely = (sely  - off_y) / OwareTable.NBR_ROW;
+						setMessage(null);
+						super.wakeup(3);
+				}
+				//#ifdef DLOGGING
+				if (finestLoggable) {logger.finest("procPointerPressed x,off_x,selx,y,off_y,sely,OwareScreen.actPlayer=" + selx + "," + sely + "," + OwareScreen.actPlayer);}
+				//#endif
+			}
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("procPointerPressed error", e);
+			//#endif
+		}
+  }
+
 	public void run() {
 		int ckeyCode = INVALID_KEY_CODE;
 		synchronized(this) {
@@ -659,9 +714,24 @@ public final class OwareScreen extends GameScreen
 		}
 		if (ckeyCode != INVALID_KEY_CODE) {
 			procKeyPressed(ckeyCode);
+			synchronized(this) {
+				this.keyCode = INVALID_KEY_CODE;
+			}
 		}
+		int cx = -1;
+		int cy = -1;
 		synchronized(this) {
-			this.keyCode = INVALID_KEY_CODE;
+			if ((this.pointerPress[0] == -1) && (this.pointerPress[1] == -1)) {
+				cx = this.pointerPress[0];
+				cy = this.pointerPress[1];
+			}
+		}
+		if ((cx != -1) && (cy != -1)) {
+			procPointerPressed(cx, cy);
+			synchronized(this) {
+				this.pointerPress[0] = -1;
+				this.pointerPress[1] = -1;
+			}
 		}
 	}
 
