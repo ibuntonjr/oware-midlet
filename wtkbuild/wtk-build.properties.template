@@ -31,7 +31,7 @@ emulator.class=org.microemu.app.Main
 #Comment out if you do not want to run findbugs
 #findbugs.home = ${ext.drive}/opt/tools/findbugs-1.3.4
 #For findbugs
-#findbug.classes = ${phoneme.home}/classes
+findbug.classes = ${phoneme.home}/classes
 #Comment out if you do not want to run PMD
 #pmd.home = ${ext.drive}/mostdownloads/gnu/sourceforge/pmd/pmd-4.2.4
 pmd.xsl = pmd-compile-reduced.xsl
@@ -96,7 +96,7 @@ zipdir = ../zipedsrc
 need.svn.preprocessed = true
 svn.home = C:\\PROGRA~1\\COLLAB~1
 svn.url =  https://oware-midlet.googlecode.com/svn/trunk/
-svn.src =  mobile-rss-reader
+svn.src =  oware-midlet
 svn.user =  ibuntonjr
 #Need ti distribute the SVN dirs
 need.dist.svn.dirs = true
