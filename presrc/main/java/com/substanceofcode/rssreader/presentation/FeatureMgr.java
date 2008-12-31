@@ -45,6 +45,7 @@ import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.Form;
+import javax.microedition.lcdui.Font;
 
 import net.eiroca.j2me.app.BaseApp;
 
@@ -61,6 +62,11 @@ import net.sf.jlogmicro.util.logging.Level;
 public class FeatureMgr implements CommandListener, Runnable {
 
 	private Hashtable promptCommands = null;
+	//#ifdef DMIDP20
+    public static final int DEFAULT_FONT_CHOICE = 0;
+    protected int fontChoice = DEFAULT_FONT_CHOICE;
+    protected Font font;
+	//#endif
 	final private Displayable disp;
 	private Command origCmd = null;
 	protected Command exCmd = null;
@@ -351,5 +357,44 @@ public class FeatureMgr implements CommandListener, Runnable {
 			}
 			return numRange;
 	}
+
+	//#ifdef DMIDP20
+	/* Get the font size. This is the actual size of the font */
+	final public int getFontSize(int fontChoice) {
+		int fontSize;
+		switch (fontChoice) {
+			case 1:
+				fontSize = Font.SIZE_SMALL;
+				break;
+			case 2:
+				fontSize = Font.SIZE_MEDIUM;
+				break;
+			case 3:
+				fontSize = Font.SIZE_LARGE;
+				break;
+			case DEFAULT_FONT_CHOICE:
+			default:
+				fontSize = Font.getDefaultFont().getSize();
+				break;
+		}
+		return fontSize;
+	}
+
+	public void initFont() {
+		if (fontChoice == DEFAULT_FONT_CHOICE) {
+			this.font = Font.getDefaultFont();
+		} else {
+			Font defFont = Font.getDefaultFont();
+			this.font = Font.getFont(Font.FACE_SYSTEM, defFont.getStyle(),
+					getFontSize(fontChoice));
+		}
+		/* UNDO
+        final int fitPolicy = midlet.getSettings().getFitPolicy();
+        if (fitPolicy != List.TEXT_WRAP_DEFAULT) {
+			super.setFitPolicy(fitPolicy);
+		}
+		*/
+	}
+	//#endif
 
 }
