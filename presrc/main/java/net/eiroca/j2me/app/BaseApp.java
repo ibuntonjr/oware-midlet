@@ -1078,17 +1078,9 @@ public abstract class BaseApp extends MIDlet implements CommandListener
   public static int INVALID_INDEX = 1000;
   public static Vector menuShown;
   public static Vector menuCombined;
-  public static int beginSpecial = 0;
-  public static int endSpecial = 0;
-  public static final String FONT_SIZE_KEY = "font-size";
   public static Settings settings = null;
   public static String[] messages;
   public static Image[] icons;
-
-	/* UNDO REMOVE?
-  public static int NOT_SPECIAL = 1000;
-  public static int pSpecial = NOT_SPECIAL;
-	*/
 
   private static char LINESEP = BaseApp.CR;
   private static char STRIP = BaseApp.LF;
