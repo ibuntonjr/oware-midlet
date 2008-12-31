@@ -212,6 +212,8 @@
 	<target name="display.props" >
 	    <echo message="src=${src}" />
 	    <echo message="presrc=${presrc}" />
+	    <echo message="svnexport=${svnexport}" />
+	    <echo message="main=${main}" />
 	    <echo message="jar.presrc=${jar.presrc}" />
 	    <echo message="msg.dir=${msg.dir}" />
 	    <echo message="compat.presrc=${compat.presrc}" />
@@ -621,12 +623,13 @@
 		</concat>
 	</target>
 
-	<target name="create.rim.files" depends="prepare" >
+	<target name="create.rim.files" depends="prepare" if="rim.home">
+		<copy file="${dist}/${build.file.root}.jad" tofile="${dist}/${build.file.root}_cod.jad" />
 		<exec executable="${rim.home}\\bin\\rapc" >
 			<arg value="import=&quot;${rim.home}\\lib\\net_rim_api.jar&quot;" />
 			<arg value="codename=${project.name}" />
 			<arg value="-midlet" />
-			<arg value="jad=${dist}/${build.file.root}.jad" />
+			<arg value="jad=${dist}/${build.file.root}_cod.jad" />
 			<arg value="${dist}/${build.file.root}.jar" />
 		</exec>
 		<move file="${project.name}.cso" tofile="${dist}/${build.prefix}${project.name}_${FMIDLETVERSROOT}.cso" />
@@ -832,7 +835,7 @@
 			<param name="no.staging" value="true" />
 			<param name="no.release" value="true" />
 		</antcall>
-		<antcall target="run" >
+		<antcall target="run.dist.version" >
 			<param name="wtk.properties" value="wtk2.0jsr75.properties${wtk.template}" />
 			<param name="no.staging" value="true" />
 			<param name="no.release" value="true" />
@@ -1110,7 +1113,7 @@
 	</target>
 
 	<target name="run.dist.midp.2.0.jsr75" unless="no.2.0.jsr75" >
-		<antcall target="run" inheritAll="true" >
+		<antcall target="run.dist.version" inheritAll="true" >
 			<param name="wtk.properties" value="wtk2.0.jsr75.properties${wtk.template}" />
 			<param name="dist.vers" value="${dist.midp20.jsr75}" />
 			<param name="build.vers" value="${build.midp20.jsr75}" />
