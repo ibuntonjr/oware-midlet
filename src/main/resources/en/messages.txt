@@ -24,6 +24,7 @@ Oware
 Undo
 Redo
 Pause
+Test
 Logging
 Game Mode
 player vs A.I.
@@ -37,11 +38,11 @@ Red
 Blue
 Max holes eaten(captured from)
 Grand Slam variation
-Grand Slam illegal
-Grand Slam legal, but no capture
-Grand Slam legal, but remaining stones go to opponent
-Grand Slam legal, but last hole (house) is not captured
-Grand Slam legal, but first hole (house) is not captured
+Illegal
+OK no capture
+OK remaining stones go to opponent
+OK last hole not captured
+OK first hole not captured
 Good Luck
 Thinking
 Invalid Move
@@ -53,3 +54,5 @@ Human
 Computer
  pass
 L
+M
+H
