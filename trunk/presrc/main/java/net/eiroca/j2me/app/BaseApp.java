@@ -42,6 +42,8 @@
 @DMIDPVERS@
 // Expand to define test define
 @DTESTDEF@
+// Expand to define JMUnit test define
+@DJMTESTDEF@
 // Expand to define logging define
 @DLOGDEF@
 //#ifdef DLARGEMEM
@@ -93,7 +95,9 @@ import com.substanceofcode.rssreader.presentation.FeatureForm;
 import com.substanceofcode.rssreader.presentation.FeatureList;
 import com.substanceofcode.rssreader.presentation.FeatureMgr;
 
-
+//#ifdef DJMTEST
+import jmunit.framework.cldc10.TestSuite;
+//#endif
 //#ifdef DLOGGING
 import net.sf.jlogmicro.util.logging.Logger;
 import net.sf.jlogmicro.util.logging.Level;
@@ -103,7 +107,13 @@ import net.sf.jlogmicro.util.logging.Level;
   * Perform application tasks, standard commands.  Store messages, menus, and
 	* icons
   */
-public abstract class BaseApp extends MIDlet implements CommandListener
+public abstract class BaseApp
+//#ifdef DJMTEST
+extends TestSuite
+//#else
+extends MIDlet
+//#endif
+implements CommandListener
 //#ifdef DMIDP20
 , ItemCommandListener
 //#endif
@@ -113,6 +123,13 @@ public abstract class BaseApp extends MIDlet implements CommandListener
   public static final String sCR = "\n";
   public static final char CR = '\n';
   public static final char LF = '\r';
+
+  //#ifdef DLOGGING
+  private Logger logger = Logger.getLogger("BaseApp");
+  private boolean fineLoggable = logger.isLoggable(Level.FINE);
+  private boolean finestLoggable = logger.isLoggable(Level.FINEST);
+  private boolean traceLoggable = logger.isLoggable(Level.TRACE);
+  //#endif
 
   /*
    * Mathematics
@@ -1096,6 +1113,9 @@ public abstract class BaseApp extends MIDlet implements CommandListener
    * @return    InputStream
    */
   public static InputStream getInputStream(final String res) {
+		//#ifdef DLOGGING
+		Logger logger = Logger.getLogger("BaseApp");
+		//#endif
     StringBuffer sb = new StringBuffer(BaseApp.BUF_SIZE);
     String basepath;
     final Class me = res.getClass();
@@ -1111,8 +1131,18 @@ public abstract class BaseApp extends MIDlet implements CommandListener
     sb.append(res);
     InputStream in = me.getResourceAsStream(sb.toString());
     if (in == null) {
+			//#ifdef DLOGGING
+      if (in == null) {
+				logger.warning("getInputStream missing error for res,sb=" + res + "," + sb.toString());
+			}
+			//#endif
       sb = new StringBuffer(basepath).append(res);
       in = me.getResourceAsStream(sb.toString());
+			//#ifdef DLOGGING
+      if (in == null) {
+				logger.severe("getInputStream missing error for res,locale,sb" + res + "," + locale + "," + sb.toString(), new IOException("Cannot find resource " + res));
+			}
+			//#endif
     }
     return in;
   }
@@ -1646,28 +1676,43 @@ public abstract class BaseApp extends MIDlet implements CommandListener
    *          previous Displayable) if save is set to true
    */
   public static void show(final Alert alert, Displayable next, final boolean save) {
-    Displayable previous = null;
-    if (!BaseApp.displayableStack.empty()) {
-      previous = (Displayable) BaseApp.displayableStack.peek();
-    }
-    if (next == null) {
-      next = BaseApp.getDisplay();
-    }
-    else {
-      final boolean isNew = (previous == null) || (previous != next);
-      boolean isAlert = (next instanceof Alert) && (((Alert) next).getTimeout() != Alert.FOREVER);
-      if (save && isNew && !isAlert) {
-        BaseApp.displayableStack.push(next);
-      }
-    }
-    BaseApp.midlet.changed(BaseApp.EV_BEFORECHANGE, previous, next);
-    if (alert == null) {
-      BaseApp.setDisplay(next);
-    }
-    else {
-      BaseApp.setDisplay(alert, next);
-    }
-    BaseApp.midlet.changed(BaseApp.EV_AFTERCHANGE, previous, next);
+		//#ifdef DLOGGING
+		Logger logger = Logger.getLogger("BaseApp");
+		logger.finest("show alert,next,save=" + alert + "," + next + "," + save);
+		//#endif
+		try {
+			Displayable previous = null;
+			if (!BaseApp.displayableStack.empty()) {
+				previous = (Displayable) BaseApp.displayableStack.peek();
+			}
+			if (next == null) {
+				next = BaseApp.getDisplay();
+			}
+			else {
+				final boolean isNew = (previous == null) || (previous != next);
+				boolean isAlert = (next instanceof Alert) && (((Alert) next).getTimeout() != Alert.FOREVER);
+				if (save && isNew && !isAlert) {
+					BaseApp.displayableStack.push(next);
+				}
+			}
+		//#ifdef DLOGGING
+		logger.finest("show previous,next,BaseApp.midlet=" + previous + "," + next + "," + BaseApp.midlet);
+		//#endif
+			BaseApp.midlet.changed(BaseApp.EV_BEFORECHANGE, previous, next);
+			if (alert == null) {
+				BaseApp.setDisplay(next);
+			}
+			else {
+				BaseApp.setDisplay(alert, next);
+			}
+			BaseApp.midlet.changed(BaseApp.EV_AFTERCHANGE, previous, next);
+		}
+    catch (final Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("show error", e);
+			//#endif
+		}
   }
 
   /**
@@ -1835,7 +1880,15 @@ public abstract class BaseApp extends MIDlet implements CommandListener
   /**
    * Setup midlet and display references
    */
-  public BaseApp() {
+	//#ifdef DJMTEST
+  public BaseApp(String name)
+	//#else
+  public BaseApp()
+	//#endif
+	{
+		//#ifdef DJMTEST
+		super(name);
+		//#endif
     Device.init();
     BaseApp.midlet = this;
     BaseApp.display = Display.getDisplay(this);
@@ -1856,6 +1909,9 @@ public abstract class BaseApp extends MIDlet implements CommandListener
    * StartApp initialize or resume the application
    */
   final public void startApp() throws MIDletStateChangeException {
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("startApp");}
+		//#endif
     if (!initialized) {
       init();
     }
@@ -1868,13 +1924,20 @@ public abstract class BaseApp extends MIDlet implements CommandListener
    * Pause the application
    */
   final public void pauseApp() {
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("pauseApp");}
+		//#endif
     pause();
   }
 
   /**
    * Close the application
    */
-  final public void destroyApp(final boolean unconditional) throws MIDletStateChangeException {
+  final public void destroyApp(final boolean unconditional)
+	  throws MIDletStateChangeException {
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("destroyApp");}
+		//#endif
     done();
   }
 
