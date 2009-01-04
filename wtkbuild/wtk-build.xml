@@ -412,9 +412,9 @@
 			<fileset dir="${res}" includes="**/*.txt" />
 		</copy>
 		<!-- UNDO -->
-		<copy todir="${wtk.res}" >
+		<copy todir="${wtk.res}" flatten="true" >
 			<filterset refid="midlet.info" />
-			<fileset dir="${res}/en" includes="**/*.txt" />
+			<fileset dir="${res}" includes="**/*.txt" />
 		</copy>
 	</target>
 
@@ -530,9 +530,9 @@
 			</fileset>
 		</copy>
 		<!-- UNDO -->
-		<copy todir="${tmpres}/${msg.todir}" >
+		<copy todir="${tmpres}/${msg.base.todir}" flatten="true" >
 			<filterset refid="midlet.info" />
-			<fileset dir="${msg.dir}/en" >
+			<fileset dir="${msg.dir}" >
 				<include name="**/*.txt" />
 			</fileset>
 		</copy>
