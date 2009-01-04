@@ -15,6 +15,7 @@
 + Some setup to use JMUnit
 + Fix problems with screen on N80, etc
 + Some more logging
++ Put text files under jar root in addition to locale dir
 + Fix problems with undo/redo changing the user to move next
 + Prepare for prompts using message number
 + Allow removal of prompt for command without removing the command
