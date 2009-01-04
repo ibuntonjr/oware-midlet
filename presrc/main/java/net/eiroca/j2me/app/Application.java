@@ -40,6 +40,8 @@
  * IN THE SOFTWARE.
  *
  */
+// Expand to define JMUnit test define
+@DJMTESTDEF@
 // Expand to define logging define
 @DLOGDEF@
 package net.eiroca.j2me.app;
@@ -79,6 +81,12 @@ public abstract class Application extends BaseApp implements CommandListener
 	private Logger logger;
 	private boolean fineLoggable;
 	private boolean finestLoggable;
+	//#endif
+
+	//#ifdef DJMTEST
+  public Application(String name) {
+    super(name);
+	}
 	//#endif
 
   /**
