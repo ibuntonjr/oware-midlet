@@ -26,10 +26,12 @@
 package net.sf.yinlight.boardgame.oware.game;
 
 import java.util.Vector;
+import java.util.Stack;
 import net.eiroca.j2me.game.tpg.GameMinMax;
 import net.eiroca.j2me.game.tpg.GameMove;
 import net.eiroca.j2me.game.tpg.GameTable;
 import net.eiroca.j2me.game.tpg.TwoPlayerGame;
+import net.sf.yinlight.boardgame.oware.midlet.OwareMIDlet;
 
 //#ifdef DLOGGING
 import net.sf.jlogmicro.util.logging.Logger;
@@ -41,34 +43,30 @@ import net.sf.jlogmicro.util.logging.Level;
 	*/
 public final class OwareGame extends TwoPlayerGame {
 
+  public final static int NBR_MAX_STACK = 6;
   protected int evalNum = 0;
-  protected int libertyPenalty;
-  protected int numFirstFreeNeighbours;
-  protected int numSecondFreeNeighbours;
-  public int numFirstPlayer;
-  public int numSecondPlayer;
-  protected int point;
-  protected int pointFirstPlayer;
-  protected int pointSecondPlayer;
-  protected int s01;
-  protected int s11;
-  protected int sBonus;
-  protected boolean squareErase;
   protected byte rPlayer;
   protected OwareTable rTable;
   protected static int maxHoles = OwareTable.NBR_COL;
-  protected static int grandSlam = 0;
   public static final int GRAND_SLAM_ILLEGAL = 0;
   public static final int GRAND_SLAM_LEGAL_NO_CAPTURE = 1;
   public static final int GRAND_SLAM_LEGAL_OPPONENT = 2;
   public static final int GRAND_SLAM_LEGAL_LAST = 3;
   public static final int GRAND_SLAM_LEGAL_FIRST = 4;
   protected int[][] tableIntArray = new int[OwareTable.NBR_ROW][OwareTable.NBR_COL];
+  protected Stack prevTbls = new Stack();
+  protected Stack redoTbls = new Stack();
+  protected Stack prevPlayers = new Stack();
+  protected Stack redoPlayers = new Stack();
+  protected int point;
+
 
 	//#ifdef DLOGGING
 	private Logger logger = Logger.getLogger("OwareGame");
 	private boolean fineLoggable = logger.isLoggable(Level.FINE);
+  private boolean finerLoggable = logger.isLoggable(Level.FINER);
 	private boolean finestLoggable = logger.isLoggable(Level.FINEST);
+	private boolean traceLoggable = logger.isLoggable(Level.TRACE);
 	//#endif
 
   /**
@@ -196,7 +194,7 @@ public final class OwareGame extends TwoPlayerGame {
 			boolean emptyHoles = allEmptyHoles(newTable, player);
 
 			if (captureAll && changed && (holesCaptured > 0) && emptyHoles) {
-					switch (grandSlam) {
+					switch (OwareMIDlet.gsGrandSlam) {
 					case GRAND_SLAM_ILLEGAL:
 					default:
 						//#ifdef DLOGGING
@@ -352,56 +350,38 @@ public final class OwareGame extends TwoPlayerGame {
    * Evaluate the board to determine points.
 	 *
    * @param fullProcess
+   * @param endGame
    * @author Irv Bunton
    */
-  protected void eval(boolean fullProcess) {
+  protected void eval(boolean fullProcess, boolean endGame) {
 		try {
 			rTable.convertToIntArray(tableIntArray);
-			boolean lazyProcess = !fullProcess || isGameEnded() || (numFirstPlayer + numSecondPlayer > 58);
-			numFirstPlayer = 0;
-			numSecondPlayer = 0;
-			pointFirstPlayer = 0;
-			pointSecondPlayer = 0;
-			numFirstFreeNeighbours = 0;
-			numSecondFreeNeighbours = 0;
-			for (int i = 0; i < OwareTable.NBR_ROW; ++i) {
-				for (int j = 0; j < OwareTable.NBR_COL; ++j) {
-					final int item = tableIntArray[i][j];
+			boolean lazyProcess = fullProcess || endGame || isGameEnded();
+			int pointFirstPlayer = rTable.getPoint((byte)0);
+			int pointSecondPlayer = rTable.getPoint((byte)1);
+			if (lazyProcess || endGame) {
+				for (int i = 0; i < OwareTable.NBR_ROW; ++i) {
+					for (int j = 0; j < OwareTable.NBR_COL; ++j) {
 						int cseeds = rTable.getSeeds(i, j);
-					switch (item) {
-						case 1:
-							if (cseeds > 0) {
-								numFirstPlayer += rTable.getSeeds(i, j);
-							} else {
-								numFirstFreeNeighbours += 1;
+						if (cseeds > 0) {
+							if (endGame) {
+								rTable.setPoint((byte)i, (byte)(rTable.getPoint((byte)i) +
+										cseeds));
+								rTable.setSeeds(i, j, (byte)0);
 							}
-							break;
-						case 2:
-							if (cseeds > 0) {
-								numSecondPlayer += rTable.getSeeds(i, j);
-							} else {
-									numSecondFreeNeighbours += 1;
-							}
-							break;
-						default:
-							break;
+						}
+						if (i == 0) {
+							pointFirstPlayer += cseeds;
+						} else {
+								pointSecondPlayer += cseeds;
+						}
 					}
 				}
 			}
-			pointFirstPlayer = rTable.getPoint((byte)0);
-			pointSecondPlayer = rTable.getPoint((byte)1);
 			//#ifdef DLOGGING
-			if (finestLoggable) {logger.finest("eval pointFirstPlayer,pointSecondPlayer,numFirstPlayer,numSecondPlayer,rTable.getPassNum()=" + pointFirstPlayer + "," + pointSecondPlayer + "," + numFirstPlayer + "," + numSecondPlayer + "," + rTable.getPassNum());}
+			if (finestLoggable) {logger.finest("eval pointFirstPlayer,pointSecondPlayer,rTable.getPassNum()=" + pointFirstPlayer + "," + pointSecondPlayer + "," +  rTable.getPassNum());}
 			//#endif
 			point = pointFirstPlayer - pointSecondPlayer;
-			if (lazyProcess && isGameEnded()) {
-				if (point > 0) {
-					point += GameMinMax.MAX_POINT;
-				}
-				else if (point < 0) {
-					point -= GameMinMax.MAX_POINT;
-				}
-			}
 			if (rPlayer == 1) {
 				point = -point;
 			}
@@ -418,10 +398,8 @@ public final class OwareGame extends TwoPlayerGame {
   }
 
   public int getGameResult() {
-    int score = (pointFirstPlayer - pointSecondPlayer);
-    if (rPlayer == 1) {
-      score = -score;
-    }
+		eval(true, false);
+    int score = point;
     if (score >= 0) {
       return TwoPlayerGame.WIN;
     }
@@ -551,8 +529,22 @@ public final class OwareGame extends TwoPlayerGame {
 		//#ifdef DLOGGING
 		if (finestLoggable) {logger.finest("setTable rTable != null,rPlayer,player,evalNum=" + (rTable != null) + "," + rPlayer + "," + player + "," + OwareTable.getPlayerItem(player) + "," + evalNum);}
 		//#endif
-    eval(fullProcess);
+    eval(fullProcess, false);
   }
+
+	public void procEndGame() {
+		//#ifdef DLOGGING
+		if (finerLoggable) {logger.finer("procEndGame");}
+		//#endif
+		try {
+			eval(false, true);
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("procEndGame error", e);
+			//#endif
+		}
+	}
 
   protected GameTable getTable() {
 		return rTable;
@@ -561,6 +553,12 @@ public final class OwareGame extends TwoPlayerGame {
   protected byte getPlayer() {
 		return rPlayer;
 	}
+
+	//#ifdef DTEST
+  public void setPlayer(byte player) {
+		rPlayer = player;
+	}
+	//#endif
 
   public static boolean turn(final OwareTable table, final byte player, final OwareMove move, final OwareTable newt) {
 		//#ifdef DLOGGING
@@ -581,20 +579,152 @@ public final class OwareGame extends TwoPlayerGame {
 				) != null;
   }
 
+	public void saveLastTable(OwareTable ot, byte player) {
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("saveLastTable ot,player=" + ot + "," + player);}
+		//#endif
+		saveLast(redoTbls, prevTbls, new OwareTable(ot));
+		saveLast(redoPlayers, prevPlayers, new Byte(player));
+	}
+
+	public void saveLast(Stack removeTbls, Stack addTbls, Object obj) {
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("saveLast removeTbls.size(),addTbls.size()=" + removeTbls.size() + "," + addTbls.size());}
+		//#endif
+		synchronized(this) {
+			if (addTbls.size() >= NBR_MAX_STACK) {
+				addTbls.removeElementAt(NBR_MAX_STACK - 1);
+			}
+			if (removeTbls.size() > 0) {
+				removeTbls.removeAllElements();
+			}
+			addTbls.push(obj);
+		}
+	}
+
+	public OwareTable popLastTable(byte player) {
+		if ((prevTbls.size() == 0) || (prevPlayers.size() == 0)) {
+			return null;
+		}
+		byte cplayer = ((Byte)prevPlayers.pop()).byteValue();
+		if (cplayer != player) {
+			return null;
+		}
+		return (OwareTable)prevTbls.pop();
+	}
+
+	public OwareTable popLast() {
+		synchronized(this) {
+			if ((prevTbls.size() == 0) || (prevPlayers.size() == 0)) {
+				return null;
+			}
+			prevPlayers.pop();
+			return (OwareTable)prevTbls.pop();
+		}
+	}
+
+	public OwareTable undoTable(OwareTable ot, byte player) {
+		Byte bplayer =  (Byte)unwindTable(prevPlayers, redoPlayers);
+		OwareTable lastTbl = (OwareTable)unwindTable(prevTbls, redoTbls);
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("undoTable rPlayer,bplayer,lastTbl=" + rPlayer + "," + bplayer + "," + lastTbl);}
+		//#endif
+		if ((bplayer == null) || (lastTbl == null)) {
+			return null;
+		}
+		byte cplayer =  bplayer.byteValue();
+		if (cplayer != player) {
+			//#ifdef DLOGGING
+			if (finestLoggable) {logger.severe("undoTable Error != player,player=" + player + "," + cplayer);}
+			//#endif
+			return null;
+		}
+		ot.copyDataFrom(lastTbl);
+		setTable(ot, player, false);
+		return ot;
+	}
+
+	public OwareTable redoTable(OwareTable ot, byte player) {
+		Byte bplayer =  (Byte)unwindTable(redoPlayers, prevPlayers);
+		OwareTable lastTbl = (OwareTable)unwindTable(redoTbls, prevTbls);
+		if ((bplayer == null) || (lastTbl == null)) {
+			return null;
+		}
+		byte cplayer =  bplayer.byteValue();
+		if (cplayer != player) {
+			//#ifdef DLOGGING
+			if (finestLoggable) {logger.severe("undoTable Error != player,player=" + player + "," + cplayer);}
+			//#endif
+			return null;
+		}
+		ot.copyDataFrom(lastTbl);
+		setTable(ot, player, false);
+		return (OwareTable)ot;
+	}
+
+	private Object unwindTable(Stack removeTbls, Stack addTbls) {
+		synchronized(this) {
+			//#ifdef DLOGGING
+			if (finestLoggable) {logger.finest("unwindTable removeTbls.size(),addTbls.size()=" + removeTbls.size() + "," + addTbls.size());}
+			//#endif
+			if (removeTbls.size() == 0) {
+				return null;
+			}
+			
+			if (addTbls.size() >= NBR_MAX_STACK) {
+				addTbls.removeElementAt(NBR_MAX_STACK - 1);
+			}
+			Object lastTbl = (Object)removeTbls.pop();
+			addTbls.push(lastTbl);
+			return lastTbl;
+		}
+	}
+
+	public boolean checkLastTable() {
+		synchronized(this) {
+			//#ifdef DLOGGING
+			if (traceLoggable) {logger.trace("checkLastTable prevTbls.size(),redoTbls.size(),prevTbls.size(),rPlayer=" + "," + prevTbls.size() + "," + redoTbls.size() + "," + rPlayer);}
+			//#endif
+			if (checkLast(prevTbls, prevPlayers, redoTbls, 0, rPlayer)) {
+				return true;
+			} else {
+				return checkLast(prevTbls, prevPlayers, redoTbls, 1, rPlayer);
+			}
+		}
+	}
+
+	public boolean checkLast(Stack checkTbls, Stack checkPlayers,
+			Stack addTbls, int ix, byte player) {
+		synchronized(this) {
+			//#ifdef DLOGGING
+			if (traceLoggable) {logger.trace("checkLast checkTbls.size(),addTbls.size(),ix,player=" + "," + checkTbls.size() + "," + addTbls.size() + "," + ix + "," + player);}
+			//#endif
+			return ((checkPlayers.size() > (ix + 1)) && (checkPlayers.size() < NBR_MAX_STACK) &&
+					(((Byte)checkPlayers.elementAt(
+								checkPlayers.size() - ix - 1)).byteValue() == player) &&
+			(checkTbls.size() > 0) && (addTbls.size() < NBR_MAX_STACK));
+		}
+	}
+
+	public boolean checkLastRedoTable() {
+		synchronized(this) {
+			//#ifdef DLOGGING
+			if (traceLoggable) {logger.trace("checkLastRedoTable redoTbls.size(),prevTbls.size()=" + "," + redoTbls.size() + "," + prevTbls.size());}
+			//#endif
+			if (checkLast(redoTbls, redoPlayers, prevTbls, 0, rPlayer)) {
+				return true;
+			} else {
+				return checkLast(redoTbls, redoPlayers, prevTbls, 1, rPlayer);
+			}
+		}
+	}
+
 	public void setMaxHoles(int maxHoles) {
 			OwareGame.maxHoles = maxHoles;
 	}
 
 	public int getMaxHoles() {
 			return (OwareGame.maxHoles);
-	}
-
-	public void setGrandSlam(int grandSlam) {
-			OwareGame.grandSlam = grandSlam;
-	}
-
-	public int getGrandSlam() {
-			return (OwareGame.grandSlam);
 	}
 
 }
