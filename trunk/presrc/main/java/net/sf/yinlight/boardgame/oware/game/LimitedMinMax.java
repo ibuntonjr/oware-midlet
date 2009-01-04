@@ -111,7 +111,7 @@ public class LimitedMinMax extends GameMinMax {
 			actMove = null;
 			for (int i = 0; !cut && (i < pMoves.length); ++i) {
 				tpg.turn(state, player, pMoves[i], newState);
-				if (depth == 1) {
+				if (depth <= 1) {
 					actPoint = tpg.getTblPoint(newState, player);
 				}
 				else {
