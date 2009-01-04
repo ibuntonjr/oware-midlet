@@ -34,8 +34,6 @@ package com.substanceofcode.rssreader.presentation;
 
 import java.util.Hashtable;
 
-import javax.microedition.lcdui.Alert;
-import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
@@ -73,9 +71,9 @@ public class FeatureForm extends Form {
 		featureMgr = new FeatureMgr(this);
 		//#ifdef DLOGGING
 		if (fineLoggable) {logger.fine("Starting FeatureForm "
-			//#ifdef DMIDP20
+				//#ifdef DMIDP20
 				+ super.getTitle()
-			//#endif
+				//#endif
 				);}
 		//#endif
 	}
@@ -85,7 +83,7 @@ public class FeatureForm extends Form {
 		init();
 	}
 
-	final public void addPromptCommand(Command cmd, String prompt) {
+	final public void addPromptCommand(Command cmd, int prompt) {
 		super.addCommand(cmd);
 		featureMgr.addPromptCommand(cmd, prompt);
 	}
@@ -95,19 +93,24 @@ public class FeatureForm extends Form {
 		featureMgr.removeCommand(cmd);
 	}
 
-    final public void setCommandListener(CommandListener cmdListener) {
+	final public void removePrompt(Command cmd) {
+		super.removeCommand(cmd);
+		featureMgr.removePrompt(cmd);
+	}
+
+	final public void setCommandListener(CommandListener cmdListener) {
 		super.setCommandListener(featureMgr);
 		featureMgr.setCommandListener(cmdListener, false);
 	}
 
-    final public void setCommandListener(CommandListener cmdListener,
+	final public void setCommandListener(CommandListener cmdListener,
 			boolean background) {
 		super.setCommandListener(featureMgr);
 		featureMgr.setCommandListener(cmdListener, background);
-    }
+	}
 
-    public FeatureMgr getFeatureMgr() {
-        return (featureMgr);
-    }
+	public FeatureMgr getFeatureMgr() {
+		return (featureMgr);
+	}
 
 }
