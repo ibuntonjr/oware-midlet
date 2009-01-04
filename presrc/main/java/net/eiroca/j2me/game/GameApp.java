@@ -21,6 +21,8 @@
  */
 // Expand to define MIDP define
 @DMIDPVERS@
+// Expand to define JMUnit test define
+@DJMTESTDEF@
 // Expand to define logging define
 @DLOGDEF@
 package net.eiroca.j2me.game;
@@ -137,6 +139,12 @@ public abstract class GameApp extends Application {
 	private Logger logger;
 	private boolean fineLoggable;
 	private boolean finestLoggable;
+	//#endif
+
+	//#ifdef DJMTEST
+  public GameApp(String name) {
+    super(name);
+	}
 	//#endif
 
   /**
