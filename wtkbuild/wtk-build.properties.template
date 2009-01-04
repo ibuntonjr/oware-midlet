@@ -104,6 +104,7 @@ need.res = true
 icon.dir = ${res}
 msg.dir = ${res}/en
 msg.todir = en/
+msg.base.todir = 
 res.todir = 
 #add.jars = true
 #copy.jar.src = true
