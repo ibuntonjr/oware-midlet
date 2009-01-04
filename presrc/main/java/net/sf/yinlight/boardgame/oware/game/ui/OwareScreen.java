@@ -139,15 +139,6 @@ public final class OwareScreen extends GameScreen
 		/* Do not suppress keys.  However, do full screen. */
     super(midlet, false, true);
     OwareScreen.rgame = new OwareGame();
-		if (GameApp.graphics) {
-			cup1Image = BaseApp.createImage(CUP1);
-		}
-		//#ifdef DLOGGING
-		if (finestLoggable) {logger.finest("constructor cup1Image cup1Image.getWidth(),cup1Image.getHeight()=" + ((cup1Image == null) ? "cup1Image is null" : cup1Image.getWidth() + "," + cup1Image.getHeight()));}
-		//#endif
-		//undo cup2Image = null; // undo BaseApp.createImage(CUP2);
-		turnImage = cup1Image;
-		// FIX turnImage = BaseApp.createImage(TURN_ICON);
 		// FIX for different AIs and skill
     switch (OwareMIDlet.gsLevel) {
 			case OwareMIDlet.gsLevelNormal:
@@ -186,15 +177,30 @@ public final class OwareScreen extends GameScreen
 		if (finestLoggable) {logger.finest("initGraphics simage,simage.getGraphics()=" + simage + "," + simage.getGraphics());}
 		//#endif
 		//#endif
+		if (GameApp.graphics) {
+			cup1Image = BaseApp.createImage(CUP1);
+		}
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("constructor cup1Image cup1Image.getWidth(),cup1Image.getHeight()=" + ((cup1Image == null) ? "cup1Image is null" : cup1Image.getWidth() + "," + cup1Image.getHeight()));}
+		//#endif
+		//undo cup2Image = null; // undo BaseApp.createImage(CUP2);
+		turnImage = cup1Image;
+		// FIX turnImage = BaseApp.createImage(TURN_ICON);
 		/* Leave space to the right of the board for putting other info. */
     width = screenWidth * OwareTable.NBR_COL / (OwareTable.NBR_COL + 1);
     vertWidth = screenWidth - width;
     height = screenHeight;
     sizex = (width - 1) / OwareTable.NBR_COL;
     sizey = (height - 1) / OwareTable.NBR_ROW;
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("initGraphics cup1Image cup1Image.getWidth(),cup1Image.getHeight()=" + ((cup1Image == null) ? "cup1Image is null" : cup1Image.getWidth() + "," + cup1Image.getHeight()));}
+		//#endif
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("initGraphics  width,sizex,vertWidth,sizey" + width + "," + sizex + "," + vertWidth + "," + screenHeight + "," + sizey);}
+		//#endif
     final int origSizey = sizey;
 		//#ifdef DLOGGING
-		if (finestLoggable) {logger.finest("constructor sizex,sizey=" + sizex + "," + sizey);}
+		if (finestLoggable) {logger.finest("initGraphics sizex,sizey=" + sizex + "," + sizey);}
 		//#endif
     if (OwareScreen.ASPECT_LIMIT_B * sizex > OwareScreen.ASPECT_LIMIT_A * sizey) {
       sizex = sizey * OwareScreen.ASPECT_LIMIT_A / OwareScreen.ASPECT_LIMIT_B;
@@ -212,7 +218,7 @@ public final class OwareScreen extends GameScreen
 				pieceHeight = 20 * sizey / 30;
 			}
 			//#ifdef DLOGGING
-			if (finestLoggable) {logger.finest("constructor origSizey,newSizey,sizey,pieceWidth,pieceHeight=" + origSizey + "," + newSizey + "," + sizey + "," + pieceWidth + "," + pieceHeight);}
+			if (finestLoggable) {logger.finest("initGraphics origSizey,newSizey,sizey,pieceWidth,pieceHeight=" + origSizey + "," + newSizey + "," + sizey + "," + pieceWidth + "," + pieceHeight);}
 			//#endif
 		}
     height = sizey * OwareTable.NBR_ROW;
@@ -252,7 +258,7 @@ public final class OwareScreen extends GameScreen
 			off_x = 2;
 		}
 		//#ifdef DLOGGING
-		if (finestLoggable) {logger.finest("constructor screenWidth,screenHeight,width,vertWidth,height,sizex,sizey,pieceWidth,pieceHeight,cupWidth,cupHeight,fontHeight=" + screenWidth + "," + screenHeight + "," + width + "," + vertWidth + "," + height + "," + sizex + "," + sizey + "," + pieceWidth + "," + pieceHeight + "," + cupWidth + "," + cupHeight + "," + fontHeight);}
+		if (finestLoggable) {logger.finest("initGraphics screenWidth,screenHeight,width,vertWidth,height,sizex,off_x,sizey,off_y,pieceWidth,pieceHeight,cupWidth,cupHeight,fontHeight=" + screenWidth + "," + screenHeight + "," + width + "," + vertWidth + "," + height + "," + sizex + "," + sizey + "," + pieceWidth + "," + pieceHeight + "," + cupWidth + "," + cupHeight + "," + fontHeight);}
 		//#endif
 		return cscreen;
   }
@@ -261,14 +267,13 @@ public final class OwareScreen extends GameScreen
     super.init();
 		try { BaseApp.background = 0x00FFFFFF;
 			BaseApp.foreground = 0x00000000;
-			screen = initGraphics();
 			score.beginGame(1, 0, 0);
 			// FIX allow to set
 			if (bsavedRec.length > 0) {
 				loadRecordStore(bsavedRec);
 				bsavedRec = new byte[0];
 			} else {
-				OwareScreen.actPlayer = 1;
+				OwareScreen.actPlayer = (byte)OwareMIDlet.gsFirst;
 				if (OwareMIDlet.gsPlayer == 1) {
 					isHuman[OwareScreen.actPlayer] = true;
 					isHuman[1 - OwareScreen.actPlayer] = false;
@@ -282,7 +287,6 @@ public final class OwareScreen extends GameScreen
 				OwareScreen.turnNum = 1;
 				OwareScreen.table = new OwareTable();
 				OwareScreen.rgame.setMaxHoles(OwareMIDlet.gsMaxHoles);
-				OwareScreen.rgame.setGrandSlam(OwareMIDlet.gsGrandSlam);
 			}
 			updateSkillInfo();
 			setMessage(BaseApp.messages[OwareMIDlet.MSG_GOODLUCK]);
@@ -429,7 +433,7 @@ public final class OwareScreen extends GameScreen
 			final int x = off_x + col * sizex + piece_offx;
 			int y = off_y + row * sizey + piece_offy;
 			if (y < 0) {
-				y = off_y;
+				y = 0;
 			}
 			int lastMove = onBoard ? lastMovePoint : (byte)0;
 			int seeds = onBoard ? OwareScreen.table.getSeeds(row, col) : 0;
@@ -441,7 +445,7 @@ public final class OwareScreen extends GameScreen
 				screen.setColor(BaseApp.background);
 				screen.fillArc(x, y, cupWidth, cupHeight, 0, 360);
 			} else {
-				if (player == 1) {
+				if (player == OwareMIDlet.gsFirst) {
 					screen.setColor(OwareScreen.COLOR_P1);
 				}
 				else {
@@ -765,7 +769,7 @@ public final class OwareScreen extends GameScreen
 
   public void updateSkillInfo() {
     if (!OwareScreen.twoplayer) {
-      infoLines[2] = BaseApp.messages[OwareMIDlet.MSG_LEVELPREFIX] + OwareMIDlet.gsLevel;
+      infoLines[2] = BaseApp.messages[OwareMIDlet.MSG_LEVELPREFIX + OwareMIDlet.gsLevel] + OwareMIDlet.gsDept;
     }
     else {
       infoLines[2] = null;
@@ -863,35 +867,29 @@ public final class OwareScreen extends GameScreen
    * @param startForeThinking
    * @author Irv Bunton
    */
-  protected boolean processMove(final OwareMove move, final boolean startForeThinking) {
+  //#ifdef DTEST
+  public
+  //#else
+  protected
+	//#endif
+		boolean processMove(final OwareMove move, final boolean startForeThinking) {
 		//#ifdef DLOGGING
 		if (finerLoggable) {logger.finer("processMove 1 move.row,move.col,OwareScreen.actPlayer,startForeThinking=" + move.row + "," + move.col + "," + OwareScreen.actPlayer + "," + startForeThinking);}
 		//#endif
 		try {
 			final OwareTable newTable = new OwareTable();
-			// Save the table BEFORE we make the current move.
-			if (isHuman[OwareScreen.actPlayer]) {
-				//#ifdef DLOGGING
-				if (finestLoggable) {logger.finest("Saving last human move OwareScreen.actPlayer=" + OwareScreen.actPlayer);}
-				//#endif
-				OwareScreen.table.saveLastTable(OwareScreen.table);
-				//#ifdef DLOGGING
-			} else {
-				if (finestLoggable) {logger.finest("Not saving the AI move OwareScreen.actPlayer=" + OwareScreen.actPlayer);}
-				//#endif
-			}
+			//#ifdef DLOGGING
+			if (finestLoggable) {logger.finest("Saving last human move OwareScreen.actPlayer=" + OwareScreen.actPlayer);}
+			//#endif
 			/* Simulate the results of taking the move and put results in newTable. */
 			tables = OwareScreen.rgame.animatedTurn(OwareScreen.table, OwareScreen.actPlayer, move, newTable);
 			boolean goodMove = (tables != null);
 			if (!goodMove) {
 				setMessage(BaseApp.messages[OwareMIDlet.MSG_INVALIDMOVE], 2000);
-				if (isHuman[OwareScreen.actPlayer]) {
-					//#ifdef DLOGGING
-					if (finestLoggable) {logger.finest("Saving last human move OwareScreen.actPlayer=" + OwareScreen.actPlayer);}
-					//#endif
-					OwareScreen.table.popLastTable();
-					return false;
-				}
+				//#ifdef DLOGGING
+				if (finestLoggable) {logger.finest("No valid move OwareScreen.actPlayer,=isHuman[OwareScreen.actPlayer])" + OwareScreen.actPlayer + "," + isHuman[OwareScreen.actPlayer]);}
+				//#endif
+				return false;
 			}
 			else {
 				if (startForeThinking) {
@@ -901,6 +899,7 @@ public final class OwareScreen extends GameScreen
 					if (finestLoggable) {logger.finest("processMove 1b scheduled");}
 					//#endif
 				}
+				OwareScreen.rgame.saveLastTable(OwareScreen.table, OwareScreen.actPlayer);
 				synchronized (this) {
 					for (int i = 0; i < tables.length; ++i) {
 						OwareScreen.table = (OwareTable) tables[i];
@@ -927,32 +926,8 @@ public final class OwareScreen extends GameScreen
 					if (finerLoggable) {logger.finer("1 loop OwareScreen.actPlayer,OwareScreen.rgame.isGameEnded()=" + OwareScreen.actPlayer + "," + OwareScreen.rgame.isGameEnded());}
 					//#endif
 					if (OwareScreen.rgame.isGameEnded()) {
-						final int result = OwareScreen.rgame.getGameResult();
-						String endMessage;
-						final boolean firstWin = ((result == TwoPlayerGame.LOSS) && (OwareScreen.actPlayer == 0)) || ((result == TwoPlayerGame.WIN) && (OwareScreen.actPlayer == 1));
-						final int winner = firstWin ? 1 : 0;
-						if (!OwareScreen.twoplayer && firstWin) {
-							endMessage = BaseApp.messages[OwareMIDlet.MSG_WONCOMPUTER];
-						}
-						else if (result == TwoPlayerGame.DRAW) {
-							endMessage = BaseApp.messages[OwareMIDlet.MSG_DRAW];
-						}
-						else {
-							if (OwareScreen.twoplayer) {
-								endMessage = OwareMIDlet.playerNames[winner] + BaseApp.messages[OwareMIDlet.MSG_PLAYERWON];
-							}
-							else {
-								endMessage = BaseApp.messages[OwareMIDlet.MSG_HUMANWON];
-							}
-						}
-						final int firstNum = OwareScreen.rgame.numFirstPlayer;
-						final int secondNum = OwareScreen.rgame.numSecondPlayer;
-						endMessage += OwareScreen.NL + OwareMIDlet.playerNames[0] + OwareScreen.SEP + firstNum + OwareScreen.NL + OwareMIDlet.playerNames[1] + OwareScreen.SEP + secondNum;
-						setMessage(endMessage);
 						gameEnded = true;
-						//#ifdef DLOGGING
-						if (finestLoggable) {logger.finest("processMove game ended result,firstWin,winner,firstNum,secondNum=" + result + "," + firstWin + "," + winner + firstNum + "," + secondNum);}
-						//#endif
+						procEndGame();
 					}
 					else {
 						/* Change to other player. */
@@ -1006,6 +981,45 @@ public final class OwareScreen extends GameScreen
 			super.wakeup(3);
 		}
   }
+
+	public void procEndGame() {
+		//#ifdef DLOGGING
+		if (finerLoggable) {logger.finer("procEndGame");}
+		//#endif
+		try {
+					OwareScreen.rgame.procEndGame();
+					final int result = OwareScreen.rgame.getGameResult();
+					String endMessage;
+					final boolean firstWin = ((result == TwoPlayerGame.LOSS) && (OwareScreen.actPlayer == 0)) || ((result == TwoPlayerGame.WIN) && (OwareScreen.actPlayer == 1));
+					final int winner = firstWin ? 1 : 0;
+					if (!OwareScreen.twoplayer && firstWin) {
+						endMessage = BaseApp.messages[OwareMIDlet.MSG_WONCOMPUTER];
+					}
+					else if (result == TwoPlayerGame.DRAW) {
+						endMessage = BaseApp.messages[OwareMIDlet.MSG_DRAW];
+					}
+					else {
+						if (OwareScreen.twoplayer) {
+							endMessage = OwareMIDlet.playerNames[winner] + BaseApp.messages[OwareMIDlet.MSG_PLAYERWON];
+						}
+						else {
+							endMessage = BaseApp.messages[OwareMIDlet.MSG_HUMANWON];
+						}
+					}
+					final int firstNum = OwareScreen.table.getPoint((byte)0);
+					final int secondNum = OwareScreen.table.getPoint((byte)1);
+					endMessage += OwareScreen.NL + OwareMIDlet.playerNames[0] + OwareScreen.SEP + firstNum + OwareScreen.NL + OwareMIDlet.playerNames[1] + OwareScreen.SEP + secondNum;
+					setMessage(endMessage);
+					//#ifdef DLOGGING
+					if (finestLoggable) {logger.finest("processMove game ended result,firstWin,winner,firstNum,secondNum=" + result + "," + firstWin + "," + winner + firstNum + "," + secondNum);}
+					//#endif
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("procEndGame error", e);
+			//#endif
+		}
+	}
 
   public int saveGameParameters(final byte[] b, final int offset) {
     int index = offset;
@@ -1204,4 +1218,25 @@ public final class OwareScreen extends GameScreen
 			//#endif
 		}
 	}
+
+	public void undoTable() {
+		byte prevPlayer = (byte) (1 - OwareScreen.actPlayer);
+		if (!isHuman[prevPlayer]) {
+			OwareScreen.actPlayer = prevPlayer;
+			rgame.undoTable(table, OwareScreen.actPlayer);
+		}
+		OwareScreen.actPlayer = (byte) (1 - OwareScreen.actPlayer);
+		rgame.undoTable(table, OwareScreen.actPlayer);
+	}
+
+	public void redoTable() {
+		OwareScreen.actPlayer = (byte) (1 - OwareScreen.actPlayer);
+		rgame.redoTable(table, OwareScreen.actPlayer);
+		byte newPlayer = (byte) (1 - OwareScreen.actPlayer);
+		if (!isHuman[newPlayer]) {
+			OwareScreen.actPlayer = newPlayer;
+			rgame.redoTable(table, OwareScreen.actPlayer);
+		}
+	}
+
 }
