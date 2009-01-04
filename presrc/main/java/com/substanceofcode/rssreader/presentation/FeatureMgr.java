@@ -151,16 +151,21 @@ public class FeatureMgr implements CommandListener, Runnable {
 		//#endif
     }
 
-	public void addPromptCommand(Command cmd, String prompt) {
+	public void addPromptCommand(Command cmd, int prompt) {
 		synchronized(this) {
 			if (promptCommands == null) {
 				promptCommands = new Hashtable();
 			}
-			promptCommands.put(cmd, prompt);
+			promptCommands.put(cmd, new Integer(prompt));
 		}
 	}
 
 	public void removeCommand(Command cmd) {
+		removePrompt(cmd);
+		disp.removeCommand(cmd);
+	}
+
+	public void removePrompt(Command cmd) {
 		synchronized(this) {
 			if (promptCommands != null) {
 				promptCommands.remove(cmd);
@@ -199,15 +204,17 @@ public class FeatureMgr implements CommandListener, Runnable {
 							synchronized(this) {
 								origCmd = ccmd;
 							}
-							String promptMsg = (String)cpromptCommands.get(ccmd);
+							int promptMsg = ((Integer)cpromptCommands.get(ccmd)).intValue();
 							// Due to a quirk on T637 (MIDP 1.0), we need to create a form
 							// before the alert or the alert will not be seen.
+							// FIX
 							Form formAlert = new Form(ccmd.getLabel());
-							formAlert.append(promptMsg);
-							formAlert.addCommand(new Command("OK", Command.OK, 0));
-							formAlert.addCommand(new Command("Cancel", Command.CANCEL, 1));
+							formAlert.append(BaseApp.messages[promptMsg]);
+							formAlert.addCommand(BaseApp.cOK);
+							formAlert.addCommand(BaseApp.cBACK);
 							formAlert.setCommandListener(this);
 							BaseApp.setDisplay(formAlert);
+							/* FIX
 							Alert promptAlert = new Alert(ccmd.getLabel(),
 									promptMsg, null,
 									AlertType.CONFIRMATION);
@@ -216,6 +223,8 @@ public class FeatureMgr implements CommandListener, Runnable {
 							promptAlert.addCommand(new Command("Cancel", Command.CANCEL, 1));
 							promptAlert.setCommandListener(this);
 							BaseApp.setDisplay(promptAlert, formAlert);
+							*/
+							BaseApp.setDisplay(formAlert);
 						} else if (cdisp.equals(disp)) {
 							//#ifdef DLOGGING
 							if (fineLoggable) {logger.fine("Equal cdisp,disp,cmdFeatureUser=" + ccmd.getLabel() + "," + cdisp + "," + disp + "," + cmdFeatureUser);}
@@ -231,7 +240,7 @@ public class FeatureMgr implements CommandListener, Runnable {
 							//#endif
 
 							try {
-								if ((ccmd.getCommandType() == Command.OK)
+								if ((ccmd == BaseApp.cOK)
 								//#ifdef DMIDP20
 									   || ccmd.equals(Alert.DISMISS_COMMAND)
 								//#endif
@@ -246,7 +255,7 @@ public class FeatureMgr implements CommandListener, Runnable {
 									if (background && (runFeatureUser != null)) {
 										runFeatureUser.run();
 									}
-								} else if (ccmd.getCommandType() == Command.CANCEL) {
+								} else if (ccmd == BaseApp.cBACK) {
 									BaseApp.setDisplay(disp);
 								}
 							} finally {
