@@ -52,16 +52,12 @@ public final class OwareTable implements GameTable {
   public final static int NBR_COL = 6;
   public final static int NBR_PLAYERS = 2;
   public final static int NBR_ATTRIBUTES = 2;
-  public final static int NBR_MAX_STACK = 3;
   private final static int TABLE_STORE_SIZE = (NBR_ATTRIBUTES * OwareTable.NBR_COL * OwareTable.NBR_ROW) + (NBR_PLAYERS * 1) + (NBR_PLAYERS * 3) + 1;
   public final static int WINNING_SCORE = 25;
   protected byte[][] board;
   protected byte[] point;
   protected OwareMove[] lastMove;
   protected int passNum;
-	// FIX save stack
-  protected Stack prevTbls = new Stack();
-  protected Stack redoTbls = new Stack();
 
   //#ifdef DLOGGING
   private Logger logger = Logger.getLogger("OwareTable");
@@ -138,8 +134,6 @@ public final class OwareTable implements GameTable {
     board = new byte[NBR_ATTRIBUTES][NBR_COL * NBR_ROW];
     point = new byte[NBR_PLAYERS];
     lastMove = new OwareMove[NBR_PLAYERS];
-		BaseApp.copyInto(table.prevTbls, prevTbls);
-		BaseApp.copyInto(table.redoTbls, redoTbls);
 		//#ifdef DLOGGING
 		if (finestLoggable) {logger.finest("constructor board[0].length,board[1].length,board[1].length=" + board[0].length + "," + board[1].length);}
 		//#endif
@@ -171,7 +165,7 @@ public final class OwareTable implements GameTable {
     }
   }
 
-  private void copyDataFromMain(final GameTable table) {
+  public void copyDataFrom(final GameTable table) {
 		try {
 			final OwareTable rtable = (OwareTable) table;
 			for (int i = 0; i < NBR_ATTRIBUTES; i++) {
@@ -185,22 +179,9 @@ public final class OwareTable implements GameTable {
 				lastMove[i] = new OwareMove(rtable.lastMove[i]);
 				lastMove[i].setPoint(rtable.lastMove[i].getPoint());
 				//#ifdef DLOGGING
-				if (traceLoggable) {logger.trace("copyDataFromMain i,lastMove[i].row,lastMove[i].col,lastMove[i].getPoint()=" + i + "," + lastMove[i].row + "," + lastMove[i].col + "," + lastMove[i].getPoint());}
+				if (traceLoggable) {logger.trace("copyDataFrom i,lastMove[i].row,lastMove[i].col,lastMove[i].getPoint()=" + i + "," + lastMove[i].row + "," + lastMove[i].col + "," + lastMove[i].getPoint());}
 				//#endif
 			}
-		} catch (Throwable e) {
-			e.printStackTrace();
-			//#ifdef DLOGGING
-			logger.severe("copyDataFrom error", e);
-			//#endif
-		}
-  }
-
-  public void copyDataFrom(final GameTable table) {
-		try {
-			copyDataFromMain(table);
-			BaseApp.copyInto(((OwareTable)table).prevTbls, prevTbls);
-			BaseApp.copyInto(((OwareTable)table).redoTbls, redoTbls);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			//#ifdef DLOGGING
@@ -217,73 +198,6 @@ public final class OwareTable implements GameTable {
   public GameMove getEmptyMove() {
     return new OwareMove(0, 0);
   }
-
-	public void saveLastTable(OwareTable ot) {
-		synchronized(this) {
-			if (prevTbls.size() >= NBR_MAX_STACK) {
-				prevTbls.removeElementAt(NBR_MAX_STACK - 1);
-			}
-			if (redoTbls.size() > 0) {
-				redoTbls.removeAllElements();
-			}
-			prevTbls.push(new OwareTable(ot));
-		}
-	}
-
-	public OwareTable popLastTable() {
-		synchronized(this) {
-			if (prevTbls.size() > 0) {
-				return (OwareTable)prevTbls.pop();
-			} else {
-				return null;
-			}
-		}
-	}
-
-	public OwareTable undoTable() {
-		return unwindTable(prevTbls, redoTbls);
-	}
-
-	public OwareTable redoTable() {
-		return unwindTable(redoTbls, prevTbls);
-	}
-
-	private OwareTable unwindTable(Stack removeTbls, Stack addTbls) {
-		synchronized(this) {
-			//#ifdef DLOGGING
-			if (finestLoggable) {logger.finest("unwindTable removeTbls.size(),addTbls.size()=" + removeTbls.size() + "," + addTbls.size());}
-			//#endif
-			if (removeTbls.size() == 0) {
-				return null;
-			}
-			
-			if (addTbls.size() >= NBR_MAX_STACK) {
-				addTbls.removeElementAt(NBR_MAX_STACK - 1);
-			}
-			OwareTable lastTbl = (OwareTable)removeTbls.pop();
-			addTbls.push(lastTbl);
-			copyDataFromMain(lastTbl);
-			return lastTbl;
-		}
-	}
-
-	public boolean checkLastTable() {
-		synchronized(this) {
-			//#ifdef DLOGGING
-			if (traceLoggable) {logger.trace("checkLastTable prevTbls.size(),redoTbls.size()=" + "," + prevTbls.size() + "," + redoTbls.size());}
-			//#endif
-			return ((prevTbls.size() > 0) && (redoTbls.size() < NBR_MAX_STACK));
-		}
-	}
-
-	public boolean checkLastRedoTable() {
-		synchronized(this) {
-			//#ifdef DLOGGING
-			if (traceLoggable) {logger.trace("checkLastRedoTable redoTbls.size(),prevTbls.size()=" + "," + redoTbls.size() + "," + prevTbls.size());}
-			//#endif
-			return ((redoTbls.size() > 0) && (prevTbls.size() < NBR_MAX_STACK));
-		}
-	}
 
   /**
    * Get the player for the coordinates
@@ -451,18 +365,93 @@ public final class OwareTable implements GameTable {
   }
 
   /**
+   * Convert items to string
+   */
+  public String toRowItemString(int i) {
+    final StringBuffer ret = new StringBuffer(80);
+		for (int j = 0; j < NBR_COL; ++j) {
+			ret.append(getItem(i, j));
+    }
+    return ret.toString();
+  }
+
+  /**
+   * Convert items to string
+   */
+  public String toItemString() {
+    final StringBuffer ret = new StringBuffer(80);
+    for (int i = 0; i < NBR_ROW; ++i) {
+			ret.append(toRowItemString(i));
+      ret.append('\n');
+    }
+    ret.append("pass: ").append(getPassNum()).append('\n');
+    return ret.toString();
+  }
+
+  /**
+   * Convert seeds to string
+   */
+  public String toRowString(int i) {
+    final StringBuffer ret = new StringBuffer(80);
+		for (int j = 0; j < NBR_COL; ++j) {
+			ret.append(getSeeds(i, j));
+    }
+		ret.append(getPoint((byte)i));
+    return ret.toString();
+  }
+
+  /**
    * Should use StringBuffer instead of String, but this method is only for debug purposes.
    */
   public String toString() {
     final StringBuffer ret = new StringBuffer(80);
     for (int i = 0; i < NBR_ROW; ++i) {
-      for (int j = 0; j < NBR_COL; ++j) {
-        ret.append(getItem(i, j));
-      }
+			ret.append(toRowString(i));
       ret.append('\n');
     }
     ret.append("pass: ").append(getPassNum()).append('\n');
     return ret.toString();
+  }
+
+  /**
+   * Convert string to seeds
+   */
+  public void fromRowString(int i, String nums)
+	throws IllegalArgumentException {
+		final byte[] bnums = nums.getBytes();
+		final int len = bnums.length;
+		int j = 0;
+		try {
+			for (; (j < len) && (j < NBR_COL); ++j) {
+				byte seeds = (j < len) ? (byte)(bnums[j] - '0') : (byte)0;
+				if (seeds > 9) {
+					Exception e = new IllegalArgumentException("Seed # invalid " + j);
+					e.printStackTrace();
+					//#ifdef DLOGGING
+					logger.severe("fromRowString error i,j,seeds=" + i + "," + j + "," + seeds, e);
+					//#endif
+					throw e;
+				}
+				setSeeds(i, j, seeds);
+			}
+			//#ifdef DLOGGING
+			if (finestLoggable && (len != (NBR_COL + 1))) {logger.finest("fromRowString length error i,bnums.length=" + i + "," + bnums.length);}
+			//#endif
+			if (len >= (NBR_COL + 1)) {
+				String spoint = new String(bnums, NBR_COL, len - NBR_COL);
+				byte point = (byte)((Integer.valueOf(spoint)).intValue());
+				setPoint((byte)i, point);
+			} else {
+				setPoint((byte)i, (byte)0);
+			}
+		} catch (IllegalArgumentException e) {
+			throw e;
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("fromRowString error i,bnums.length=" + i + "," + bnums.length, e);
+			//#endif
+		}
   }
 
 	public void setLastMove(int player, int row, int col, byte lastPoint) {
@@ -473,5 +462,56 @@ public final class OwareTable implements GameTable {
 	public OwareMove getLastMove(int player) {
 			return (lastMove[player]);
 	}
+
+  public boolean equals(final OwareTable table) {
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("equals");}
+		//#endif
+		boolean isEquals = true;
+		try {
+			final int len = NBR_COL * NBR_ROW;
+			for (int i = 0; i < NBR_ATTRIBUTES; i++) {
+				for (int j = 0; j < len; j++) {
+					if (table.board[i][j] != board[i][j]) {
+						//#ifdef DLOGGING
+						if (finestLoggable) {
+							logger.finest("equals board[i] != table.board[i][j] i,j=" + i + "," + j + ","+ board[i][j] + "!=" + table.board[i][j]);
+							if (i == 1) {
+								logger.finest("equals seeds row,col=" + (i / NBR_COL) + "," + (i % NBR_COL));
+							}
+						}
+						//#endif
+						isEquals = false;
+					}
+				}
+			}
+			if (passNum != table.passNum) {
+					//#ifdef DLOGGING
+					if (finestLoggable) {logger.finest("equals passNum != table.passNum=" + passNum + "!=" + table.passNum);}
+					//#endif
+					isEquals = false;
+			}
+			for (int i = 0; i < NBR_PLAYERS; i++) {
+				if (point[i] != table.point[i]) {
+					//#ifdef DLOGGING
+					if (finestLoggable) {logger.finest("equals point[i] != table.point[i]=" + point[i] + "!=" + table.point[i]);}
+					//#endif
+					isEquals = false;
+				}
+			}
+			/* FIX
+			for (int i = 0; i < NBR_PLAYERS; i++) {
+				lastMove[i] = new OwareMove(table.lastMove[i]);
+				lastMove[i].setPoint(table.lastMove[i].getPoint());
+			}
+			*/
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("equals error", e);
+			//#endif
+		}
+		return isEquals;
+  }
 
 }
