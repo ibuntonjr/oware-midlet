@@ -34,8 +34,6 @@ package com.substanceofcode.rssreader.presentation;
 
 import java.util.Hashtable;
 
-import javax.microedition.lcdui.Alert;
-import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
@@ -112,7 +110,7 @@ public class FeatureList extends List {
 		init();
 	}
 
-	final public void addPromptCommand(Command cmd, String prompt) {
+	final public void addPromptCommand(Command cmd, int prompt) {
 		super.addCommand(cmd);
 		featureMgr.addPromptCommand(cmd, prompt);
 	}
@@ -122,16 +120,21 @@ public class FeatureList extends List {
 		featureMgr.removeCommand(cmd);
 	}
 
-    final public void setCommandListener(CommandListener cmdListener) {
+	final public void removePrompt(Command cmd) {
+		super.removeCommand(cmd);
+		featureMgr.removePrompt(cmd);
+	}
+
+	final public void setCommandListener(CommandListener cmdListener) {
 		super.setCommandListener(featureMgr);
 		featureMgr.setCommandListener(cmdListener, false);
 	}
 
-    final public void setCommandListener(CommandListener cmdListener,
+	final public void setCommandListener(CommandListener cmdListener,
 			boolean background) {
 		super.setCommandListener(featureMgr);
 		featureMgr.setCommandListener(cmdListener, background);
-    }
+	}
 
 	//#ifdef DMIDP20
 	final public int append(String stringPart, Image imagePart) {
@@ -143,10 +146,10 @@ public class FeatureList extends List {
 			rtn = super.append(stringPart, imagePart);
 		}
 		/* FIX
-		if (font != null) {
-			setFont(rtn, font);
-		}
-		*/
+			 if (font != null) {
+			 setFont(rtn, font);
+			 }
+		 */
 		return rtn;
 	}
 
@@ -159,10 +162,10 @@ public class FeatureList extends List {
 		}
 		int newElement = (elementnum < 0) ? 0 : elementnum;
 		/* FIX
-		if (font != null) {
-			setFont(newElement, font);
-		}
-		*/
+			 if (font != null) {
+			 setFont(newElement, font);
+			 }
+		 */
 	}
 
 	final public void set(int elementnum, String stringPart, Image imagePart) {
@@ -173,10 +176,10 @@ public class FeatureList extends List {
 			super.set(elementnum, stringPart, imagePart);
 		}
 		/* FIX
-		if (font != null) {
-			setFont(elementnum, font);
-		}
-		*/
+			 if (font != null) {
+			 setFont(elementnum, font);
+			 }
+		 */
 	}
 
 	private void handleError(RuntimeException e) {
@@ -187,16 +190,16 @@ public class FeatureList extends List {
 			logger.warning("ArrayIndexOutOfBoundsException on setFont");
 			//#endif
 			/* FIX
-			featureMgr.getMidlet().getLoadForm().appendNote(
-					"Font not supported by device.  Reset to default or pick another font.");
-			featureMgr.getMidlet().getSettings().setFontChoice(
-					RssReaderSettings.DEFAULT_FONT_CHOICE);
-			this.font = null;
-			final int last = super.size() - 1;
-			if (last >= 0) {
-				super.setFont(last, Font.getDefaultFont());
-			}
-			*/
+				 featureMgr.getMidlet().getLoadForm().appendNote(
+				 "Font not supported by device.  Reset to default or pick another font.");
+				 featureMgr.getMidlet().getSettings().setFontChoice(
+				 RssReaderSettings.DEFAULT_FONT_CHOICE);
+				 this.font = null;
+				 final int last = super.size() - 1;
+				 if (last >= 0) {
+				 super.setFont(last, Font.getDefaultFont());
+				 }
+			 */
 		} else {
 			//#ifdef DLOGGING
 			logger.severe("Other exception " + e.getClass().getName());
@@ -205,20 +208,20 @@ public class FeatureList extends List {
 		}
 	}
 
-    /* FIX
-    public Font getFont() {
-        return (font);
-    }
+	/* FIX
+		 public Font getFont() {
+		 return (font);
+		 }
 
-    public void setFont(Font font) {
-        this.font = font;
-    }
-	*/
+		 public void setFont(Font font) {
+		 this.font = font;
+		 }
+	 */
 
 	//#endif
 
-    public FeatureMgr getFeatureMgr() {
-        return (featureMgr);
-    }
+	public FeatureMgr getFeatureMgr() {
+		return (featureMgr);
+	}
 
 }
