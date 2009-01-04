@@ -50,7 +50,7 @@ Canvas
 {
 
   protected final GameApp midlet;
-  protected Graphics screen;
+  protected Graphics screen = null;
   protected Image simage;
   protected int screenWidth;
   protected int screenHeight;
@@ -77,34 +77,31 @@ Canvas
     midlet = aMidlet;
     fullScreenMode = fullScreen;
 		//#ifdef DMIDP20
-    setFullScreenMode(fullScreenMode);
+    super.setFullScreenMode(fullScreenMode);
 		//#endif
     score = new Score();
-    screen = initGraphics();
 	}
 
+	//#ifdef DMIDP10
   /**
    * Initialize graphics portion only. This is for MIDP 1.0 devices which
 	 * do not get screen info until paint.  It is also used by MIDP 2.x
 	 * to be consistent.  So, we allow it to be called from 2 places.
    */
 	public Graphics initGraphics(int x, int y) {
-		//#ifdef DMIDP20
-		Graphics cscreen = getGraphics();
 		//#ifdef DLOGGING
 		if (finestLoggable) {logger.finest("initGraphics cscreen=" + cscreen);}
 		//#endif
-		//#else
 		simage = Image.createImage(x, y);
 		Graphics cscreen = simage.getGraphics();
 		//#ifdef DLOGGING
 		if (finestLoggable) {logger.finest("initGraphics simage,cscreen=" + simage + "," + cscreen);}
 		//#endif
-		//#endif
     screenWidth = x;
     screenHeight = y;
 		return cscreen;
   }
+	//#endif
 
   /**
    * Initialize graphics portion only. This is for MIDP 1.0 devices which
@@ -114,7 +111,12 @@ Canvas
 	public Graphics initGraphics() {
 		//#ifdef DMIDP20
 		Graphics cscreen = getGraphics();
-		return initGraphics(cscreen.getClipWidth(), cscreen.getClipHeight());
+    screenWidth = cscreen.getClipWidth();
+    screenHeight = cscreen.getClipHeight();
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("initGraphics cscreen,screenWidth,screenHeight=" + cscreen + "," + screenWidth + "," + screenHeight);}
+		//#endif
+		return cscreen;
 		//#else
 		return initGraphics(super.getWidth(), super.getHeight());
 		//#endif
@@ -133,11 +135,14 @@ Canvas
 
   public void init() {
     active = true;
+    if (screen == null) {
+			screen = initGraphics();
+		}
   }
 
   public void show() {
 		//#ifdef DMIDP20
-    setFullScreenMode(fullScreenMode);
+    super.setFullScreenMode(fullScreenMode);
 		//#endif
 		synchronized(this) {
 			//#ifdef DCLDCV11
