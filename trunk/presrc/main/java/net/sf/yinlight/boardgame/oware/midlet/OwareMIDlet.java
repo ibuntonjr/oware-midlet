@@ -3,6 +3,7 @@
 	* FIX game menu
 	* FIX no getGraphics for GameScreen 1.0 for GameScreen
 	* FIX no suppress keys for 1.0 for GameApp
+	* FIX take out fromRowString from OwareTable
  * Based upon jtReversi game written by Jataka Ltd.
  *
  * This software was modified 2008-12-07.  The original file was Reversi.java
@@ -28,6 +29,8 @@
  */
 // Expand to define test define
 @DTESTDEF@
+// Expand to define JMUnit test define
+@DJMTESTDEF@
 // Expand to define test ui define
 @DTESTUIDEF@
 // Expand to define logging define
@@ -49,6 +52,7 @@ import net.eiroca.j2me.game.tpg.GameMinMax;
 import net.sf.yinlight.boardgame.oware.game.ui.OwareScreen;
 import net.sf.yinlight.boardgame.oware.game.OwareGame;
 import net.sf.yinlight.boardgame.oware.game.OwareTable;
+import net.sf.yinlight.boardgame.oware.game.OwareMove;
 import com.substanceofcode.rssreader.presentation.FeatureForm;
 import com.substanceofcode.rssreader.presentation.FeatureMgr;
 
@@ -73,6 +77,7 @@ public class OwareMIDlet extends GameApp {
   final public static short MSG_MENU_MAIN_UNDO = (short)(GameApp.MSG_USERDEF + MSG_OFFSET++);
   final public static short MSG_MENU_MAIN_REDO = (short)(GameApp.MSG_USERDEF + MSG_OFFSET++);
   final public static short MSG_MENU_MAIN_PAUSE = (short)(GameApp.MSG_USERDEF + MSG_OFFSET++);
+  final public static short MSG_MENU_MAIN_TEST = (short)(GameApp.MSG_USERDEF + MSG_OFFSET++);
   final public static short MSG_MENU_MAIN_LOGGING = (short)(GameApp.MSG_USERDEF + MSG_OFFSET++);
   final public static int MSG_GAMEMODE = GameApp.MSG_USERDEF + MSG_OFFSET++;
   final public static int MSG_GAMEMODE1 = GameApp.MSG_USERDEF + MSG_OFFSET++;
@@ -110,8 +115,12 @@ public class OwareMIDlet extends GameApp {
 	//#ifdef DMIDP10
   public static final int GA_PAUSE = GameApp.GA_USERDEF + 2;
 	//#endif
+	//#ifdef DTEST
+  public static final int GA_TEST = GameApp.GA_USERDEF + 3;
+  public static final int GA_PERFORMTEST = GameApp.GA_USERDEF + 4;
+	//#endif
 	//#ifdef DLOGGING
-  public static final int GA_LOGGING = GameApp.GA_USERDEF + 3;
+  public static final int GA_LOGGING = GameApp.GA_USERDEF + 5;
 	//#endif
 
   public static String[] playerNames;
@@ -126,18 +135,34 @@ public class OwareMIDlet extends GameApp {
 	//#ifdef DLOGGING
   protected TextField opLogLevel;
 	//#endif
+	//#ifdef DTEST
+  public static final int MAX_STR_ROW = OwareTable.NBR_COL + 3;
+  protected TextField tstName;
+  protected TextField tstRow0;
+  protected TextField tstRow1;
+  protected TextField tstMove;
+  protected TextField tstActRow0;
+  protected TextField tstActRow1;
+  protected TextField tstExpRow0;
+  protected TextField tstExpRow1;
+  protected TextField tstSuccess;
+  protected TextField tstMveSuccess;
+  protected TextField tstGameOver;
+  protected Displayable gameTest = null;
+	//#endif
 
 	/* How many human players. */
   public static int gsPlayer = 1;
+  public static int gsFirst = 1;
 	/* Skill level. */
-  final static public int gsLevelNormal = 1;
-  final static public int gsLevelDifficult = 2;
-  final static public int gsLevelHard = 3;
+  final static public int gsLevelNormal = 0;
+  final static public int gsLevelDifficult = 1;
+  final static public int gsLevelHard = 2;
   public static int gsLevel = gsLevelDifficult;
 	/* Dept.  Number of moves that the AI tests. */
   public static int gsDept = 3;
   public static int gsMaxHoles = OwareTable.NBR_COL;
-  public static int gsGrandSlam = 1;
+  public static int gsGrandSlam = 0;
 
 	//#ifdef DLOGGING
   private boolean fineLoggable;
@@ -148,7 +173,11 @@ public class OwareMIDlet extends GameApp {
 	//#endif
 
   public OwareMIDlet() {
+		//#ifdef DJMTEST
+    super("Mancala Test Suite");
+		//#else
     super();
+		//#endif
 		//#ifdef DLOGGING
 		logManager = LogManager.getLogManager();
 		logManager.readConfiguration(this);
@@ -163,9 +192,13 @@ public class OwareMIDlet extends GameApp {
         }, {
             GameApp.ME_MAINMENU, GameApp.MSG_MENU_MAIN_NEWGAME, GameApp.GA_NEWGAME, 1
         }, {
-            GameApp.ME_MAINMENU, OwareMIDlet.MSG_MENU_MAIN_UNDO, (short)OwareMIDlet.GA_UNDO, 2
+            GameApp.ME_MAINMENU, OwareMIDlet.MSG_MENU_MAIN_UNDO, (short)OwareMIDlet.GA_UNDO, -1
         }, {
-            GameApp.ME_MAINMENU, OwareMIDlet.MSG_MENU_MAIN_REDO, (short)OwareMIDlet.GA_REDO, 3
+            GameApp.ME_MAINMENU, OwareMIDlet.MSG_MENU_MAIN_REDO, (short)OwareMIDlet.GA_REDO, -1
+		//#ifdef DLOGGING
+        }, {
+            GameApp.ME_MAINMENU, OwareMIDlet.MSG_MENU_MAIN_TEST, (short)OwareMIDlet.GA_TEST, 0
+		//#endif
         }, {
             GameApp.ME_MAINMENU, GameApp.MSG_MENU_MAIN_OPTIONS, GameApp.GA_OPTIONS, 4
         }, {
@@ -262,8 +295,8 @@ public class OwareMIDlet extends GameApp {
 					OwareMIDlet.MSG_GRAND_SLAM,
 					Choice.EXCLUSIVE,
 					new int[] { OwareMIDlet.MSG_GRAND_SLAM1,
-			OwareMIDlet.MSG_GRAND_SLAM2, OwareMIDlet.MSG_GRAND_SLAM2,
-			OwareMIDlet.MSG_GRAND_SLAM3, OwareMIDlet.MSG_GRAND_SLAM4});
+			OwareMIDlet.MSG_GRAND_SLAM2, OwareMIDlet.MSG_GRAND_SLAM3,
+			OwareMIDlet.MSG_GRAND_SLAM4, OwareMIDlet.MSG_GRAND_SLAM5});
 			//#ifdef DLOGGING
 			opLogLevel = new TextField("Logging level",
 							logger.getParent().getLevel().getName(), 20, TextField.ANY);
@@ -287,6 +320,76 @@ public class OwareMIDlet extends GameApp {
 		}
   }
 
+	//#ifdef DTEST
+  protected Displayable getTesting() {
+		try {
+			final Form form = new FeatureForm(BaseApp.messages[OwareMIDlet.MSG_MENU_MAIN_TEST]);
+			tstName = new TextField("Test name",
+							"", 80, TextField.ANY);
+			tstRow0 = new TextField("Input row 0 cups/total",
+							"", MAX_STR_ROW, TextField.ANY);
+			tstRow1 = new TextField("Input row 1 cups/total",
+							"", MAX_STR_ROW, TextField.ANY);
+			tstMove = new TextField("Move", "", 2, TextField.ANY);
+			tstActRow0 = new TextField("Actual row 0 cups/total",
+							"", MAX_STR_ROW, TextField.DECIMAL | TextField.UNEDITABLE);
+			tstActRow1 = new TextField("Actual row 1 cups/total",
+							"", MAX_STR_ROW, TextField.DECIMAL | TextField.UNEDITABLE);
+			tstExpRow0 = new TextField("Expected row 0 cups/total",
+							"", MAX_STR_ROW, TextField.ANY);
+			tstExpRow1 = new TextField("Expected row 1 cups/total",
+							"", MAX_STR_ROW, TextField.ANY);
+			tstSuccess = new TextField("Test success",
+							"", 8, TextField.UNEDITABLE);
+			tstMveSuccess = new TextField("Test move success",
+							"", 8, TextField.UNEDITABLE);
+			tstGameOver = new TextField("Test game over",
+							"", 8, TextField.UNEDITABLE);
+			form.append(tstName);
+			form.append(tstRow0);
+			form.append(tstRow1);
+			form.append(tstMove);
+			form.append(tstActRow0);
+			form.append(tstActRow1);
+			form.append(tstExpRow0);
+			form.append(tstExpRow1);
+			form.append(tstSuccess);
+			form.append(tstMveSuccess);
+			form.append(tstGameOver);
+			BaseApp.setup(form, BaseApp.cBACK, BaseApp.cOK);
+			return form;
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("getTesting error", e);
+			//#endif
+			return null;
+		}
+  }
+
+  public void doShowTesting() {
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("doShowTesting");}
+		//#endif
+		try {
+			if (gameTest == null) {
+				gameTest = getTesting();
+			}
+			if (OwareScreen.table != null) {
+				tstRow0.setString(OwareScreen.table.toRowString(0));
+				tstRow1.setString(OwareScreen.table.toRowString(1));
+			}
+			BaseApp.show(null, gameTest, true);
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("doShowOptions error", e);
+			//#endif
+		}
+	}
+
+	//#endif
+
   public void doShowOptions() {
 		//#ifdef DLOGGING
 		if (finestLoggable) {logger.finest("doShowOptions");}
@@ -294,13 +397,12 @@ public class OwareMIDlet extends GameApp {
 		try {
 			super.doShowOptions();
 			opPlayers.setSelectedIndex(OwareMIDlet.gsPlayer - 1, true);
-			opLevel.setSelectedIndex(OwareMIDlet.gsLevel - 1, true);
+			opLevel.setSelectedIndex(OwareMIDlet.gsLevel, true);
 			opDept.setSelectedIndex(OwareMIDlet.gsDept - 1, true);
 			opMaxHoles.setSelectedIndex(OwareMIDlet.gsMaxHoles - 1, true);
 			opGrandSlam.setSelectedIndex(OwareMIDlet.gsGrandSlam, true);
 			//#ifdef DLOGGING
-			opLogLevel.setString(
-							logger.getParent().getLevel().getName());
+			opLogLevel.setString( logger.getParent().getLevel().getName());
 			//#endif
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -336,7 +438,7 @@ public class OwareMIDlet extends GameApp {
 		//#endif
 		try {
 			OwareMIDlet.gsPlayer = opPlayers.getSelectedIndex() + 1;
-			OwareMIDlet.gsLevel = opLevel.getSelectedIndex() + 1;
+			OwareMIDlet.gsLevel = opLevel.getSelectedIndex();
 			OwareMIDlet.gsDept = opDept.getSelectedIndex() + 1;
 			OwareMIDlet.gsMaxHoles = opMaxHoles.getSelectedIndex() + 1;
 			OwareMIDlet.gsGrandSlam = opGrandSlam.getSelectedIndex();
@@ -353,6 +455,120 @@ public class OwareMIDlet extends GameApp {
 			//#endif
 		}
   }
+
+	//#ifdef DTEST
+  public void doPerformTest() {
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("doPerformTest");}
+		//#endif
+		try {
+			perfResult result = performTest(tstRow0.getString(), tstRow1.getString(),
+			tstExpRow0.getString(), tstExpRow1.getString(), tstMove.getString());
+			//#ifdef DLOGGING
+			if (traceLoggable) {logger.trace("doPerformTest result.success=" + result.success);}
+			//#endif
+			tstSuccess.setString(String.valueOf(result.success));
+			//#ifdef DLOGGING
+			if (traceLoggable) {logger.trace("doPerformTest result.mveResult=" + result.mveResult);}
+			//#endif
+			tstMveSuccess.setString(String.valueOf(result.mveResult));
+			//#ifdef DLOGGING
+			if (traceLoggable) {logger.trace("doPerformTest result.actRow0.length(),result.actRow0=" + result.actRow0.length() + "," + result.actRow0);}
+			//#endif
+			tstActRow0.setString(result.actRow0);
+			//#ifdef DLOGGING
+			if (traceLoggable) {logger.trace("doPerformTest result.actRow1.length(),result.actRow1=" + result.actRow1.length() + "," + result.actRow1);}
+			//#endif
+			tstActRow1.setString(result.actRow1);
+			tstGameOver.setString(String.valueOf(result.gameOver));
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("doPerformTest error", e);
+			//#endif
+		}
+  }
+
+	public class perfResult {
+		public boolean success;
+		public boolean mveResult;
+		public boolean gameOver;
+		public String actRow0;
+		public String actRow1;
+	}
+
+
+  public perfResult performTest(String srow0,
+                          String srow1,
+                          String sexpRow0,
+                          String sexpRow1, String smove) {
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("performTest");}
+		//#endif
+		perfResult result = new perfResult();
+		try {
+			OwareScreen.table.fromRowString(0, srow0);
+			System.out.println("JUnit srow0:" + srow0);
+			OwareScreen.table.fromRowString(1, srow1);
+			System.out.println("JUnit srow1:" + srow1);
+			OwareTable cmpTable = new OwareTable(OwareScreen.table);
+			OwareTable newTable = new OwareTable();
+			System.out.println("JUnit smove:" + smove);
+			OwareMove move = new OwareMove(
+					Integer.valueOf(smove.substring(0, 1)).intValue(),
+			Integer.valueOf(smove.substring(1)).intValue());
+			((OwareScreen)GameApp.game).actPlayer = (byte)move.row;
+			((OwareScreen)GameApp.game).rgame.setPlayer((byte)move.row);
+			result.mveResult = ((OwareScreen)GameApp.game).processMove(move, false);
+			cmpTable.fromRowString(0, sexpRow0);
+			System.out.println("JUnit sexpRow0:" + sexpRow0);
+			cmpTable.fromRowString(1, sexpRow1);
+			System.out.println("JUnit sexpRow1:" + sexpRow1);
+			result.success = OwareScreen.table.equals(cmpTable);
+			result.gameOver = ((OwareScreen)GameApp.game).rgame.isGameEnded();
+			result.actRow0 = OwareScreen.table.toRowString(0);
+			result.actRow1 = OwareScreen.table.toRowString(1);
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("doPerformTest error", e);
+			//#endif
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("doPerformTest error", e);
+			//#endif
+		} finally {
+			return result;
+		}
+  }
+
+  /**
+   * Command dispatcher
+   */
+  public void commandAction(final Command c, final Displayable d) {
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("commandAction c,d=" + c.getLabel() + "," + c + "," + d);}
+		//#endif
+		try {
+			if (d == gameTest) {
+				if (c == BaseApp.cOK) {
+					processGameAction(GA_PERFORMTEST);
+				} else {
+					super.commandAction(c, d);
+				}
+			} else {
+					super.commandAction(c, d);
+			}
+
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("commandAction error", e);
+			//#endif
+		}
+  }
+	//#endif
 
   /**
    * Pause the game
@@ -401,11 +617,11 @@ public class OwareMIDlet extends GameApp {
 				if (GameApp.game != null) {
 					OwareScreen osc = (OwareScreen)GameApp.game;
 					if (OwareScreen.table != null) {
-						if (OwareScreen.table.checkLastTable()) {
+						if (OwareScreen.rgame.checkLastTable()) {
 							Application.insertMenuItem(gameMenu, GA_UNDO);
 							canUndo = true;
 						}
-						if (OwareScreen.table.checkLastRedoTable()) {
+						if (OwareScreen.rgame.checkLastRedoTable()) {
 							Application.insertMenuItem(gameMenu, GA_REDO);
 							canRedo = true;
 						}
@@ -456,13 +672,18 @@ public class OwareMIDlet extends GameApp {
 					doGameStart();
 					break;
 				case GA_UNDO: // Undo last move
-					((OwareScreen)GameApp.game).table.undoTable();
+					((OwareScreen) GameApp.game).undoTable();
 					doGameResume();
 					break;
 				case GA_REDO: // Redo last move
-					((OwareScreen)GameApp.game).table.redoTable();
+					((OwareScreen) GameApp.game).redoTable();
 					doGameResume();
 					break;
+				//#ifdef DTEST
+				case GA_TEST: // Redo last move
+					doShowTesting();
+					break;
+				//#endif
 				case GA_OPTIONS:
 					doShowOptions();
 					break;
@@ -475,6 +696,11 @@ public class OwareMIDlet extends GameApp {
 				case GA_APPLYOPTIONS:
 					doApplyOptions();
 					break;
+					//#ifdef DLOGGING
+				case GA_PERFORMTEST:
+					doPerformTest();
+					break;
+					//#endif
 					//#ifdef DLOGGING
 				case GA_LOGGING:
 					doShowLogging();
