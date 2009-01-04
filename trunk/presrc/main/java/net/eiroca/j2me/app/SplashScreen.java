@@ -62,7 +62,7 @@ public class SplashScreen extends Canvas implements SchedulerNotify {
       splashImage = BaseApp.createImage(image);
     }
 		//#ifdef DLOGGING
-		if (finestLoggable) {logger.finest("constructor image,time=" + image + "," + time);}
+		if (finestLoggable) {logger.finest("constructor image,time,splashImage=" + image + "," + time + "," + splashImage);}
 		//#endif
     show();
   }
