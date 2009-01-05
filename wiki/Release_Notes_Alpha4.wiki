@@ -1,0 +1,31 @@
+#labels Featured
+#Release notes for Alpha 4
+=1.0 2008-12-27 Alpha 2 Version=
+  * Handle grand slam variations.  
+  * Don't allow move if opponent has no seeds.  
+  * Support changes in max holes captured.
+  * Fix redo
+  * Fix JAR URL
+
+=1.0 2008-12-31 Alpha 3 Version=
+  * Handle pointer press/drag
+  * Future font support
+  * Fix top piece above board not shown
+  * Fix JAD jar size problem
+
+=1.0 2009-01-04 Alpha 4 Version=
+  * Some setup to use JMUnit
+  * Fix problems with screen on N80, etc
+  * Some more logging
+  * Put text files under jar root in addition to locale dir
+  * Fix problems with undo/redo changing the user to move next
+  * Prepare for prompts using message number
+  * Allow removal of prompt for command without removing the command
+  * Make sure we don't get infinate loop if no depth.
+  * Fix scoring.
+  * Fix top piece above table not showing up.
+  * Fix grand slam variations
+  * Fix display of skill and depth
+  * Fix skill settings
+  * Allow testing with JMUnit
+  * Allow interactive testing.
