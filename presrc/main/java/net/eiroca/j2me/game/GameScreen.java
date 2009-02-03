@@ -16,6 +16,9 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+/**
+ * This was modified no later than 2009-01-29
+ */
 // Expand to define MIDP define
 @DMIDPVERS@
 // Expand to define CLDC define
@@ -51,7 +54,9 @@ Canvas
 
   protected final GameApp midlet;
   protected Graphics screen = null;
+	//#ifdef DMIDP10
   protected Image simage;
+	//#endif
   protected int screenWidth;
   protected int screenHeight;
   protected final boolean fullScreenMode;
@@ -89,9 +94,6 @@ Canvas
 	 * to be consistent.  So, we allow it to be called from 2 places.
    */
 	public Graphics initGraphics(int x, int y) {
-		//#ifdef DLOGGING
-		if (finestLoggable) {logger.finest("initGraphics cscreen=" + cscreen);}
-		//#endif
 		simage = Image.createImage(x, y);
 		Graphics cscreen = simage.getGraphics();
 		//#ifdef DLOGGING
@@ -146,7 +148,7 @@ Canvas
 		//#endif
 		synchronized(this) {
 			//#ifdef DCLDCV11
-			animationThread = new GameThread(this, "GameScreen");
+			animationThread = new GameThread(this, "TGameScreen");
 			//#else
 			animationThread = new GameThread(this);
 			//#endif
