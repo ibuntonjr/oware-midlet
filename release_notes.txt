@@ -58,3 +58,4 @@
   (Oware/Mancala already had an indicator)
 + Added comments
 + More logging
++ Fix saving/loading of initial seeds for Oware
