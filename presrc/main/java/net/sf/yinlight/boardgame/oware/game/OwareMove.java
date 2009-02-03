@@ -21,6 +21,9 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+/**
+ * This was modified no later than 2009-01-29
+ */
 // Expand to define logging define
 @DLOGDEF@
 package net.sf.yinlight.boardgame.oware.game;
@@ -35,10 +38,9 @@ import net.sf.jlogmicro.util.logging.Level;
 /**
 	* Oware game move
 	*/
-public final class OwareMove implements GameMove {
+public final class OwareMove extends BoardGameMove {
 
-  public int col;
-  public int row;
+  public static final int OWARE_MOVE_STORE_SIZE = 3;
   protected int point;
 
 	//#ifdef DLOGGING
@@ -47,25 +49,35 @@ public final class OwareMove implements GameMove {
   private boolean finestLoggable = logger.isLoggable(Level.FINEST);
 	//#endif
 
-  public static boolean valid(final int row, final int col) {
-    return (row == 0) && (row < OwareTable.NBR_ROW) && (col >= 0) && (col < OwareTable.NBR_COL);
-  }
-
   public OwareMove(final int row, final int col) {
+		super(row, col);
 		//#ifdef DLOGGING
 		if (finestLoggable) {logger.finest("constructor row,col=" + row + "," + col);}
 		//#endif
-    this.row = row;
-    this.col = col;
+  }
+
+  public OwareMove(final int row, final int col, int point) {
+		super(row, col);
+		this.point = point;
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("constructor row,col=" + row + "," + col);}
+		//#endif
   }
 
   public OwareMove(final OwareMove move) {
+		super(move.row, move.col);
 		//#ifdef DLOGGING
 		if (finestLoggable) {logger.finest("constructor move has row,col=" + row + "," + col);}
 		//#endif
-    row = move.row;
-    col = move.col;
+    point = move.point;
   }
+
+  public BoardGameMove getBoardGameMove(final BoardGameMove move) {
+		if (!(move instanceof OwareMove)) {
+			return null;
+		}
+		return new OwareMove((OwareMove)move);
+	}
 
   public boolean equals(final Object o) {
     if (!(o instanceof OwareMove)) { return false; }
@@ -83,14 +95,6 @@ public final class OwareMove implements GameMove {
    */
   public int getPoint() {
     return point;
-  }
-
-  public void setCoordinates(final int row, final int col) {
-    this.row = row;
-    this.col = col;
-		//#ifdef DLOGGING
-		if (finestLoggable) {logger.finest("constructor row,col=" + row + "," + col);}
-		//#endif
   }
 
   /**
