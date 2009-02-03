@@ -1,9 +1,5 @@
 /** GPL >= 2.0
  *
- * This software was modified 2008-12-09.  The original file was alphabet.c
- * in http://oware.ivorycity.com/. Also, some code was taken from 
- * GameMinMax.java in mobilesuite.sourceforge.net project.
- *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -17,6 +13,11 @@
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+/**
+ * This software was modified 2008-12-09.  The original file was alphabet.c
+ * in http://oware.ivorycity.com/. Also, some code was taken from 
+ * GameMinMax.java in mobilesuite.sourceforge.net project.
  */
 // Expand to define logging define
 @DLOGDEF@
@@ -110,7 +111,7 @@ public final class OwareMinMax extends GameMinMax {
 					bestmove.setPoint(0);
 				}
 
-				if( (depth<=0) || OwareGame.isGameEnded(testTable)) {
+				if( (depth<=0) || g.isGameEnded(g, testTable, player)) {
 					int tmpResult = OwareMinMax.heuristics[heuristic].getResult(player, testTable);
 					if (tmpResult > (byte)result) {
 						bestmove = new OwareMove(pMoves[i]);
