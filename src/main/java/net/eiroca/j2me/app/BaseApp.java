@@ -1,4 +1,5 @@
 /**
+	FIX reduce code for getImage
  * Copyright (C) 2006-2008 eIrOcA (eNrIcO Croce & sImOnA Burzio)
  * Copyright (C) 2002 Eugene Morozov (xonixboy@hotmail.com)
  *
@@ -37,6 +38,20 @@
  * IN THE SOFTWARE.
  *
  */
+/**
+ * This was modified no later than 2009-01-29
+ */
+// Expand to define MIDP define
+//#define DMIDP20
+// Expand to define test define
+//#define DNOTEST
+// Expand to define JMUnit test define
+//#define DNOJMTEST
+// Expand to define logging define
+//#define DNOLOGGING
+//#ifdef DLARGEMEM
+//#define DREGULARMEM
+//#endif
 package net.eiroca.j2me.app;
 
 import java.io.ByteArrayInputStream;
@@ -76,8 +91,32 @@ import javax.microedition.midlet.MIDletStateChangeException;
 import javax.microedition.rms.RecordListener;
 import javax.microedition.rms.RecordStore;
 import javax.microedition.rms.RecordStoreException;
+import javax.microedition.rms.InvalidRecordIDException;
+import net.eiroca.j2me.game.GameApp;
+import net.eiroca.j2me.rms.Settings;
+import com.substanceofcode.rssreader.presentation.FeatureForm;
+import com.substanceofcode.rssreader.presentation.FeatureList;
+import com.substanceofcode.rssreader.presentation.FeatureMgr;
 
-public abstract class BaseApp extends MIDlet implements CommandListener
+//#ifdef DJMTEST
+//@import jmunit.framework.cldc10.TestSuite;
+//#endif
+//#ifdef DLOGGING
+//@import net.sf.jlogmicro.util.logging.Logger;
+//@import net.sf.jlogmicro.util.logging.Level;
+//#endif
+
+/**
+  * Perform application tasks, standard commands.  Store messages, menus, and
+	* icons
+  */
+public abstract class BaseApp
+//#ifdef DJMTEST
+//@extends TestSuite
+//#else
+extends MIDlet
+//#endif
+implements CommandListener
 //#ifdef DMIDP20
 , ItemCommandListener
 //#endif
@@ -87,6 +126,13 @@ public abstract class BaseApp extends MIDlet implements CommandListener
   public static final String sCR = "\n";
   public static final char CR = '\n';
   public static final char LF = '\r';
+
+  //#ifdef DLOGGING
+//@  private Logger logger = Logger.getLogger("BaseApp");
+//@  private boolean fineLoggable = logger.isLoggable(Level.FINE);
+//@  private boolean finestLoggable = logger.isLoggable(Level.FINEST);
+//@  private boolean traceLoggable = logger.isLoggable(Level.TRACE);
+  //#endif
 
   /*
    * Mathematics
@@ -406,32 +452,43 @@ public abstract class BaseApp extends MIDlet implements CommandListener
     return maxWidth;
   }
 
-  /**
-   * Remove any tag
-   *
-   * @param text
-   * @return
-   */
-  public static String removeHtml(final String text) {
-    int htmlStartIndex;
-    int htmlEndIndex;
-    if (text == null) { return null; }
-    htmlStartIndex = text.indexOf("<");
-    if (htmlStartIndex == -1) { return text; }
-    final StringBuffer plainText = new StringBuffer(text.length());
-    String htmlText = text.trim();
-    while (htmlStartIndex >= 0) {
-      plainText.append(htmlText.substring(0, htmlStartIndex));
-      if (htmlText.substring(htmlStartIndex + 1, htmlStartIndex + 3).toLowerCase().equals("br")) {
-        plainText.append(BaseApp.CR);
-      }
-      htmlEndIndex = htmlText.indexOf(">", htmlStartIndex);
-      htmlText = htmlText.substring(htmlEndIndex + 1);
-      htmlStartIndex = htmlText.indexOf("<", 0);
-    }
-    htmlText = plainText.toString();
-    return htmlText;
-  }
+	//#ifdef DLARGEMEM
+//@  /**
+//@   * Remove any tag
+//@   *
+//@   * @param text
+//@   * @return
+//@   */
+//@  public static String removeHtml(final String text) {
+//@    int htmlStartIndex;
+//@    int htmlEndIndex;
+//@    if (text == null) { return null; }
+//@    htmlStartIndex = text.indexOf("<");
+//@    if (htmlStartIndex == -1) { return text; }
+//@    final StringBuffer plainText = new StringBuffer(text.length());
+//@    String htmlText = text.trim();
+//@    while (htmlStartIndex >= 0) {
+//@      plainText.append(htmlText.substring(0, htmlStartIndex));
+//@      if (htmlText.substring(htmlStartIndex + 1, htmlStartIndex + 3).toLowerCase().equals("br")) {
+//@        plainText.append(BaseApp.CR);
+//@      }
+//@      htmlEndIndex = htmlText.indexOf(">", htmlStartIndex);
+//@			// If we have unmatched '<' without '>' stop or we
+//@			// get into infinate loop.
+//@			if (htmlEndIndex < 0) {
+				//#ifdef DLOGGING
+//@				if (finerLoggable) {logger.finer("No end > for htmlStartIndex,htmlText=" + htmlStartIndex + "," + htmlText);}
+//@				if (finerLoggable) {logger.finer("plainText=" + plainText);}
+				//#endif
+//@				break;
+//@			}
+//@      htmlText = htmlText.substring(htmlEndIndex + 1);
+//@      htmlStartIndex = htmlText.indexOf("<", 0);
+//@    }
+//@    htmlText = plainText.toString();
+//@    return htmlText;
+//@  }
+	//#endif
 
   /**
    * If string is null of "" true is returned
@@ -654,63 +711,65 @@ public abstract class BaseApp extends MIDlet implements CommandListener
     return sb.toString();
   }
 
-  /*
-   * URL
-   */
-
-  /**
-   * URL encode a string
-   */
-  public static String URLEncode(final String s) {
-    if (s == null) { return null; }
-    final StringBuffer res = new StringBuffer(s.length());
-    char ch;
-    for (int i = 0; i < s.length(); i++) {
-      ch = s.charAt(i);
-      switch (ch) {
-        case CR:
-          res.append("%0A");
-          break;
-        case LF:
-          res.append("%0D");
-          break;
-        case ' ':
-          res.append("%20");
-          break;
-        case '#':
-          res.append("%23");
-          break;
-        case '%':
-          res.append("%25");
-          break;
-        case '&':
-          res.append("%26");
-          break;
-        case '-':
-          res.append("%2D");
-          break;
-        case '/':
-          res.append("%2F");
-          break;
-        case ':':
-          res.append("%3A");
-          break;
-        case ';':
-          res.append("%3B");
-          break;
-        case '=':
-          res.append("%3D");
-          break;
-        case '?':
-          res.append("%3F");
-          break;
-        default:
-          res.append(ch);
-          break;
-      }
-    }
-    return res.toString();
-  }
+	//#ifdef DLARGEMEM
+//@  /*
+//@   * URL
+//@   */
+//@
+//@  /**
+//@   * URL encode a string
+//@   */
+//@  public static String URLEncode(final String s) {
+//@    if (s == null) { return null; }
+//@    final StringBuffer res = new StringBuffer(s.length());
+//@    char ch;
+//@    for (int i = 0; i < s.length(); i++) {
+//@      ch = s.charAt(i);
+//@      switch (ch) {
+//@        case CR:
+//@          res.append("%0A");
+//@          break;
+//@        case LF:
+//@          res.append("%0D");
+//@          break;
+//@        case ' ':
+//@          res.append("%20");
+//@          break;
+//@        case '#':
+//@          res.append("%23");
+//@          break;
+//@        case '%':
+//@          res.append("%25");
+//@          break;
+//@        case '&':
+//@          res.append("%26");
+//@          break;
+//@        case '-':
+//@          res.append("%2D");
+//@          break;
+//@        case '/':
+//@          res.append("%2F");
+//@          break;
+//@        case ':':
+//@          res.append("%3A");
+//@          break;
+//@        case ';':
+//@          res.append("%3B");
+//@          break;
+//@        case '=':
+//@          res.append("%3D");
+//@          break;
+//@        case '?':
+//@          res.append("%3F");
+//@          break;
+//@        default:
+//@          res.append(ch);
+//@          break;
+//@      }
+//@    }
+//@    return res.toString();
+//@  }
+	//#endif
 
   /*
    * Graphics
@@ -752,66 +811,68 @@ public abstract class BaseApp extends MIDlet implements CommandListener
    * Vector
    */
 
-  /**
-   * Quick Sort
-   */
-  private static void qsort(final Vector v, final int sx, final int dx, final Comparator c) {
-    int a;
-    int b;
-    Object ele2x;
-    a = sx;
-    b = dx;
-    final Object ele1x = v.elementAt((sx + dx) / 2);
-    do {
-      while (c.compare(v.elementAt(a), ele1x) < 0) {
-        a++;
-      }
-      while (c.compare(ele1x, v.elementAt(b)) < 0) {
-        b--;
-      }
-      if (a <= b) {
-        ele2x = v.elementAt(a);
-        v.setElementAt(v.elementAt(b), a);
-        v.setElementAt(ele2x, b);
-        a++;
-        b--;
-      }
-    }
-    while (a <= b);
-    if (sx < b) {
-      BaseApp.qsort(v, sx, b, c);
-    }
-    if (a < dx) {
-      BaseApp.qsort(v, a, dx, c);
-    }
-  }
-
-  /**
-   * Sort a vector according to comparator c
-   *
-   * @param v
-   * @param c
-   */
-  public static void sort(final Vector v, final Comparator c) {
-    if ((v != null) && (v.size() > 1)) {
-      BaseApp.qsort(v, 0, v.size() - 1, c);
-    }
-  }
-
-  /**
-   * Find a element o in the vector v using the comparator c
-   *
-   * @param v
-   * @param o
-   * @param c
-   * @return
-   */
-  public static int find(final Vector v, final Object o, final Comparator c) {
-    for (int i = 0; i < v.size(); i++) {
-      if (c.compare(o, v.elementAt(i)) == 0) { return i; }
-    }
-    return -1;
-  }
+	//#ifdef DLARGEMEM
+//@  /**
+//@   * Quick Sort
+//@   */
+//@  private static void qsort(final Vector v, final int sx, final int dx, final Comparator c) {
+//@    int a;
+//@    int b;
+//@    Object ele2x;
+//@    a = sx;
+//@    b = dx;
+//@    final Object ele1x = v.elementAt((sx + dx) / 2);
+//@    do {
+//@      while (c.compare(v.elementAt(a), ele1x) < 0) {
+//@        a++;
+//@      }
+//@      while (c.compare(ele1x, v.elementAt(b)) < 0) {
+//@        b--;
+//@      }
+//@      if (a <= b) {
+//@        ele2x = v.elementAt(a);
+//@        v.setElementAt(v.elementAt(b), a);
+//@        v.setElementAt(ele2x, b);
+//@        a++;
+//@        b--;
+//@      }
+//@    }
+//@    while (a <= b);
+//@    if (sx < b) {
+//@      BaseApp.qsort(v, sx, b, c);
+//@    }
+//@    if (a < dx) {
+//@      BaseApp.qsort(v, a, dx, c);
+//@    }
+//@  }
+//@
+//@  /**
+//@   * Sort a vector according to comparator c
+//@   *
+//@   * @param v
+//@   * @param c
+//@   */
+//@  public static void sort(final Vector v, final Comparator c) {
+//@    if ((v != null) && (v.size() > 1)) {
+//@      BaseApp.qsort(v, 0, v.size() - 1, c);
+//@    }
+//@  }
+//@
+//@  /**
+//@   * Find a element o in the vector v using the comparator c
+//@   *
+//@   * @param v
+//@   * @param o
+//@   * @param c
+//@   * @return
+//@   */
+//@  public static int find(final Vector v, final Object o, final Comparator c) {
+//@    for (int i = 0; i < v.size(); i++) {
+//@      if (c.compare(o, v.elementAt(i)) == 0) { return i; }
+//@    }
+//@    return -1;
+//@  }
+	//#endif
 
   /*
    * RMS
@@ -847,6 +908,7 @@ public abstract class BaseApp extends MIDlet implements CommandListener
         }
       }
       catch (final RecordStoreException e) {
+				e.printStackTrace();
         //
       }
     }
@@ -865,6 +927,7 @@ public abstract class BaseApp extends MIDlet implements CommandListener
       }
       catch (final RecordStoreException ex) {
         //
+				ex.printStackTrace();
       }
     }
     BaseApp.recordStores.clear();
@@ -876,17 +939,65 @@ public abstract class BaseApp extends MIDlet implements CommandListener
    * @return
    */
   public static DataInputStream readRecord(final RecordStore rs, final int recordID) {
+		//#ifdef DLOGGING
+//@		Logger logger = Logger.getLogger("BaseApp");
+//@		logger.finest("readRecord rs,recordID=" + rs + "," + recordID);
+		//#endif
     DataInputStream dis = null;
     if (rs != null) {
       try {
         final byte[] data = rs.getRecord(recordID);
         dis = new DataInputStream(new ByteArrayInputStream(data));
       }
+      catch (final InvalidRecordIDException e) {
+        //
+				e.printStackTrace();
+				//#ifdef DLOGGING
+//@				logger.severe("readRecord rs,recordID=" + rs + "," + recordID, e);
+				//#endif
+      }
       catch (final RecordStoreException e) {
         //
+				e.printStackTrace();
+				//#ifdef DLOGGING
+//@				logger.severe("readRecord rs,recordID=" + rs + "," + recordID, e);
+				//#endif
       }
     }
     return dis;
+  }
+
+  /**
+   * @param rs
+   * @param recordID
+   * @return
+   */
+  public static int getRecordSize(final RecordStore rs, final int recordID) {
+		//#ifdef DLOGGING
+//@		Logger logger = Logger.getLogger("BaseApp");
+//@		logger.finest("getRecordSize rs,recordID=" + rs + "," + recordID);
+		//#endif
+		int len = 0;
+    if (rs != null) {
+      try {
+        len = rs.getRecordSize(recordID);
+      }
+      catch (final InvalidRecordIDException e) {
+        //
+				e.printStackTrace();
+				//#ifdef DLOGGING
+//@				logger.severe("getRecordSize rs,recordID=" + rs + "," + recordID, e);
+				//#endif
+      }
+      catch (final RecordStoreException e) {
+        //
+				e.printStackTrace();
+				//#ifdef DLOGGING
+//@				logger.severe("getRecordSize rs,recordID=" + rs + "," + recordID, e);
+				//#endif
+      }
+    }
+    return len;
   }
 
   /**
@@ -906,6 +1017,7 @@ public abstract class BaseApp extends MIDlet implements CommandListener
       }
       catch (final RecordStoreException e) {
         //
+				e.printStackTrace();
       }
     }
     try {
@@ -913,6 +1025,7 @@ public abstract class BaseApp extends MIDlet implements CommandListener
     }
     catch (final IOException e) {
       //
+			e.printStackTrace();
     }
   }
 
@@ -928,6 +1041,7 @@ public abstract class BaseApp extends MIDlet implements CommandListener
       }
       catch (final IOException e) {
         //
+				e.printStackTrace();
       }
     }
     if (os != null) {
@@ -936,6 +1050,7 @@ public abstract class BaseApp extends MIDlet implements CommandListener
       }
       catch (final IOException e) {
         //
+				e.printStackTrace();
       }
     }
     if (rs != null) {
@@ -944,6 +1059,7 @@ public abstract class BaseApp extends MIDlet implements CommandListener
       }
       catch (final RecordStoreException e) {
         //
+				e.printStackTrace();
       }
     }
   }
@@ -965,16 +1081,43 @@ public abstract class BaseApp extends MIDlet implements CommandListener
       }
     }
     catch (final RecordStoreException e) {
+			e.printStackTrace();
     }
   }
 
   /*
-   * Resources
+   * Resources. 
+   *
+   * Classes take up space in J2ME, so use arrays instead.  The
+   * arrays will have constants to index into the array to show attribute
+   * of the item.
    */
+  /**
+	* Menu id index into menu item definition
+	*/
   public static final int MD_MENUID = 0;
+  /**
+	* Menu text index into menu item definition
+	*/
   public static final int MD_MENUTX = 1;
+  /**
+	* Menu action index into menu item definition
+	*/
   public static final int MD_MENUAC = 2;
+  /**
+	* Menu icon index into menu item definition
+	*/
   public static final int MD_MENUIC = 3;
+
+  /**
+	* Index into index definition which holds indexes to menu definitions active
+	*/
+  public static final int ID_MENU_IX = 0;
+
+  /**
+	* Index into index definition which holds indexes to list entry active
+	*/
+  public static final int ID_MENU_LIST = 1;
 
   private static final String DIR_SEP = "/";
 
@@ -985,10 +1128,12 @@ public abstract class BaseApp extends MIDlet implements CommandListener
   public static int background = 0x00000000;
   public static int foreground = 0x00FFFFFF;
   public static short[][] menu;
+  public static int INVALID_INDEX = 1000;
+  public static Vector menuShown;
+  public static Vector menuCombined;
+  public static Settings settings = null;
   public static String[] messages;
   public static Image[] icons;
-
-  public static int pSpecial;
 
   private static char LINESEP = BaseApp.CR;
   private static char STRIP = BaseApp.LF;
@@ -996,7 +1141,17 @@ public abstract class BaseApp extends MIDlet implements CommandListener
 
   private static int BUF_SIZE = 40;
 
+  /**
+   * Take the resource name and see if it is in the local sub directory.
+	 * If not, use the main directory.
+   *
+   * @param res
+   * @return    InputStream
+   */
   public static InputStream getInputStream(final String res) {
+		//#ifdef DLOGGING
+//@		Logger logger = Logger.getLogger("BaseApp");
+		//#endif
     StringBuffer sb = new StringBuffer(BaseApp.BUF_SIZE);
     String basepath;
     final Class me = res.getClass();
@@ -1012,11 +1167,71 @@ public abstract class BaseApp extends MIDlet implements CommandListener
     sb.append(res);
     InputStream in = me.getResourceAsStream(sb.toString());
     if (in == null) {
+			//#ifdef DLOGGING
+//@      if (in == null) {
+//@				logger.warning("getInputStream missing error for res,sb=" + res + "," + sb.toString());
+//@			}
+			//#endif
       sb = new StringBuffer(basepath).append(res);
       in = me.getResourceAsStream(sb.toString());
+			//#ifdef DLOGGING
+//@      if (in == null) {
+//@				logger.severe("getInputStream missing error for res,locale,sb" + res + "," + locale + "," + sb.toString(), new IOException("Cannot find resource " + res));
+//@			}
+			//#endif
     }
     return in;
   }
+
+	//#ifdef DMIDP10
+//@  /**
+//@   * Take the resource name and see if it is in the local sub directory.
+//@	 * If not, use the main directory.
+//@   *
+//@   * @param res
+//@   * @return    Image
+//@   */
+//@  public static Image createImage(final String res) {
+		//#ifdef DLOGGING
+//@		Logger logger = Logger.getLogger("BaseApp");
+//@		logger.finest("createImage res=" + res);
+		//#endif
+//@		Image im = null;
+//@		try {
+//@			StringBuffer sb = new StringBuffer(BaseApp.BUF_SIZE);
+//@			String basepath;
+//@			sb.append(BaseApp.DIR_SEP);
+//@			if (BaseApp.resPrefix != null) {
+//@				sb.append(BaseApp.resPrefix).append(BaseApp.DIR_SEP);
+//@			}
+//@			basepath = sb.toString();
+//@			final String locale = Device.getLocale();
+//@			if (locale != null) {
+//@				sb.append(locale).append(BaseApp.DIR_SEP);
+//@			}
+//@			sb.append(res);
+//@			try {
+//@				im = Image.createImage(sb.toString());
+//@			}
+//@			catch (final IOException e) {
+				//#ifdef DLOGGING
+//@				logger.warning("createImage res not present =" + res);
+				//#endif
+//@			}
+//@			if (im == null) {
+//@				sb = new StringBuffer(basepath).append(res);
+//@				im = Image.createImage(sb.toString());
+//@			}
+//@		}
+//@    catch (final IOException e) {
+//@			e.printStackTrace();
+			//#ifdef DLOGGING
+//@			logger.severe("createImage missing error for " + res, e);
+			//#endif
+//@		}
+//@    return im;
+//@  }
+	//#endif
 
   public static String readLine(final InputStream in) throws IOException {
     String res = null;
@@ -1053,6 +1268,10 @@ public abstract class BaseApp extends MIDlet implements CommandListener
    * @return
    */
   public static Pair[] readPairs(final String res, final char sep) {
+		//#ifdef DLOGGING
+//@		Logger logger = Logger.getLogger("BaseApp");
+//@		logger.finest("readPairs res,sep=" + res + "," + sep);
+		//#endif
     final Vector s = new Vector();
     Pair p;
     String line;
@@ -1081,12 +1300,20 @@ public abstract class BaseApp extends MIDlet implements CommandListener
       while (true);
     }
     catch (final IOException e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+//@			logger.severe("readPairs missing error for " + res, e);
+			//#endif
       s.removeAllElements();
     }
     final Pair[] out = new Pair[s.size()];
-    for (int i = 0; i < s.size(); i++) {
-      out[i] = (Pair) s.elementAt(i);
-    }
+		try {
+			s.copyInto(out);
+		} catch (Throwable e) {
+			for (int i = 0; i < s.size(); i++) {
+				out[i] = (Pair) s.elementAt(i);
+			}
+		}
     return out;
   }
 
@@ -1130,10 +1357,17 @@ public abstract class BaseApp extends MIDlet implements CommandListener
    * @return
    */
   public static String[] readStrings(final String res) {
+		//#ifdef DLOGGING
+//@		Logger logger = Logger.getLogger("BaseApp");
+//@		logger.finest("readStrings res=" + res);
+		//#endif
     final Vector s = new Vector();
     String line;
     try {
       final InputStream in = BaseApp.getInputStream(res);
+      if (in == null) {
+				throw new IOException("File not in jar file " + res);
+			}
       do {
         line = BaseApp.readLine(in);
         if (line == null) {
@@ -1146,12 +1380,25 @@ public abstract class BaseApp extends MIDlet implements CommandListener
       while (true);
     }
     catch (final IOException e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+//@			logger.severe("readStrings missing error for " + res, e);
+			//#endif
       s.removeAllElements();
+			//#ifdef DTEST
+//@			for (int i = 0; i < GameApp.MSG_USERDEF * 10; i++) {
+//@          s.addElement("No file found line " + i);
+//@			}
+			//#endif
     }
     final String[] out = new String[s.size()];
-    for (int i = 0; i < s.size(); i++) {
-      out[i] = s.elementAt(i).toString();
-    }
+		try {
+			s.copyInto(out);
+		} catch (Throwable e) {
+			for (int i = 0; i < s.size(); i++) {
+				out[i] = s.elementAt(i).toString();
+			}
+		}
     return out;
   }
 
@@ -1162,10 +1409,15 @@ public abstract class BaseApp extends MIDlet implements CommandListener
    * @return
    */
   public static String readString(final String res) {
+		//#ifdef DLOGGING
+//@		Logger logger = Logger.getLogger("BaseApp");
+//@		logger.finest("readString res=" + res);
+		//#endif
     final StringBuffer sb = new StringBuffer(1024);
     int ch;
+		InputStream in = null;
     try {
-      final InputStream in = BaseApp.getInputStream(res);
+      in = BaseApp.getInputStream(res);
       do {
         ch = in.read();
         if (ch == -1) {
@@ -1177,7 +1429,22 @@ public abstract class BaseApp extends MIDlet implements CommandListener
       return sb.toString();
     }
     catch (final IOException e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+//@			logger.severe("readString missing error for " + res, e);
+			//#endif
       return null;
+		} finally {
+			if (in != null) {
+				try {
+					in.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+					//#ifdef DLOGGING
+//@					logger.severe("readString close error for " + res, e);
+					//#endif
+				}
+			}
     }
   }
 
@@ -1191,23 +1458,64 @@ public abstract class BaseApp extends MIDlet implements CommandListener
    * @return
    */
   public static Image[] splitImages(final String res, final int count, final int width, final int height) {
+		//#ifdef DLOGGING
+//@		Logger logger = Logger.getLogger("BaseApp");
+//@		logger.finest("createImage res,count,width,height=" + res + "," + count + "," + width + "," + height);
+		//#endif
     final Image[] images = new Image[count];
     try {
       Graphics g;
+			//#ifdef DMIDP20
       final InputStream in = BaseApp.getInputStream(res);
+      if (in == null) {
+				throw new IOException("File not in jar file " + res);
+			}
       final Image image = Image.createImage(in);
+			//#else
+//@      final Image image = BaseApp.createImage(res);
+			//#endif
+			int widthCount = image.getWidth();
       for (int i = 0; i < count; i++) {
         images[i] = Image.createImage(width, height);
         g = images[i].getGraphics();
         g.drawImage(image, -i * width, 0, 0);
+				widthCount -= width;
+				//#ifdef DLOGGING
+//@				logger.trace("splitImages i,widthCount=" + i + "," + widthCount);
+				//#endif
+				if (widthCount < 0) {
+					break;
+				}
       }
     }
+		//#ifdef DMIDP20
     catch (final IOException ex) {
-      System.err.println("missing " + res);
+      System.err.println("splitImages missing " + res);
+			ex.printStackTrace();
+			//#ifdef DLOGGING
+//@			logger.severe("splitImages missing error for " + res, ex);
+			//#endif
+    }
+		//#endif
+		catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+//@			logger.severe("splitImages error", e);
+			//#endif
     }
     return images;
   }
 
+	public static void copyInto(Vector from, Vector to) {
+		final int fin = from.size();
+		Object[] ofrom = new Object[fin];
+		from.copyInto(ofrom);
+		for (int i = 0; i < fin; i++) {
+			to.addElement(ofrom[i]);
+		}
+	}
+
+	//#ifdef DMIDP20
   /**
    * Load an Image from a resource file
    *
@@ -1215,17 +1523,36 @@ public abstract class BaseApp extends MIDlet implements CommandListener
    * @return
    */
   public static Image createImage(final String res) {
+		//#ifdef DLOGGING
+//@		Logger logger = Logger.getLogger("BaseApp");
+//@		logger.finest("createImage res=" + res);
+		//#endif
     Image image = null;
     try {
       final InputStream in = BaseApp.getInputStream(res);
+      if (in == null) {
+				throw new IOException("File not in jar file " + res);
+			}
       image = Image.createImage(in);
     }
     catch (final IOException ex) {
       System.err.println("missing " + res);
+			ex.printStackTrace();
+			//#ifdef DLOGGING
+//@			logger.severe("createImage missing error for " + res, ex);
+			//#endif
+    }
+		catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+//@			logger.severe("createImage error", e);
+			//#endif
     }
     return image;
   }
+	//#endif
 
+	//#ifdef DMIDP20
   /**
    * Load a tile from a resource file
    *
@@ -1251,6 +1578,7 @@ public abstract class BaseApp extends MIDlet implements CommandListener
     }
     return ok;
   }
+	//#endif
 
   /**
    * @param cl
@@ -1259,7 +1587,7 @@ public abstract class BaseApp extends MIDlet implements CommandListener
    * @return
    */
   public static Displayable getTextForm(final int title, final String textRes) {
-    final Form form = new Form(BaseApp.messages[title]);
+    final Form form = new FeatureForm(BaseApp.messages[title]);
     final String msg = BaseApp.readString(textRes);
     if (msg != null) {
       form.append(msg);
@@ -1276,7 +1604,7 @@ public abstract class BaseApp extends MIDlet implements CommandListener
    * @return
    */
   public static Displayable getTextForm(final int title, final String textRes, final Object[] o) {
-    final Form form = new Form(BaseApp.messages[title]);
+    final Form form = new FeatureForm(BaseApp.messages[title]);
     final String msg = BaseApp.readString(textRes);
     if (msg != null) {
       form.append(BaseApp.format(msg, o));
@@ -1392,37 +1720,66 @@ public abstract class BaseApp extends MIDlet implements CommandListener
    *          previous Displayable) if save is set to true
    */
   public static void show(final Alert alert, Displayable next, final boolean save) {
-    Displayable previous = null;
-    if (!BaseApp.displayableStack.empty()) {
-      previous = (Displayable) BaseApp.displayableStack.peek();
-    }
-    if (next == null) {
-      next = BaseApp.getDisplay();
-    }
-    else {
-      final boolean isNew = (previous == null) || (previous != next);
-      boolean isAlert = (next instanceof Alert) && (((Alert) next).getTimeout() != Alert.FOREVER);
-      if (save && isNew && !isAlert) {
-        BaseApp.displayableStack.push(next);
-      }
-    }
-    BaseApp.midlet.changed(BaseApp.EV_BEFORECHANGE, previous, next);
-    if (alert == null) {
-      BaseApp.setDisplay(next);
-    }
-    else {
-      BaseApp.setDisplay(alert, next);
-    }
-    BaseApp.midlet.changed(BaseApp.EV_AFTERCHANGE, previous, next);
+		//#ifdef DLOGGING
+//@		Logger logger = Logger.getLogger("BaseApp");
+//@		logger.finest("show alert,next,save=" + alert + "," + next + "," + save);
+		//#endif
+		try {
+			Displayable previous = null;
+			if (!BaseApp.displayableStack.empty()) {
+				previous = (Displayable) BaseApp.displayableStack.peek();
+			}
+			if (next == null) {
+				next = BaseApp.getDisplay();
+			}
+			else {
+				final boolean isNew = (previous == null) || (previous != next);
+				boolean isAlert = (next instanceof Alert) && (((Alert) next).getTimeout() != Alert.FOREVER);
+				if (save && isNew && !isAlert) {
+					BaseApp.displayableStack.push(next);
+				}
+			}
+		//#ifdef DLOGGING
+//@		logger.finest("show previous,next,BaseApp.midlet=" + previous + "," + next + "," + BaseApp.midlet);
+		//#endif
+			BaseApp.midlet.changed(BaseApp.EV_BEFORECHANGE, previous, next);
+			if (alert == null) {
+				BaseApp.setDisplay(next);
+			}
+			else {
+				BaseApp.setDisplay(alert, next);
+			}
+			BaseApp.midlet.changed(BaseApp.EV_AFTERCHANGE, previous, next);
+		}
+    catch (final Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+//@			logger.severe("show error", e);
+			//#endif
+		}
   }
 
+  /**
+   * Create the new command with label (int in messages), command type,
+   * priority, and action.
+   *
+   * @param label
+   * @param commandType
+   * @param priority
+   * @param action
+   * @return    Command
+   * @author Irv Bunton
+   */
   public static Command newCommand(final int label, final int commandType, final int priority, final int action) {
+
     final Command cmd = new Command(BaseApp.messages[label], commandType, priority);
     BaseApp.commands.put(cmd, new Integer(action));
     return cmd;
   }
 
   /**
+   * Register the command with it's action.
+   *
    * @param cmd
    * @param action
    */
@@ -1431,6 +1788,8 @@ public abstract class BaseApp extends MIDlet implements CommandListener
   }
 
   /**
+   * Register the action for the given list.
+   *
    * @param list
    * @param action
    */
@@ -1439,6 +1798,8 @@ public abstract class BaseApp extends MIDlet implements CommandListener
   }
 
   /**
+   * Register the item (index into the list) with it's action to take.
+   *
    * @param list
    * @param index
    * @param action
@@ -1455,18 +1816,30 @@ public abstract class BaseApp extends MIDlet implements CommandListener
    */
   abstract public boolean handleAction(int action, Displayable d, Command cmd);
 
+  /**
+   * Process the given command for either the displayable or item.
+   * Get the action(int) for the givem cmd (if non null).  
+   * If displayable (d) is a list, get selected index and get the action
+   * from listItems for the given list/index.  Else, get the action for
+   * the list from listItems.
+   *
+   * Use handleAction
+   * and if not handled there, do back or exit.
+   * 
+   * @param cmd
+   * @param d
+   * @param i
+   */
   public void process(final Command cmd, final Displayable d, final Item i) {
     // if cmd is list selection, we change cmd to actual command
     Object at = null;
-    if (cmd == List.SELECT_COMMAND) {
-      if ((d != null) && (d instanceof List)) {
-        final List list = (List) d;
-        final int index = list.getSelectedIndex();
-        at = BaseApp.listItems.get(list + "#" + index);
-        if (at == null) {
-          at = BaseApp.listItems.get(list);
-        }
-      }
+    if ((cmd == List.SELECT_COMMAND) && (d != null) && (d instanceof List)) {
+			final List list = (List) d;
+			final int index = list.getSelectedIndex();
+			at = BaseApp.listItems.get(list + "#" + index);
+			if (at == null) {
+				at = BaseApp.listItems.get(list);
+			}
     }
     if ((at == null) && (cmd != null)) {
       at = BaseApp.commands.get(cmd);
@@ -1486,23 +1859,57 @@ public abstract class BaseApp extends MIDlet implements CommandListener
             processed = true;
             break;
           }
+					default:
+						break;
         }
       }
     }
   }
 
   /**
-   * @param d
-   * @param c1
-   * @param c2
+   * Add the commands if not null to the displayable.  Set the command listener
+   * to the midlet (BaseApp.midlet = this).
+   *
+   * @param d displayable
+   * @param c1 First command
+   * @param c2 Second command
    */
   public static void setup(final Displayable d, final Command c1, final Command c2) {
-    d.setCommandListener(BaseApp.midlet);
-    if (c1 != null) {
-      d.addCommand(c1);
+		//#ifdef DLOGGING
+//@		Logger logger = Logger.getLogger("BaseApp");
+//@		logger.finest("setup d,c1,c2,is FeatureForm,is FeatureList=" +
+//@				((d == null) ? "null" : d.getClass().getName()) + "," +
+//@				((c1 == null) ? "null" : c1.getLabel()) + "," +
+//@				((c2 == null) ? "null" : c2.getLabel()) + "," +
+//@				((d == null) ? "null" : String.valueOf(d instanceof FeatureForm)) + "," +
+//@				((d == null) ? "null" : String.valueOf(d instanceof FeatureList)));
+//@			;
+		//#endif
+		try {
+			if ((d instanceof FeatureForm) || (d instanceof FeatureList)) {
+				d.setCommandListener(BaseApp.midlet);
+			} else {
+				FeatureMgr featureMgr = new FeatureMgr(d);
+				if (d instanceof CommandListener) {
+					featureMgr.setCommandListener((CommandListener)d, false);
+				} else {
+					featureMgr.setCommandListener(BaseApp.midlet, false);
+				}
+				d.setCommandListener(featureMgr);
+			}
+			if (c1 != null) {
+				d.addCommand(c1);
+			}
+			if (c2 != null) {
+				d.addCommand(c2);
+			}
     }
-    if (c2 != null) {
-      d.addCommand(c2);
+    catch (Throwable ex) {
+      System.err.println("setup error");
+			ex.printStackTrace();
+			//#ifdef DLOGGING
+//@			logger.severe("setup error", ex);
+			//#endif
     }
   }
 
@@ -1518,7 +1925,15 @@ public abstract class BaseApp extends MIDlet implements CommandListener
   /**
    * Setup midlet and display references
    */
-  public BaseApp() {
+	//#ifdef DJMTEST
+//@  public BaseApp(String name)
+	//#else
+  public BaseApp()
+	//#endif
+	{
+		//#ifdef DJMTEST
+//@		super(name);
+		//#endif
     Device.init();
     BaseApp.midlet = this;
     BaseApp.display = Display.getDisplay(this);
@@ -1539,6 +1954,9 @@ public abstract class BaseApp extends MIDlet implements CommandListener
    * StartApp initialize or resume the application
    */
   final public void startApp() throws MIDletStateChangeException {
+		//#ifdef DLOGGING
+//@		if (finestLoggable) {logger.finest("startApp");}
+		//#endif
     if (!initialized) {
       init();
     }
@@ -1551,13 +1969,20 @@ public abstract class BaseApp extends MIDlet implements CommandListener
    * Pause the application
    */
   final public void pauseApp() {
+		//#ifdef DLOGGING
+//@		if (finestLoggable) {logger.finest("pauseApp");}
+		//#endif
     pause();
   }
 
   /**
    * Close the application
    */
-  final public void destroyApp(final boolean unconditional) throws MIDletStateChangeException {
+  final public void destroyApp(final boolean unconditional)
+	  throws MIDletStateChangeException {
+		//#ifdef DLOGGING
+//@		if (finestLoggable) {logger.finest("destroyApp");}
+		//#endif
     done();
   }
 
@@ -1616,6 +2041,17 @@ public abstract class BaseApp extends MIDlet implements CommandListener
     BaseApp.display.setCurrent(anAlert, aNext);
   }
 
+	//#ifdef DMIDP20
+  /**
+   * Set the current display
+   *
+   * @param aDisplay
+   */
+	public static void setDisplayItem(Item aItem) {
+    BaseApp.display.setCurrentItem(aItem);
+  }
+	//#endif
+
   /**
    * Retrieves the system property, and returns it, or def if it is null.
    *
@@ -1628,6 +2064,7 @@ public abstract class BaseApp extends MIDlet implements CommandListener
       sValue = System.getProperty(sName);
     }
     catch (final Exception e) {
+			e.printStackTrace();
     }
     return (sValue == null ? def : sValue);
   }
@@ -1638,29 +2075,32 @@ public abstract class BaseApp extends MIDlet implements CommandListener
       sValue = getAppProperty(sName);
     }
     catch (final Exception e) {
+			e.printStackTrace();
     }
     return (sValue == null ? def : sValue);
   }
 
-  /**
-   * Checks to see if a given class/interface exists in this Java
-   * implementation.
-   *
-   * @param className the full name of the class
-   * @return true if the class/interface exists
-   */
-  public static boolean isClass(final String className) {
-    boolean found = false;
-    try {
-      if (className != null) {
-        Class.forName(className);
-        found = true;
-      }
-    }
-    catch (final ClassNotFoundException cnfe) {
-      //
-    }
-    return found;
-  }
+	//#ifdef DLARGEMEM
+//@  /**
+//@   * Checks to see if a given class/interface exists in this Java
+//@   * implementation.
+//@   *
+//@   * @param className the full name of the class
+//@   * @return true if the class/interface exists
+//@   */
+//@  public static boolean isClass(final String className) {
+//@    boolean found = false;
+//@    try {
+//@      if (className != null) {
+//@        Class.forName(className);
+//@        found = true;
+//@      }
+//@    }
+//@    catch (final ClassNotFoundException cnfe) {
+//@      //
+//@    }
+//@    return found;
+//@  }
+	//#endif
 
 }
