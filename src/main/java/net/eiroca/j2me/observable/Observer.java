@@ -17,10 +17,20 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package net.eiroca.j2me.observable;
-
-public interface Observer {
-
-  public abstract void changed(Observable observable);
-
-}
+/**
+ * This was modified no later than 2009-01-29
+ */
+// Expand to define memory size define
+//#define DREGULARMEM
+//#ifdef DLARGEMEM
+//@package net.eiroca.j2me.observable;
+//@
+//@/**
+//@	* Observe interface
+//@	*/
+//@public interface Observer {
+//@
+//@  public abstract void changed(Observable observable);
+//@
+//@}
+//#endif
