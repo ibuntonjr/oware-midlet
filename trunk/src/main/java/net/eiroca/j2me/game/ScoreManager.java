@@ -16,6 +16,9 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+/**
+ * This was modified no later than 2009-01-29
+ */
 package net.eiroca.j2me.game;
 
 import java.io.ByteArrayOutputStream;
@@ -26,6 +29,9 @@ import java.util.Vector;
 import javax.microedition.rms.RecordStore;
 import net.eiroca.j2me.app.BaseApp;
 
+/**
+	* Score manager:  record name, game name, scores, and methods to modify.
+	*/
 public class ScoreManager {
 
   private final String recordName;
@@ -105,6 +111,7 @@ public class ScoreManager {
     }
     catch (final IOException e) {
       //
+			e.printStackTrace();
     }
     BaseApp.writeData(rs, baos);
     BaseApp.close(rs, null, dos);
@@ -135,6 +142,7 @@ public class ScoreManager {
       }
       catch (final IOException e) {
         //
+				e.printStackTrace();
       }
     }
     BaseApp.close(rs, dis, null);
@@ -149,7 +157,6 @@ public class ScoreManager {
       scores[dif].removeElementAt(scores[dif].size() - 1);
     }
     saveScoreList();
-    return;
   }
 
 }
