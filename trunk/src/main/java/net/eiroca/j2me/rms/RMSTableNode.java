@@ -39,6 +39,9 @@
  * IN THE SOFTWARE.
  *
  */
+/**
+ * This was modified no later than 2009-01-29
+ */
 package net.eiroca.j2me.rms;
 
 import java.io.ByteArrayInputStream;
@@ -48,7 +51,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import javax.microedition.rms.RecordStoreException;
 
-/** Node helper class */
+/** RMS Node helper class */
 
 public class RMSTableNode {
 
