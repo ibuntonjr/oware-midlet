@@ -38,6 +38,9 @@
  * IN THE SOFTWARE.
  *
  */
+/**
+ * This was modified no later than 2009-01-29
+ */
 // Expand to define MIDP define
 @DMIDPVERS@
 // Expand to define test define
@@ -966,6 +969,39 @@ implements CommandListener
 
   /**
    * @param rs
+   * @param recordID
+   * @return
+   */
+  public static int getRecordSize(final RecordStore rs, final int recordID) {
+		//#ifdef DLOGGING
+		Logger logger = Logger.getLogger("BaseApp");
+		logger.finest("getRecordSize rs,recordID=" + rs + "," + recordID);
+		//#endif
+		int len = 0;
+    if (rs != null) {
+      try {
+        len = rs.getRecordSize(recordID);
+      }
+      catch (final InvalidRecordIDException e) {
+        //
+				e.printStackTrace();
+				//#ifdef DLOGGING
+				logger.severe("getRecordSize rs,recordID=" + rs + "," + recordID, e);
+				//#endif
+      }
+      catch (final RecordStoreException e) {
+        //
+				e.printStackTrace();
+				//#ifdef DLOGGING
+				logger.severe("getRecordSize rs,recordID=" + rs + "," + recordID, e);
+				//#endif
+      }
+    }
+    return len;
+  }
+
+  /**
+   * @param rs
    * @param baos
    */
   public static void writeData(final RecordStore rs, final ByteArrayOutputStream baos) {
@@ -1438,10 +1474,18 @@ implements CommandListener
 			//#else
       final Image image = BaseApp.createImage(res);
 			//#endif
+			int widthCount = image.getWidth();
       for (int i = 0; i < count; i++) {
         images[i] = Image.createImage(width, height);
         g = images[i].getGraphics();
         g.drawImage(image, -i * width, 0, 0);
+				widthCount -= width;
+				//#ifdef DLOGGING
+				logger.trace("splitImages i,widthCount=" + i + "," + widthCount);
+				//#endif
+				if (widthCount < 0) {
+					break;
+				}
       }
     }
 		//#ifdef DMIDP20
