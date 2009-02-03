@@ -21,15 +21,15 @@
  */
 
 // Expand to define MIDP define
-@DMIDPVERS@
+//#define DMIDP20
 // Expand to define CLDC define
-@DCLDCVERS@
+//#define DCLDCV10
 // Expand to define test define
-@DTESTDEF@
+//#define DNOTEST
 // Expand to define test ui define
-@DTESTUIDEF@
+//#define DNOTESTUI
 // Expand to define logging define
-@DLOGDEF@
+//#define DNOLOGGING
 
 package com.substanceofcode.rssreader.presentation;
 
@@ -37,19 +37,22 @@ import java.util.Hashtable;
 
 import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
+import javax.microedition.lcdui.Choice;
+import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.Form;
+import javax.microedition.lcdui.Font;
 
 import net.eiroca.j2me.app.BaseApp;
 
 //#ifdef DLOGGING
-import net.sf.jlogmicro.util.logging.Logger;
-import net.sf.jlogmicro.util.logging.LogManager;
-import net.sf.jlogmicro.util.logging.Level;
+//@import net.sf.jlogmicro.util.logging.Logger;
+//@import net.sf.jlogmicro.util.logging.LogManager;
+//@import net.sf.jlogmicro.util.logging.Level;
 //#endif
 
 /* Allow Form/List with optional commands added with addPromptCommand which if
@@ -59,6 +62,11 @@ import net.sf.jlogmicro.util.logging.Level;
 public class FeatureMgr implements CommandListener, Runnable {
 
 	private Hashtable promptCommands = null;
+	//#ifdef DMIDP20
+    public static final int DEFAULT_FONT_CHOICE = 0;
+    protected int fontChoice = DEFAULT_FONT_CHOICE;
+    protected Font font;
+	//#endif
 	final private Displayable disp;
 	private Command origCmd = null;
 	protected Command exCmd = null;
@@ -68,9 +76,9 @@ public class FeatureMgr implements CommandListener, Runnable {
     private Thread      netThread = null;  // The thread for networking, etc
 
 	//#ifdef DLOGGING
-	private Logger logger = Logger.getLogger("FeatureMgr");
-	private boolean fineLoggable = logger.isLoggable(Level.FINE);
-	private boolean finestLoggable = logger.isLoggable(Level.FINEST);
+//@	private Logger logger = Logger.getLogger("FeatureMgr");
+//@	private boolean fineLoggable = logger.isLoggable(Level.FINE);
+//@	private boolean finestLoggable = logger.isLoggable(Level.FINEST);
 	//#endif
 
 	private CommandListener cmdFeatureUser = null;
@@ -79,7 +87,7 @@ public class FeatureMgr implements CommandListener, Runnable {
 	public FeatureMgr (Displayable disp) {
 		this.disp = disp;
 		//#ifdef DLOGGING
-		if (fineLoggable) {logger.fine("Starting FeatureMgr " + disp.getClass().getName() + "," + disp);}
+//@		if (fineLoggable) {logger.fine("Starting FeatureMgr " + disp.getClass().getName() + "," + disp);}
 		//#endif
 	}
 
@@ -93,11 +101,11 @@ public class FeatureMgr implements CommandListener, Runnable {
 					}
 					this.runFeatureUser = runFeatureUser;
 					//#ifdef DLOGGING
-					if (fineLoggable) {logger.fine("setRunnable runFeatureUser" + runFeatureUser.getClass().getName() + "," + runFeatureUser);}
+//@					if (fineLoggable) {logger.fine("setRunnable runFeatureUser" + runFeatureUser.getClass().getName() + "," + runFeatureUser);}
 					//#endif
 				} else {
 					//#ifdef DLOGGING
-					if (fineLoggable) {logger.fine("setRunnable runFeatureUser=null");}
+//@					if (fineLoggable) {logger.fine("setRunnable runFeatureUser=null");}
 					//#endif
 					this.runFeatureUser = runFeatureUser;
 				}
@@ -108,7 +116,7 @@ public class FeatureMgr implements CommandListener, Runnable {
 			startWakeup(false);
 		}
 		//#ifdef DLOGGING
-		if (fineLoggable) {logger.fine("cmdFeatureUser,background,calling thread,new thread=" + cmdFeatureUser + "," + background + "," + Thread.currentThread() + "," + netThread);}
+//@		if (fineLoggable) {logger.fine("cmdFeatureUser,background,calling thread,new thread=" + cmdFeatureUser + "," + background + "," + Thread.currentThread() + "," + netThread);}
 		//#endif
     }
 
@@ -124,12 +132,12 @@ public class FeatureMgr implements CommandListener, Runnable {
 					}
 					this.runFeatureUser = (Runnable)cmdFeatureUser;
 					//#ifdef DLOGGING
-					if (fineLoggable) {logger.fine("setCommandListener cmdFeatureUser" + cmdFeatureUser.getClass().getName() + "," + cmdFeatureUser);}
+//@					if (fineLoggable) {logger.fine("setCommandListener cmdFeatureUser" + cmdFeatureUser.getClass().getName() + "," + cmdFeatureUser);}
 					//#endif
 				} else {
 					this.runFeatureUser = (Runnable)cmdFeatureUser;
 					//#ifdef DLOGGING
-					if (fineLoggable) {logger.fine("setCommandListener cmdFeatureUser=null");}
+//@					if (fineLoggable) {logger.fine("setCommandListener cmdFeatureUser=null");}
 					//#endif
 				}
 			}
@@ -139,20 +147,25 @@ public class FeatureMgr implements CommandListener, Runnable {
 			startWakeup(false);
 		}
 		//#ifdef DLOGGING
-		if (fineLoggable) {logger.fine("cmdFeatureUser,background,calling thread,new thread=" + cmdFeatureUser + "," + background + "," + Thread.currentThread() + "," + netThread);}
+//@		if (fineLoggable) {logger.fine("cmdFeatureUser,background,calling thread,new thread=" + cmdFeatureUser + "," + background + "," + Thread.currentThread() + "," + netThread);}
 		//#endif
     }
 
-	public void addPromptCommand(Command cmd, String prompt) {
+	public void addPromptCommand(Command cmd, int prompt) {
 		synchronized(this) {
 			if (promptCommands == null) {
 				promptCommands = new Hashtable();
 			}
-			promptCommands.put(cmd, prompt);
+			promptCommands.put(cmd, new Integer(prompt));
 		}
 	}
 
 	public void removeCommand(Command cmd) {
+		removePrompt(cmd);
+		disp.removeCommand(cmd);
+	}
+
+	public void removePrompt(Command cmd) {
 		synchronized(this) {
 			if (promptCommands != null) {
 				promptCommands.remove(cmd);
@@ -184,22 +197,24 @@ public class FeatureMgr implements CommandListener, Runnable {
 							cpromptCommands = promptCommands;
 						}
 						//#ifdef DLOGGING
-						if (fineLoggable) {logger.fine("disp,ccmd,cpromptCommands,corigCmd,thread=" + disp + "," + ccmd.getLabel() + "," + cpromptCommands + "," + "," + corigCmd + "," + Thread.currentThread());}
+//@						if (fineLoggable) {logger.fine("disp,ccmd,cpromptCommands,corigCmd,thread=" + disp + "," + ccmd.getLabel() + "," + cpromptCommands + "," + "," + corigCmd + "," + Thread.currentThread());}
 						//#endif
 						if ((cpromptCommands != null)
 								&& cpromptCommands.containsKey(ccmd)) {
 							synchronized(this) {
 								origCmd = ccmd;
 							}
-							String promptMsg = (String)cpromptCommands.get(ccmd);
+							int promptMsg = ((Integer)cpromptCommands.get(ccmd)).intValue();
 							// Due to a quirk on T637 (MIDP 1.0), we need to create a form
 							// before the alert or the alert will not be seen.
+							// FIX
 							Form formAlert = new Form(ccmd.getLabel());
-							formAlert.append(promptMsg);
-							formAlert.addCommand(new Command("OK", Command.OK, 0));
-							formAlert.addCommand(new Command("Cancel", Command.CANCEL, 1));
+							formAlert.append(BaseApp.messages[promptMsg]);
+							formAlert.addCommand(BaseApp.cOK);
+							formAlert.addCommand(BaseApp.cBACK);
 							formAlert.setCommandListener(this);
 							BaseApp.setDisplay(formAlert);
+							/* FIX
 							Alert promptAlert = new Alert(ccmd.getLabel(),
 									promptMsg, null,
 									AlertType.CONFIRMATION);
@@ -208,9 +223,11 @@ public class FeatureMgr implements CommandListener, Runnable {
 							promptAlert.addCommand(new Command("Cancel", Command.CANCEL, 1));
 							promptAlert.setCommandListener(this);
 							BaseApp.setDisplay(promptAlert, formAlert);
+							*/
+							BaseApp.setDisplay(formAlert);
 						} else if (cdisp.equals(disp)) {
 							//#ifdef DLOGGING
-							if (fineLoggable) {logger.fine("Equal cdisp,disp,cmdFeatureUser=" + ccmd.getLabel() + "," + cdisp + "," + disp + "," + cmdFeatureUser);}
+//@							if (fineLoggable) {logger.fine("Equal cdisp,disp,cmdFeatureUser=" + ccmd.getLabel() + "," + cdisp + "," + disp + "," + cmdFeatureUser);}
 							//#endif
 							cmdFeatureUser.commandAction(ccmd, cdisp);
 							if (background && (runFeatureUser != null)) {
@@ -219,26 +236,26 @@ public class FeatureMgr implements CommandListener, Runnable {
 						}
 						if (!cdisp.equals(disp)) {
 							//#ifdef DLOGGING
-							if (fineLoggable) {logger.fine("Not equal corigCmd,cdisp,disp=" + ((corigCmd == null) ? "corigCmd null" : corigCmd.getLabel()) + "," + cdisp + "," + disp);}
+//@							if (fineLoggable) {logger.fine("Not equal corigCmd,cdisp,disp=" + ((corigCmd == null) ? "corigCmd null" : corigCmd.getLabel()) + "," + cdisp + "," + disp);}
 							//#endif
 
 							try {
-								if ((ccmd.getCommandType() == Command.OK)
+								if ((ccmd == BaseApp.cOK)
 								//#ifdef DMIDP20
 									   || ccmd.equals(Alert.DISMISS_COMMAND)
 								//#endif
 										) {
 									//#ifdef DLOGGING
-									if (fineLoggable) {
-										logger.fine("corigCmd,type=" + corigCmd.getLabel() + "," + corigCmd.getCommandType());
-									}
+//@									if (fineLoggable) {
+//@										logger.fine("corigCmd,type=" + corigCmd.getLabel() + "," + corigCmd.getCommandType());
+//@									}
 									//#endif
 									BaseApp.setDisplay(disp);
 									cmdFeatureUser.commandAction(corigCmd, disp);
 									if (background && (runFeatureUser != null)) {
 										runFeatureUser.run();
 									}
-								} else if (ccmd.getCommandType() == Command.CANCEL) {
+								} else if (ccmd == BaseApp.cBACK) {
 									BaseApp.setDisplay(disp);
 								}
 							} finally {
@@ -249,7 +266,7 @@ public class FeatureMgr implements CommandListener, Runnable {
 						}
 					} catch (Throwable e) {
 						//#ifdef DLOGGING
-						logger.severe("commandAction caught ", e);
+//@						logger.severe("commandAction caught ", e);
 						//#endif
 						System.out.println("commandAction caught " + e + " " + e.getMessage());
 					} finally {
@@ -291,7 +308,7 @@ public class FeatureMgr implements CommandListener, Runnable {
 		if ( (netThread == null) || !netThread.isAlive() ) {
 			try {
 				//#ifdef DCLDCV11
-				netThread = new Thread(this, disp.getClass().getName());
+//@				netThread = new Thread(this, "T" + disp.getClass().getName());
 				//#else
 				netThread = new Thread(this);
 				//#endif
@@ -300,12 +317,12 @@ public class FeatureMgr implements CommandListener, Runnable {
 				System.err.println("Could not restart thread.");
 				e.printStackTrace();
 				//#ifdef DLOGGING
-				logger.severe("Could not restart thread.", e);
+//@				logger.severe("Could not restart thread.", e);
 				//#endif
 			}
 			//#ifdef DLOGGING
-			logger.info(this.getClass().getName() +
-					" thread not started.  Started now.");
+//@			logger.info(this.getClass().getName() +
+//@					" thread not started.  Started now.");
 			//#endif
 		} else if (wakeupThread) {
 			wakeup(3);
@@ -324,5 +341,44 @@ public class FeatureMgr implements CommandListener, Runnable {
     public void setBackground(boolean background) {
         this.background = background;
     }
+
+	//#ifdef DMIDP20
+	/* Get the font size. This is the actual size of the font */
+	final public int getFontSize(int fontChoice) {
+		int fontSize;
+		switch (fontChoice) {
+			case 1:
+				fontSize = Font.SIZE_SMALL;
+				break;
+			case 2:
+				fontSize = Font.SIZE_MEDIUM;
+				break;
+			case 3:
+				fontSize = Font.SIZE_LARGE;
+				break;
+			case DEFAULT_FONT_CHOICE:
+			default:
+				fontSize = Font.getDefaultFont().getSize();
+				break;
+		}
+		return fontSize;
+	}
+
+	public void initFont() {
+		if (fontChoice == DEFAULT_FONT_CHOICE) {
+			this.font = Font.getDefaultFont();
+		} else {
+			Font defFont = Font.getDefaultFont();
+			this.font = Font.getFont(Font.FACE_SYSTEM, defFont.getStyle(),
+					getFontSize(fontChoice));
+		}
+		/* UNDO
+        final int fitPolicy = midlet.getSettings().getFitPolicy();
+        if (fitPolicy != List.TEXT_WRAP_DEFAULT) {
+			super.setFitPolicy(fitPolicy);
+		}
+		*/
+	}
+	//#endif
 
 }
