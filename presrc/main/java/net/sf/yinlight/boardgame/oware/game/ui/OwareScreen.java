@@ -311,17 +311,17 @@ public final class OwareScreen extends BoardGameScreen {
 		//#ifdef DLOGGING
 		if (finerLoggable) {logger.finer("nextTurn computerMove.row,computerMove.col,BoardGameScreen.actPlayer=" + ((computerMove == null) ? "computerMoves null" : (computerMove.row + "," + computerMove.col)) + "," + BoardGameScreen.actPlayer);}
 		//#endif
-  if (computerMove == null) {
-			break;
+		if (computerMove == null) {
+			return;
 		}
-  selx = computerMove.col;
-  sely = computerMove.row;
-  processMove(computerMove, preCalculateMoves);
-  updatePossibleMoves();
+		selx = computerMove.col;
+		sely = computerMove.row;
+		processMove(computerMove, preCalculateMoves);
+		updatePossibleMoves();
 		//#ifdef DMIDP10
 		super.wakeup(3);
 		//#endif
-  GameMinMax.clearPrecalculatedMoves();
+		GameMinMax.clearPrecalculatedMoves();
 		//#ifdef DLOGGING
 		if (finerLoggable) {logger.finer("nextTurn end loop gameEnded,isHuman[BoardGameScreen.actPlayer],BoardGameScreen.actPlayer=" + gameEnded + "," + isHuman[BoardGameScreen.actPlayer] + "," + BoardGameScreen.actPlayer);}
 		//#endif
