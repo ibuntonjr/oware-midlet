@@ -21,354 +21,266 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+/**
+ * This was modified no later than 2009-01-29
+ */
+// Expand to define logging define
+//#define DNOLOGGING
+// Expand to define test define
+//#define DNOTEST
 package net.sf.yinlight.boardgame.oware.game.ui;
 
 import java.util.Timer;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Graphics;
+import javax.microedition.lcdui.Image;
+import javax.microedition.rms.RecordStore;
 import net.sf.yinlight.boardgame.oware.midlet.OwareMIDlet;
 import net.eiroca.j2me.app.BaseApp;
 import net.eiroca.j2me.game.GameApp;
+import net.sf.yinlight.boardgame.oware.game.BoardGameMove;
 import net.eiroca.j2me.game.GameScreen;
 import net.eiroca.j2me.game.tpg.GameMinMax;
 import net.eiroca.j2me.game.tpg.GameTable;
 import net.eiroca.j2me.game.tpg.TwoPlayerGame;
 import net.sf.yinlight.boardgame.oware.game.OwareGame;
 import net.sf.yinlight.boardgame.oware.game.OwareMove;
+import net.sf.yinlight.boardgame.oware.game.BoardGameScreen;
+import net.sf.yinlight.boardgame.oware.game.BoardGameTable;
 import net.sf.yinlight.boardgame.oware.game.OwareTable;
+import net.sf.yinlight.boardgame.oware.game.LimitedMinMax;
+import net.sf.yinlight.boardgame.oware.game.OwareMinMax;
+import net.sf.yinlight.boardgame.oware.game.BoardGameApp;
 
-public final class OwareScreen extends GameScreen {
+//#ifdef DLOGGING
+//@import net.sf.jlogmicro.util.logging.Logger;
+//@import net.sf.jlogmicro.util.logging.Level;
+//#endif
 
-  private static final char NL = '\n';
-  private static final String SEP = ": ";
-  private static final int COLOR_TEXT_BG = 0xEEEEEE;
-  private static final int COLOR_TEXT_FG = 0x000000;
-  private static final int COLOR_BG = 0xFFFFD0;
-  private static final int COLOR_FG = 0x000000;
-  private static final int COLOR_P1 = 0xFF0000;
-  private static final int COLOR_P2 = 0x0000FF;
-  private static final int COLOR_DARKBOX = 0x000000;
-  private static final int ASPECT_LIMIT_A = 400; // 1.5
-  private static final int ASPECT_LIMIT_B = 300; // 1.5
-  private static final int[][] heurMatrix = {
-      {
-          500, -240, 85, 69, 69, 85, -240, 500
-      }, {
-          -240, -130, 49, 23, 23, 49, -130, -240
-      }, {
-          85, 49, 1, 9, 9, 1, 49, 85
-      }, {
-          69, 23, 9, 32, 32, 9, 23, 69
-      }, {
-          69, 23, 9, 32, 32, 9, 23, 69
-      }, {
-          85, 49, 1, 9, 9, 1, 49, 85
-      }, {
-          -240, -130, 49, 23, 23, 49, -130, -240
-      }, {
-          500, -240, 85, 69, 69, 85, -240, 500
-      }
-  };
-  private final String infoLines[] = new String[3];
-  private String message;
-  private final int pnums[] = new int[2];
-  private OwareMove[] possibleMoves;
-  private int sizex;
-  private int sizey;
-  private final int vertWidth;
-  private int width;
-  private int height;
-  public int selx;
-  public int sely;
+/**
+	* Oware game screen (game canvas).
+	*/
+public final class OwareScreen extends BoardGameScreen {
 
-  public long messageEnd;
+  private static final String OWARE_STORE = "OWARE_GAME";
 
-  private MinimaxTimerTask mtt;
-  private final Timer timer = new Timer();
+  //#ifdef DTEST
+//@	private boolean debug = false;
+  //#endif
+  //#ifdef DLOGGING
+//@  private Logger logger = Logger.getLogger("OwareScreen");
+//@  private boolean fineLoggable = logger.isLoggable(Level.FINE);
+//@  private boolean finerLoggable = logger.isLoggable(Level.FINER);
+//@  private boolean finestLoggable = logger.isLoggable(Level.FINEST);
+//@  private boolean traceLoggable = logger.isLoggable(Level.TRACE);
+  //#endif
 
-  public static byte actPlayer;
-  public boolean gameEnded = true;
-  public boolean[] isHuman = new boolean[2];
-  public GameTable[] tables;
-  public static int turnNum;
-  public static OwareTable table;
-  public static OwareGame rgame;
-  public static boolean twoplayer;
-
-  private final int fontHeight;
-  private final int off_y;
-  private final int off_x;
-  private final int pieceWidth;
-  private final int pieceHeight;
-  private final int piece_offx;
-  private final int piece_offy;
-
-  public OwareScreen(final GameApp midlet) {
-    super(midlet, false, true);
-    OwareScreen.rgame = new OwareGame(OwareScreen.heurMatrix, 10, 18, true);
-    name = BaseApp.messages[OwareMIDlet.MSG_NAME];
-    width = screenWidth * 8 / 10;
-    vertWidth = screenWidth - width;
-    height = screenHeight;
-    sizex = (width - 1) / 8;
-    sizey = (height - 1) / 8;
-    if (OwareScreen.ASPECT_LIMIT_B * sizex > OwareScreen.ASPECT_LIMIT_A * sizey) {
-      sizex = sizey * OwareScreen.ASPECT_LIMIT_A / OwareScreen.ASPECT_LIMIT_B;
-    }
-    if (OwareScreen.ASPECT_LIMIT_B * sizey > OwareScreen.ASPECT_LIMIT_A * sizex) {
-      sizey = sizex * OwareScreen.ASPECT_LIMIT_A / OwareScreen.ASPECT_LIMIT_B;
-    }
-    width = sizex * 8;
-    height = sizey * 8;
-    fontHeight = screen.getFont().getHeight();
-    pieceWidth = 20 * sizex / 30;
-    pieceHeight = 20 * sizey / 30;
-    piece_offx = (sizex - pieceWidth) / 2;
-    piece_offy = (sizey - pieceHeight) / 2;
-    selx = 0;
-    sely = 0;
-    off_y = (screenHeight - height) / 2;
-    off_x = 2;
+  public OwareScreen(final GameApp midlet, final boolean suppressKeys,
+			final boolean fullScreen) {
+		/* Do not suppress keys.  However, do full screen. */
+    super(midlet, false, true, OwareMIDlet.MSG_NAME);
+    BoardGameScreen.rgame = new OwareGame();
+		// FIX for different AIs and skill
+    switch (OwareMIDlet.gsLevel) {
+			case OwareMIDlet.gsLevelNormal:
+				gMiniMax = new LimitedMinMax();
+				break;
+			case OwareMIDlet.gsLevelDifficult:
+				gMiniMax= new OwareMinMax(0);
+				break;
+			case OwareMIDlet.gsLevelHard:
+			default:
+				gMiniMax = new OwareMinMax(1);
+				break;
+		}
     updateSkillInfo();
-  }
+	}
 
   public void init() {
-    super.init();
-    BaseApp.background = 0x00FFFFFF;
-    BaseApp.foreground = 0x00000000;
-    score.beginGame(1, 0, 0);
-    if (Oware.gsPlayer == 1) {
-      isHuman[0] = true;
-      isHuman[1] = false;
-      OwareScreen.twoplayer = false;
-    }
-    else {
-      isHuman[0] = true;
-      isHuman[1] = true;
-      OwareScreen.twoplayer = true;
-    }
-    updateSkillInfo();
-    setMessage(BaseApp.messages[OwareMIDlet.MSG_GOODLUCK]);
-    gameEnded = false;
-    OwareScreen.actPlayer = 0;
-    OwareScreen.turnNum = 1;
-    OwareScreen.table = new OwareTable();
-    updatePossibleMoves();
+		try {
+			BoardGameScreen.table = new OwareTable(Math.abs(BoardGameApp.gsRow),
+					Math.abs(BoardGameApp.gsCol), Math.abs(BoardGameApp.gsNbrPlayers),
+					Math.abs(OwareMIDlet.gsInitSeeds));
+			super.init();
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+//@			logger.severe("init error", e);
+			//#endif
+		}
   }
 
   public boolean tick() {
-    screen.setColor(BaseApp.background);
-    screen.fillRect(0, 0, screenWidth, screenHeight);
-    drawBoard();
-    drawTable();
-    drawSelectionBox();
-    drawPossibleMoves();
-    drawVertInfo();
-    drawMessage();
-    return true;
+		try {
+			screen.setColor(BaseApp.background);
+			screen.fillRect(0, 0, screenWidth, screenHeight);
+			drawBoard();
+			drawTable();
+			drawSelectionBox();
+			drawPossibleMoves();
+			drawVertInfo();
+			drawMessage();
+			return true;
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+//@			logger.severe("tick error", e);
+			//#endif
+			return true;
+		}
   }
 
-  protected void drawMessage() {
-    if ((message == null) || ((messageEnd != 0) && (messageEnd > System.currentTimeMillis()))) { return; }
-    int startIndex;
-    int endIndex = -1;
-    final int breaks = BaseApp.lineBreaks(message);
-    final int maxWidth = BaseApp.maxSubWidth(screen.getFont(), message) + 10;
-    int cornerX = (width - maxWidth) / 2;
-    if (cornerX < 0) {
-      cornerX = (screenWidth - maxWidth) / 2;
-    }
-    else {
-      cornerX += off_x;
-    }
-    int cornerY = off_y + (height - (breaks + 1) * fontHeight - 6) / 2;
-    screen.setColor(OwareScreen.COLOR_TEXT_BG);
-    screen.fillRect(cornerX - 1, cornerY - 1, maxWidth, (breaks + 1) * fontHeight + 6);
-    screen.setColor(OwareScreen.COLOR_TEXT_FG);
-    screen.drawRect(cornerX - 1, cornerY - 1, maxWidth, (breaks + 1) * fontHeight + 6);
-    screen.drawRect(cornerX, cornerY, maxWidth - 2, (breaks + 1) * fontHeight + 4);
-    while (endIndex < message.length()) {
-      startIndex = endIndex + 1;
-      endIndex = message.indexOf(NL, startIndex);
-      if (endIndex == -1) {
-        endIndex = message.length();
-      }
-      final String submessage = message.substring(startIndex, endIndex);
-      screen.drawString(submessage, cornerX + 5, cornerY + 2, Graphics.TOP | Graphics.LEFT);
-      cornerY += fontHeight;
-    }
-  }
-
-  protected void drawBoard() {
-    screen.setColor(OwareScreen.COLOR_BG);
-    screen.fillRect(off_x, off_y, width, height);
-    screen.setColor(OwareScreen.COLOR_FG);
-    for (int i = 0; i <= 8; ++i) {
-      screen.drawLine(off_x, off_y + i * sizey, off_x + width, off_y + i * sizey);
-      screen.drawLine(off_x + i * sizex, off_y, off_x + i * sizex, off_y + height);
-    }
-  }
-
-  protected void drawPiece(final int row, final int col, final int player) {
-    final int x = off_x + row * sizex + piece_offx;
-    final int y = off_y + col * sizey + piece_offy;
-    if (player == 1) {
-      screen.setColor(OwareScreen.COLOR_P1);
-    }
-    else {
-      screen.setColor(OwareScreen.COLOR_P2);
-    }
-    screen.fillArc(x, y, pieceWidth, pieceHeight, 0, 360);
-  }
-
-  protected void drawPossibleMoves() {
-    if (possibleMoves == null) {
-      // end of the game
-      return;
-    }
-    int x;
-    int y;
-    screen.setColor(OwareScreen.COLOR_DARKBOX);
-    for (int i = 0; i < possibleMoves.length; ++i) {
-      x = off_x + possibleMoves[i].row * sizex + sizex / 2;
-      y = off_y + possibleMoves[i].col * sizey + sizey / 2;
-      screen.fillRect(x, y, 2, 2);
-    }
+  /**
+   * Draw a piece on the board at the row/col for the player.  If onBoard
+	 * is true, the piece is in the playing area.  If false, it is on the
+	 * right to identify the players.
+	 *
+   * @param row
+   * @param col
+   * @param player
+   * @param onBoard
+   */
+  protected void drawPiece(final int row, final int col, final int player,
+			boolean onBoard, Image cupImage, int lastMovePoint) {
+		try {
+			OwareTable ot = (OwareTable)BoardGameScreen.table;
+			final int x = off_x + col * sizex + piece_offx;
+			int y = off_y + row * sizey + piece_offy;
+			if (y < 0) {
+				y = 0;
+			}
+			int lastMove = onBoard ? lastMovePoint : (byte)0;
+			int seeds = onBoard ? ot.getSeeds(row, col) : 0;
+			if (onBoard && (seeds == 0)) {
+				// Reverse the square
+				screen.setColor(BaseApp.foreground);
+				screen.drawRect(x, y, cupWidth, cupHeight);
+				screen.fillRect(x, y, cupWidth, cupHeight);
+				screen.setColor(BaseApp.background);
+				screen.fillArc(x, y, cupWidth, cupHeight, 0, 360);
+			} else {
+				if (player == OwareMIDlet.gsFirst) {
+					screen.setColor(BoardGameScreen.COLOR_P1);
+				}
+				else {
+					screen.setColor(BoardGameScreen.COLOR_P2);
+				}
+				if (cupImage == null) {
+					screen.fillArc(x, y, cupWidth, cupHeight, 0, 360);
+				} else {
+					screen.drawImage(cupImage, x + cupImagexOffset, y, Graphics.TOP | Graphics.LEFT);
+				}
+			}
+			if (onBoard) {
+				screen.setColor(BaseApp.foreground);
+				screen.drawString(" " + String.valueOf(
+							(int) seeds),
+							x, y + cupHeight + 1, Graphics.TOP | Graphics.HCENTER);
+				if (lastMove > 0) {
+					screen.drawString(" " + String.valueOf(
+								(int) -lastMove),
+								x, y + cupHeight + 2 + fontHeight, Graphics.TOP | Graphics.HCENTER);
+				}
+			}
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+//@			logger.severe("drawPiece error", e);
+			//#endif
+		}
   }
 
   protected void drawSelectionBox() {
-    if (OwareScreen.getActPlayer() == 0) {
-      screen.setColor(OwareScreen.COLOR_P1);
+    if (BoardGameScreen.getActPlayer() == 0) {
+      screen.setColor(BoardGameScreen.COLOR_P1);
     }
     else {
-      screen.setColor(OwareScreen.COLOR_P2);
+      screen.setColor(BoardGameScreen.COLOR_P2);
     }
     screen.drawRect(off_x + selx * sizex, off_y + sely * sizey, sizex, sizey);
     screen.drawRect(off_x + selx * sizex + 1, off_y + sely * sizey + 1, sizex - 2, sizey - 2);
   }
 
   protected void drawTable() {
-    pnums[0] = 0;
-    pnums[1] = 0;
-    int item;
-    for (int i = 0; i < 8; ++i) {
-      for (int j = 0; j < 8; ++j) {
-        item = OwareScreen.table.getItem(i, j);
-        if (item != 0) {
-          drawPiece(i, j, item);
-          pnums[item - 1]++;
-        }
-      }
-    }
-    infoLines[0] = Integer.toString(pnums[0]);
-    infoLines[1] = Integer.toString(pnums[1]);
+		try {
+			OwareTable ot = (OwareTable)BoardGameScreen.table;
+			int item;
+			for (int i = 0; i < BoardGameScreen.table.nbrRow; ++i) {
+				int lastCol = -10;
+				int lastRow = -10;
+				int lastPoint = 10;
+				OwareMove clastMove = (OwareMove)BoardGameScreen.table.getLastMove(i);
+				if (clastMove != null) {
+					lastRow = clastMove.row;
+					lastCol = clastMove.col;
+					lastPoint = clastMove.getPoint();
+				}
+				//#ifdef DLOGGING
+//@				if ((tableDraws-- > 0) && finestLoggable) {drawItems = true;logger.finest("drawTable up i,lastRow,lastCol,lastPoint,BoardGameScreen.actPlayer=" + i + "," + lastRow + "," + lastCol + "," + lastPoint + "," + BoardGameScreen.actPlayer);}
+				//#endif
+				for (int j = 0; j < BoardGameScreen.table.nbrCol; ++j) {
+					item = BoardGameScreen.table.getItem(i, j);
+					//#ifdef DTEST
+//@					if (debug) {System.out.println("drawTable item=" + item);}
+					//#endif
+					if (item != 0) {
+						drawPiece(i, j, item, true, piece1Image, ((i == lastRow) &&
+									(j == lastCol)) ? lastPoint : 0);
+					}
+				}
+			}
+			infoLines[0] = " " + Integer.toString(ot.getPoint((byte)0));
+			infoLines[1] = " " + Integer.toString(ot.getPoint((byte)1));
+			//#ifdef DLOGGING
+//@			if (drawItems) {
+//@				drawItems = false;
+//@			}
+			//#endif
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+//@			logger.severe("drawTable error", e);
+			//#endif
+		}
   }
 
   public void drawVertInfo() {
-    // two pieces
-    drawPiece(9, 0, 1);
-    drawPiece(9, 7, 0);
-    // numbers
-    screen.setColor(BaseApp.foreground);
-    screen.drawString(infoLines[0], width + vertWidth, off_y + sizey + 2, Graphics.TOP | Graphics.RIGHT);
-    screen.drawString(infoLines[1], width + vertWidth, off_y + 7 * sizey, Graphics.BOTTOM | Graphics.RIGHT);
-    // active player
-    screen.fillRect(9 * sizex - sizex / 2, off_y + sizey / 2 + OwareScreen.getActPlayer() * 7 * sizey, 2, 2);
-    // skill
-    if (infoLines[2] != null) {
-      screen.drawString(infoLines[2], width + vertWidth, screenHeight / 2, Graphics.BASELINE | Graphics.RIGHT);
-    }
-  }
-
-  public void keyPressed(final int keyCode) {
-    if (gameEnded) {
-      midlet.doGameStop();
-    }
-    else {
-      switch (getGameAction(keyCode)) {
-        case Canvas.UP:
-          sely = (sely + 8 - 1) % 8;
-          message = null;
-          break;
-        case Canvas.DOWN:
-          sely = (sely + 1) % 8;
-          message = null;
-          break;
-        case Canvas.LEFT:
-          selx = (selx + 8 - 1) % 8;
-          message = null;
-          break;
-        case Canvas.RIGHT:
-          selx = (selx + 1) % 8;
-          message = null;
-          break;
-        case Canvas.FIRE:
-          if (message != null) {
-            message = null;
-          }
-          else {
-            nextTurn(selx, sely);
-          }
-          break;
-        default:
-          midlet.doGamePause();
-          break;
-      }
-    }
-  }
-
-  public void setMessage(final String message) {
-    this.message = message;
-    messageEnd = 0;
-  }
-
-  public void setMessage(final String message, final int delay) {
-    this.message = message;
-    messageEnd = System.currentTimeMillis() + delay * 1000;
-  }
-
-  public void updatePossibleMoves() {
-    possibleMoves = (OwareMove[]) OwareScreen.rgame.possibleMoves(OwareScreen.table, OwareScreen.actPlayer);
-  }
-
-  public void updateSkillInfo() {
-    if (!OwareScreen.twoplayer) {
-      infoLines[2] = BaseApp.messages[OwareMIDlet.MSG_LEVELPREFIX] + OwareMIDlet.gsLevel;
-    }
-    else {
-      infoLines[2] = null;
-    }
-  }
-
-  protected OwareMove computerTurn(final OwareMove prevMove) {
-    OwareMove move = (OwareMove) GameMinMax.precalculatedBestMove(prevMove);
-    if (move == null) {
-      setMessage(BaseApp.messages[OwareMIDlet.MSG_THINKING]);
-      GameMinMax.cancel(false);
-      move = (OwareMove) GameMinMax.minimax(OwareScreen.getActSkill(), OwareScreen.table, OwareScreen.actPlayer, OwareScreen.rgame, true, 0, true, true, null);
-    }
-    message = null;
-    OwareScreen.rgame.resetEvalNum();
-    return move;
-  }
-
-  public static byte getActPlayer() {
-    return OwareScreen.actPlayer;
-  }
-
-  public static int getActSkill() {
-    int actSkill = OwareMIDlet.gsLevel;
-    if (OwareScreen.turnNum > 50) {
-      actSkill++;
-    }
-    if (OwareScreen.turnNum > 55) {
-      actSkill++;
-    }
-    return actSkill;
+		try {
+			// two pieces
+			//undo
+			drawPiece(-1, BoardGameScreen.table.nbrCol - 1, 1, false,
+					((BoardGameScreen.actPlayer == 0) ? piece1Image : null), 0); /* y, x */
+			drawPiece(BoardGameScreen.table.nbrRow, BoardGameScreen.table.nbrCol - 1, 0, false,
+					((BoardGameScreen.actPlayer == 1) ? piece1Image : null), 0); /* y, x */
+			// numbers
+			screen.setColor(BaseApp.foreground);
+			screen.drawString(infoLines[0],
+					width + vertWidth, off_y + cupHeight + 1 + piece_offy,
+					Graphics.TOP | Graphics.RIGHT);
+			screen.drawString(infoLines[1], width + vertWidth,
+					off_y + ((BoardGameScreen.table.nbrRow - 1) * sizey) + cupHeight + 1 + piece_offy,
+					Graphics.BOTTOM | Graphics.RIGHT);
+			// active player screen.
+			// FIX if height problem as we could put the image in this square
+			if (turnImage == null) {
+				screen.drawRect(width + vertWidth - sizex,
+						off_y + BoardGameScreen.getActPlayer() * ((BoardGameScreen.table.nbrRow - 1) * sizey), sizex, sizey);
+			}
+			// skill
+			// Put at middle of height.
+			if (infoLines[2] != null) { screen.drawString(infoLines[2], width + vertWidth, screenHeight / 2, Graphics.BASELINE | Graphics.RIGHT); }
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+//@			logger.severe("drawVertInfo error", e);
+			//#endif
+		}
   }
 
   public void nextTurn(final int row, final int col) {
-    if (mtt != null) {
+    if ((mtt != null) && preCalculateMoves) {
       mtt.cancel();
       while (mtt.ended == false) {
         synchronized (this) {
@@ -377,163 +289,211 @@ public final class OwareScreen extends GameScreen {
           }
           catch (final Exception e) {
             //
+						e.printStackTrace();
           }
         }
       }
     }
+		//#ifdef DLOGGING
+//@		if (finestLoggable) {logger.finest("nextTurn row,col,BoardGameScreen.actPlayer,gameEnded,(mtt != null)=" + row + "," + col + "," + BoardGameScreen.actPlayer + "," + gameEnded + "," + (mtt != null));}
+		//#endif
     if (gameEnded) { return; }
     final OwareMove move = new OwareMove(row, col);
-    processMove(move, false);
+    if (!processMove(move, false)) {
+			return;
+		}
     updatePossibleMoves();
-    while (!gameEnded && !isHuman[OwareScreen.actPlayer]) {
+		//#ifdef DMIDP10
+//@		super.wakeup(3);
+		//#endif
+    while (!gameEnded && !isHuman[BoardGameScreen.actPlayer]) {
       mtt = new MinimaxTimerTask();
-      final OwareMove computerMove = computerTurn(move);
-      selx = computerMove.row;
-      sely = computerMove.col;
-      processMove(computerMove, true);
+      final OwareMove computerMove = (OwareMove)computerTurn(move);
+			//#ifdef DLOGGING
+//@			if (finerLoggable) {logger.finer("nextTurn computerMove.row,computerMove.col,BoardGameScreen.actPlayer=" + ((computerMove == null) ? "computerMoves null" : (computerMove.row + "," + computerMove.col)) + "," + BoardGameScreen.actPlayer);}
+			//#endif
+      if (computerMove == null) {
+				break;
+			}
+      selx = computerMove.col;
+      sely = computerMove.row;
+      processMove(computerMove, preCalculateMoves);
       updatePossibleMoves();
+			//#ifdef DMIDP10
+//@			super.wakeup(3);
+			//#endif
       GameMinMax.clearPrecalculatedMoves();
+			break;
     }
-  }
-
-  protected void processMove(final OwareMove move, final boolean startForeThinking) {
-    final OwareTable newTable = new OwareTable();
-    tables = OwareScreen.rgame.animatedTurn(OwareScreen.table, OwareScreen.actPlayer, move, newTable);
-    boolean goodMove = (tables != null);
-    if (!goodMove) {
-      setMessage(BaseApp.messages[OwareMIDlet.MSG_INVALIDMOVE], 2000);
-    }
-    else {
-      if (startForeThinking) {
-        mtt.setStartTable(tables[tables.length - 1]);
-        timer.schedule(mtt, 0);
-      }
-      synchronized (this) {
-        for (int i = 0; i < tables.length; ++i) {
-          OwareScreen.table = (OwareTable) tables[i];
-          if (i < tables.length - 1) {
-            try {
-              wait(300);
-            }
-            catch (final InterruptedException e) {
-              // do something
-            }
-          }
-        }
-      }
-      boolean nonPass = false;
-      OwareScreen.table = newTable;
-      while (!nonPass && !gameEnded) {
-        OwareScreen.rgame.process(newTable, OwareScreen.actPlayer);
-        if (OwareScreen.rgame.isGameEnded()) {
-          final int result = OwareScreen.rgame.getGameResult();
-          String endMessage;
-          final boolean firstWin = ((result == TwoPlayerGame.LOSS) && (OwareScreen.actPlayer == 0)) || ((result == TwoPlayerGame.WIN) && (OwareScreen.actPlayer == 1));
-          final int winner = firstWin ? 1 : 0;
-          if (!OwareScreen.twoplayer && firstWin) {
-            endMessage = BaseApp.messages[OwareMIDlet.MSG_WONCOMPUTER];
-          }
-          else if (result == TwoPlayerGame.DRAW) {
-            endMessage = BaseApp.messages[OwareMIDlet.MSG_DRAW];
-          }
-          else {
-            if (ReversiScreen.twoplayer) {
-              endMessage = OwareMIDlet.playerNames[winner] + BaseApp.messages[OwareMIDlet.MSG_PLAYERWON];
-            }
-            else {
-              endMessage = BaseApp.messages[OwareMIDlet.MSG_HUMANWON];
-            }
-          }
-          final int firstNum = OwareScreen.rgame.numFirstPlayer;
-          final int secondNum = OwareScreen.rgame.numSecondPlayer;
-          endMessage += OwareScreen.NL + OwareMIDlet.playerNames[0] + OwareScreen.SEP + firstNum + OwareScreen.NL + OwareMIDlet.playerNames[1] + OwareScreen.SEP + secondNum;
-          setMessage(endMessage);
-          gameEnded = true;
-        }
-        else {
-          OwareScreen.actPlayer = (byte) (1 - OwareScreen.actPlayer);
-          OwareScreen.turnNum++;
-          if (!OwareScreen.rgame.hasPossibleMove(OwareScreen.table, OwareScreen.actPlayer)) {
-            String message;
-            if (isHuman[OwareScreen.actPlayer]) {
-              if (OwareScreen.twoplayer) {
-                message = OwareMIDlet.playerNames[OwareScreen.actPlayer];
-              }
-              else {
-                message = BaseApp.messages[OwareMIDlet.MSG_HUMAN];
-              }
-            }
-            else {
-              message = BaseApp.messages[OwareMIDlet.MSG_COMPUTER];
-            }
-            setMessage(message + OwareMIDlet.MSG_PASS, 3000);
-            OwareScreen.table.setPassNum(OwareScreen.table.getPassNum() + 1);
-            // just to be sure
-            GameMinMax.clearPrecalculatedMoves();
-          }
-          else {
-            nonPass = true;
-          }
-        }
-      }
-    }
-  }
-
-  public void saveGameParameters(final byte[] b, final int offset) {
-    int index = offset;
-    // isHuman
-    b[index] = 0;
-    if (isHuman[0]) {
-      b[index] |= 1;
-    }
-    if (isHuman[1]) {
-      b[index] |= 2;
-    }
-    index++;
-    // actPlayer
-    b[index++] = OwareScreen.actPlayer;
-    // turnNum
-    b[index++] = (byte) OwareScreen.turnNum;
+		//#ifdef DLOGGING
+//@		if (finerLoggable) {logger.finer("nextTurn end loop gameEnded,isHuman[BoardGameScreen.actPlayer],BoardGameScreen.actPlayer=" + gameEnded + "," + isHuman[BoardGameScreen.actPlayer] + "," + BoardGameScreen.actPlayer);}
+		//#endif
   }
 
   /**
-   * Saves data into byte[]
+   * Process the move.  Change the player to the other player
+	 *
+   * @param move
+   * @param startForeThinking
+   * @author Irv Bunton
    */
-  public byte[] saveRecordStore() {
-    final byte[] result = new byte[70];
-    result[0] = (byte) OwareMIDlet.gsLevel;
-    result[1] = (byte) (gameEnded ? 0 : 1);
-    saveGameParameters(result, 2);
-    OwareScreen.table.toByteArray(result, 5);
-    return result;
+  //#ifdef DTEST
+//@  public
+  //#else
+  protected
+	//#endif
+		boolean processMove(final BoardGameMove move, final boolean startForeThinking) {
+		//#ifdef DLOGGING
+//@		if (finerLoggable) {logger.finer("processMove 1 move.row,move.col,BoardGameScreen.actPlayer,startForeThinking=" + move.row + "," + move.col + "," + BoardGameScreen.actPlayer + "," + startForeThinking);}
+		//#endif
+		try {
+			final OwareTable newTable = (OwareTable)table.getEmptyTable();
+			//#ifdef DLOGGING
+//@			if (finestLoggable) {logger.finest("Saving last human move BoardGameScreen.actPlayer=" + BoardGameScreen.actPlayer);}
+			//#endif
+			/* Simulate the results of taking the move and put results in newTable. */
+			tables = BoardGameScreen.rgame.animatedTurn(BoardGameScreen.table, BoardGameScreen.actPlayer, move, newTable);
+			boolean goodMove = (tables != null);
+			if (!goodMove) {
+				setMessage(BaseApp.messages[OwareMIDlet.MSG_INVALIDMOVE], 2000);
+				//#ifdef DLOGGING
+//@				if (finestLoggable) {logger.finest("No valid move BoardGameScreen.actPlayer,=isHuman[BoardGameScreen.actPlayer])" + BoardGameScreen.actPlayer + "," + isHuman[BoardGameScreen.actPlayer]);}
+				//#endif
+				return false;
+			}
+			else {
+				if (startForeThinking) {
+					mtt.setStartGame(gMiniMax, BoardGameScreen.rgame,
+							tables[tables.length - 1], getActSkill(), getActPlayer());
+					timer.schedule(mtt, 0);
+					//#ifdef DLOGGING
+//@					if (finestLoggable) {logger.finest("processMove 1b scheduled");}
+					//#endif
+				}
+
+				synchronized (this) {
+					for (int i = 0; i < tables.length; ++i) {
+						BoardGameScreen.table = (OwareTable) tables[i];
+						if (i < tables.length - 1) {
+							try {
+								wait(300);
+							}
+							catch (final InterruptedException e) {
+								// do something
+							}
+						}
+					}
+				}
+				boolean nonPass = false;
+				/* Make current table the simulated move. */
+				BoardGameScreen.table = newTable;
+				BoardGameScreen.rgame.saveLastTable(BoardGameScreen.table,
+						BoardGameScreen.actPlayer, BoardGameScreen.turnNum);
+				//#ifdef DLOGGING
+//@				if (finestLoggable) {logger.finest("processMove 2 BoardGameScreen.actPlayer,goodMove=" + BoardGameScreen.actPlayer + "," + goodMove);}
+				//#endif
+				while (!nonPass && !gameEnded) {
+					/* Process the move. */
+					BoardGameScreen.rgame.process(newTable, BoardGameScreen.actPlayer);
+					//#ifdef DLOGGING
+//@					if (finerLoggable) {logger.finer("1 loop BoardGameScreen.actPlayer,BoardGameScreen.rgame.isGameEnded()=" + BoardGameScreen.actPlayer + "," + BoardGameScreen.rgame.isGameEnded());}
+					//#endif
+					if (BoardGameScreen.rgame.isGameEnded()) {
+						gameEnded = true;
+						procEndGame();
+					}
+					else {
+						/* Change to other player. */
+						BoardGameScreen.actPlayer = (byte) (1 - BoardGameScreen.actPlayer);
+						BoardGameScreen.turnNum++;
+						//#ifdef DLOGGING
+//@						if (finerLoggable) {logger.finer("2 loop BoardGameScreen.actPlayer=" + BoardGameScreen.actPlayer);}
+						//#endif
+						if (!BoardGameScreen.rgame.hasPossibleMove(BoardGameScreen.table, BoardGameScreen.actPlayer)) {
+							String message;
+							if (isHuman[BoardGameScreen.actPlayer]) {
+								if (BoardGameScreen.twoplayer) {
+									message = OwareMIDlet.playerNames[BoardGameScreen.actPlayer];
+								}
+								else {
+									message = BaseApp.messages[OwareMIDlet.MSG_HUMAN];
+								}
+							}
+							else {
+								message = BaseApp.messages[OwareMIDlet.MSG_COMPUTER];
+							}
+							setMessage(message + OwareMIDlet.MSG_PASS, 3000);
+							BoardGameScreen.table.setPassNum(BoardGameScreen.table.getPassNum() + 1);
+							// just to be sure
+							GameMinMax.clearPrecalculatedMoves();
+							//#ifdef DLOGGING
+//@							if (finestLoggable) {logger.finest("processMove has increase pass number possible move BoardGameScreen.table.getPassNum()=" + BoardGameScreen.table.getPassNum());}
+							//#endif
+							break;
+						}
+						else {
+							nonPass = true;
+							//#ifdef DLOGGING
+//@							if (finestLoggable) {logger.finest("processMove nonPass=" + nonPass);}
+							//#endif
+						}
+					}
+				}
+			}
+			return true;
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+//@			logger.severe("processMove error", e);
+			//#endif
+			return false;
+		} finally {
+			//#ifdef DLOGGING
+//@			if (finerLoggable) {logger.finer("processMove return move.row,move.col,BoardGameScreen.actPlayer,startForeThinking,tables.length=" + move.row + "," + move.col + "," + BoardGameScreen.actPlayer + "," + startForeThinking + "," + ((tables == null) ? "tables is null" : String.valueOf(tables.length)));}
+//@			tableDraws = 2;
+			//#endif
+			super.wakeup(3);
+		}
   }
 
-  public void loadGameParameters(final byte[] b, final int offset) {
-    int index = offset;
-    isHuman[0] = false;
-    isHuman[1] = false;
-    if ((b[index] & 1) > 0) {
-      isHuman[0] = true;
-    }
-    if ((b[index] & 2) > 0) {
-      isHuman[1] = true;
-    }
-    OwareScreen.twoplayer = isHuman[0] && isHuman[1];
-    index++;
-    OwareScreen.actPlayer = b[index++];
-    OwareScreen.turnNum = b[index++];
-  }
-
-  /**
-   * Loads data from byte[]
-   */
-  public boolean loadRecordStore(final byte[] b) {
-    if (b.length != 70) { return false; }
-    OwareMIDlet.gsLevel = b[0];
-    gameEnded = (b[1] == 1) ? true : false;
-    loadGameParameters(b, 2);
-    OwareScreen.table = new OwareTable(b, 5);
-    return true;
-  }
+	public void procEndGame() {
+		//#ifdef DLOGGING
+//@		if (finerLoggable) {logger.finer("procEndGame");}
+		//#endif
+		try {
+					OwareTable ot = (OwareTable)BoardGameScreen.table;
+					BoardGameScreen.rgame.procEndGame();
+					final int result = BoardGameScreen.rgame.getGameResult();
+					String endMessage;
+					final boolean firstWin = ((result == TwoPlayerGame.LOSS) && (BoardGameScreen.actPlayer == 0)) || ((result == TwoPlayerGame.WIN) && (BoardGameScreen.actPlayer == 1));
+					final int winner = firstWin ? 1 : 0;
+					if (!BoardGameScreen.twoplayer && firstWin) {
+						endMessage = BaseApp.messages[OwareMIDlet.MSG_WONCOMPUTER];
+					}
+					else if (result == TwoPlayerGame.DRAW) {
+						endMessage = BaseApp.messages[OwareMIDlet.MSG_DRAW];
+					}
+					else {
+						if (BoardGameScreen.twoplayer) {
+							endMessage = OwareMIDlet.playerNames[winner] + BaseApp.messages[OwareMIDlet.MSG_PLAYERWON];
+						}
+						else {
+							endMessage = BaseApp.messages[OwareMIDlet.MSG_HUMANWON];
+						}
+					}
+					final int firstNum = ot.getPoint((byte)0);
+					final int secondNum = ot.getPoint((byte)1);
+					endMessage += BoardGameScreen.NL + OwareMIDlet.playerNames[0] + BoardGameScreen.SEP + firstNum + BoardGameScreen.NL + OwareMIDlet.playerNames[1] + BoardGameScreen.SEP + secondNum;
+					setMessage(endMessage);
+					//#ifdef DLOGGING
+//@					if (finestLoggable) {logger.finest("processMove game ended result,firstWin,winner,firstNum,secondNum=" + result + "," + firstWin + "," + winner + firstNum + "," + secondNum);}
+					//#endif
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+//@			logger.severe("procEndGame error", e);
+			//#endif
+		}
+	}
 
 }
