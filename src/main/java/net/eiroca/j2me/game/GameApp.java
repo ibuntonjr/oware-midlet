@@ -2,6 +2,9 @@
  *
  * Copyright (C) 2006-2008 eIrOcA (eNrIcO Croce & sImOnA Burzio)
  *
+ * This software was modified 2008-12-07.  The original file was Reversi.java
+ * in mobilesuite.sourceforge.net project.
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -16,14 +19,23 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+/**
+ * This was modified no later than 2009-01-29
+ */
 // Expand to define MIDP define
-@DMIDPVERS@
+//#define DMIDP20
+// Expand to define JMUnit test define
+//#define DNOJMTEST
+// Expand to define logging define
+//#define DNOLOGGING
 package net.eiroca.j2me.game;
 
 import java.util.Vector;
+import javax.microedition.midlet.MIDletStateChangeException;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
+import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.List;
 import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextField;
@@ -33,7 +45,23 @@ import javax.microedition.media.Player;
 import net.eiroca.j2me.app.Application;
 import net.eiroca.j2me.app.BaseApp;
 import net.eiroca.j2me.app.SplashScreen;
+import com.substanceofcode.rssreader.presentation.FeatureForm;
 
+
+//#ifdef DLOGGING
+//@import net.sf.jlogmicro.util.logging.Logger;
+//@import net.sf.jlogmicro.util.logging.Level;
+//#endif
+
+/**
+  * Used to handle a game application.  This has the message numbers for
+  * common commands (e.g. OK), messages (e.g. game over), menu names (e.g.
+  * new game).  It also has resource names (images, and message next).
+  * Also has RMS store name?.  Has reference to GameScreen, ScoreManager,
+  * game menu, game settings, game options, game new high score.
+  * Game actions startup/start, stop, abort, pause, resume,
+  * abstract game action, help, about. options, high score, show settings,
+  */
 public abstract class GameApp extends Application {
 
   public static final int ME_MAINMENU = 0;
@@ -87,10 +115,13 @@ public abstract class GameApp extends Application {
   public static final String RES_HELP = "help.txt";
   public static final String RES_MSGS = "messages.txt";
   public static final String RES_SPLASH = "splash.png";
+  public static String resSplash = RES_SPLASH;
 
   public static boolean usVibrate = true;
   public static boolean usBackLight = true;
   public static int usVolume = 100;
+  public static String GRAPHICS_PROPERY = "oware-graphics";
+  public static boolean graphics = true;
 
   public static String RMS_HIGHSCORE = "HighScore";
   public static String hsName = "HighScore";
@@ -98,7 +129,7 @@ public abstract class GameApp extends Application {
   public static int hsMaxLevel = 1;
   public static int hsMaxScore = 5;
 
-  public static GameScreen game;
+  public static GameScreen game = null;
   public static ScoreManager highscore;
 
   protected List gameMenu;
@@ -109,26 +140,63 @@ public abstract class GameApp extends Application {
   private TextField tName;
   private StringItem tScore;
 
+	//#ifdef DLOGGING
+//@	private Logger logger;
+//@	private boolean fineLoggable;
+//@	private boolean finestLoggable;
+	//#endif
+
+	//#ifdef DJMTEST
+//@  public GameApp(String name) {
+//@    super(name);
+//@	}
+	//#endif
+
   /**
    * Initialize the game
    */
   public void init() {
+		//#ifdef DLOGGING
+//@		logger = Logger.getLogger("GameApp");
+//@		fineLoggable = logger.isLoggable(Level.FINE);
+//@		finestLoggable = logger.isLoggable(Level.FINEST);
+//@		if (finestLoggable) {logger.finest("init");}
+		//#endif
     super.init();
-    BaseApp.messages = BaseApp.readStrings(GameApp.RES_MSGS);
-    BaseApp.icons = BaseApp.splitImages(GameApp.RES_MENUICON, 7, 12, 12);
-    GameApp.highscore = new ScoreManager(GameApp.RMS_HIGHSCORE, GameApp.hsName, GameApp.hsMaxLevel, GameApp.hsMaxScore, true);
-    GameApp.game = getGameScreen();
-    BaseApp.cOK = BaseApp.newCommand(GameApp.MSG_LABEL_OK, Command.OK, 30, BaseApp.AC_NONE);
-    BaseApp.cBACK = BaseApp.newCommand(GameApp.MSG_LABEL_BACK, Command.BACK, 20, BaseApp.AC_BACK);
-    BaseApp.cEXIT = BaseApp.newCommand(GameApp.MSG_LABEL_EXIT, Command.EXIT, 10, BaseApp.AC_EXIT);
-    gameMenu = Application.getMenu(GameApp.game.name, GameApp.ME_MAINMENU, GameApp.GA_CONTINUE, BaseApp.cEXIT);
-    processGameAction(GameApp.GA_STARTUP);
+		try {
+			final String gval = super.getAppProperty(GRAPHICS_PROPERY);
+			GameApp.graphics = ((gval == null) || gval.equals("true"));
+			BaseApp.messages = BaseApp.readStrings(GameApp.RES_MSGS);
+			if (GameApp.graphics) {
+				BaseApp.icons = BaseApp.splitImages(GameApp.RES_MENUICON, 9, 12, 12);
+			} else {
+				BaseApp.icons = new Image[9];
+				for (int i = 0; i < BaseApp.icons.length; i++) {
+					BaseApp.icons[i] = null;
+				}
+			}
+			GameApp.highscore = new ScoreManager(GameApp.RMS_HIGHSCORE, GameApp.hsName, GameApp.hsMaxLevel, GameApp.hsMaxScore, true);
+			GameApp.game = getGameScreen();
+			BaseApp.cOK = BaseApp.newCommand(GameApp.MSG_LABEL_OK, Command.OK, 30, BaseApp.AC_NONE);
+			BaseApp.cBACK = BaseApp.newCommand(GameApp.MSG_LABEL_BACK, Command.BACK, 20, BaseApp.AC_BACK);
+			BaseApp.cEXIT = BaseApp.newCommand(GameApp.MSG_LABEL_EXIT, Command.EXIT, 10, BaseApp.AC_EXIT);
+			gameMenu = getGameMenu();
+			processGameAction(GameApp.GA_STARTUP);
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+//@			logger.severe("init error", e);
+			//#endif
+		}
   }
 
   /**
    * Resume the game
    */
   public void resume() {
+		//#ifdef DLOGGING
+//@		if (finestLoggable) {logger.finest("resume");}
+		//#endif
     BaseApp.show(null, gameMenu, true);
   }
 
@@ -143,6 +211,9 @@ public abstract class GameApp extends Application {
    * Destroy the game
    */
   public void done() {
+		//#ifdef DLOGGING
+//@		if (finestLoggable) {logger.finest("done");}
+		//#endif
     doGameAbort();
     BaseApp.closeRecordStores();
     super.done();
@@ -160,36 +231,61 @@ public abstract class GameApp extends Application {
    * Command dispatcher
    */
   public void commandAction(final Command c, final Displayable d) {
-    int gameAction = GameApp.GA_NONE;
-    if (d == gameMenu) {
-      int index = gameMenu.getSelectedIndex();
-      if (!isActive()) {
-        if (index >= BaseApp.pSpecial) {
-          index++;
-        }
-      }
-      gameAction = BaseApp.menu[index][BaseApp.MD_MENUAC];
-    }
-    else if (c == BaseApp.cOK) {
-      if (d == gameSettings) {
-        gameAction = GameApp.GA_APPLYSETTINGS;
-      }
-      else if (d == gameOptions) {
-        gameAction = GameApp.GA_APPLYOPTIONS;
-      }
-      else if (d == gameNewHighScore) {
-        gameAction = GameApp.GA_NEWHIGHSCORE;
-      }
-    }
-    if (c == BaseApp.cEXIT) {
-      BaseApp.midlet.notifyDestroyed();
-    }
-    else if (c == BaseApp.cBACK) {
-      BaseApp.back(null);
-    }
-    else {
-      processGameAction(gameAction);
-    }
+		//#ifdef DLOGGING
+//@		if (finestLoggable) {logger.finest("commandAction c,d=" + c.getLabel() + "," + c + "," + d);}
+		//#endif
+		try {
+			int gameAction = GameApp.GA_NONE;
+			if (d == gameMenu) {
+				int index = gameMenu.getSelectedIndex();
+				//#ifdef DLOGGING
+//@				if (finestLoggable) {logger.finest("commandAction index,isActive()=" + index + "," +  "," + isActive());}
+				//#endif
+				index = ((Integer)BaseApp.menuShown.elementAt(index)).intValue();
+				//#ifdef DLOGGING
+//@				if (finestLoggable) {logger.finest("commandAction modified index=" + index);}
+				//#endif
+				gameAction = BaseApp.menu[index][BaseApp.MD_MENUAC];
+				//#ifdef DLOGGING
+//@				if (finestLoggable) {logger.finest("commandAction mindex,gameAction=" + index + "," +  gameAction);}
+				//#endif
+			}
+			//#ifdef DMIDP10
+//@			else if (d == game) {
+//@				process(c, d, null);
+//@			}
+			//#endif
+			else if (c == BaseApp.cOK) {
+				if (d == gameSettings) {
+					gameAction = GameApp.GA_APPLYSETTINGS;
+				}
+				else if (d == gameOptions) {
+					gameAction = GameApp.GA_APPLYOPTIONS;
+				}
+				else if (d == gameNewHighScore) {
+					gameAction = GameApp.GA_NEWHIGHSCORE;
+				}
+			}
+			if (c == BaseApp.cEXIT) {
+				try {
+					BaseApp.midlet.destroyApp(true);
+				} catch (MIDletStateChangeException e) {
+					e.printStackTrace();
+				};
+				BaseApp.midlet.notifyDestroyed();
+			}
+			else if (c == BaseApp.cBACK) {
+				BaseApp.back(null);
+			}
+			else {
+				processGameAction(gameAction);
+			}
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+//@			logger.severe("commandAction error", e);
+			//#endif
+		}
   }
 
   /**
@@ -209,7 +305,13 @@ public abstract class GameApp extends Application {
    * Game Startup
    */
   public void doStartup() {
-    final Displayable splash = getSplash();
+    Displayable splash = null;
+		if (GameApp.graphics) {
+			splash = getSplash();
+		}
+		//#ifdef DLOGGING
+//@		if (finestLoggable) {logger.finest("doStartup splash=" + splash);}
+		//#endif
     if (splash != null) {
       BaseApp.setDisplay(splash);
     }
@@ -222,27 +324,44 @@ public abstract class GameApp extends Application {
    * Abort the game
    */
   public void doGameAbort() {
+		//#ifdef DLOGGING
+//@		if (finestLoggable) {logger.finest("doGameAbort isActive()=" + isActive());}
+		//#endif
     if (isActive()) {
       GameApp.game.done();
-      gameMenu.delete(BaseApp.pSpecial);
+			prepGameMenu(isActive());
     }
   }
 
   /**
-   * Start the game
+   * Start the game.  Abort a previous game.  Prepare to continue if needed.
+	 * Initialize the game and show it.
    */
   public void doGameStart() {
-    doGameAbort();
-    Application.insertMenuItem(gameMenu, BaseApp.pSpecial, BaseApp.menu[BaseApp.pSpecial]);
-    GameApp.game.init();
-    GameApp.game.show();
-    BaseApp.show(null, GameApp.game, true);
+		//#ifdef DLOGGING
+//@		if (finestLoggable) {logger.finest("doGameStart");}
+		//#endif
+		try {
+			doGameAbort();
+			prepGameMenu(isActive());
+			GameApp.game.init();
+			GameApp.game.show();
+			BaseApp.show(null, GameApp.game, true);
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+//@			logger.severe("doGameStart error", e);
+			//#endif
+		}
   }
 
   /**
    * Resume the game
    */
   public void doGameResume() {
+		//#ifdef DLOGGING
+//@		if (finestLoggable) {logger.finest("doGameResume isActive()=" + isActive());}
+		//#endif
     if (isActive()) {
       GameApp.game.show();
       BaseApp.show(null, GameApp.game, true);
@@ -253,6 +372,9 @@ public abstract class GameApp extends Application {
    * Pause the game
    */
   public void doGamePause() {
+		//#ifdef DLOGGING
+//@		if (finestLoggable) {logger.finest("doGamePause isActive()=" + isActive());}
+		//#endif
     if (isActive()) {
       GameApp.game.hide();
       BaseApp.back(null, gameMenu, true);
@@ -263,10 +385,13 @@ public abstract class GameApp extends Application {
    * Stop the game
    */
   public void doGameStop() {
+		//#ifdef DLOGGING
+//@		if (finestLoggable) {logger.finest("doGameStop isActive()=" + isActive(), new Exception("UNDO"));}
+		//#endif
     if (isActive()) {
       GameApp.game.hide();
       GameApp.game.done();
-      gameMenu.delete(BaseApp.pSpecial);
+			prepGameMenu(isActive());
       int score = GameApp.game.score.getScore();
       Score hs = null;
       if (GameApp.hsLevel >= GameApp.hsMaxLevel) {
@@ -305,6 +430,9 @@ public abstract class GameApp extends Application {
    * Set new high score
    */
   public void doSetNewHighScore() {
+		//#ifdef DLOGGING
+//@		if (finestLoggable) {logger.finest("doSetNewHighScore isActive()=" + isActive());}
+		//#endif
     GameApp.game.score.name = tName.getString();
     GameApp.highscore.addNewScore(GameApp.hsLevel, GameApp.game.score);
     BaseApp.back(null, gameMenu, true);
@@ -314,6 +442,9 @@ public abstract class GameApp extends Application {
    * Show About
    */
   public void doAbout() {
+		//#ifdef DLOGGING
+//@		if (finestLoggable) {logger.finest("doAbout isActive()=" + isActive());}
+		//#endif
     final Displayable d = BaseApp.getTextForm(GameApp.MSG_MENU_MAIN_ABOUT, GameApp.RES_ABOUT);
     BaseApp.show(null, d, true);
   }
@@ -322,6 +453,9 @@ public abstract class GameApp extends Application {
    * Show help
    */
   public void doHelp() {
+		//#ifdef DLOGGING
+//@		if (finestLoggable) {logger.finest("doHelp");}
+		//#endif
     final Displayable d = BaseApp.getTextForm(GameApp.MSG_MENU_MAIN_HELP, GameApp.RES_HELP);
     BaseApp.show(null, d, true);
   }
@@ -330,6 +464,9 @@ public abstract class GameApp extends Application {
    * Show high score
    */
   public void doHighScore() {
+		//#ifdef DLOGGING
+//@		if (finestLoggable) {logger.finest("doHighScore");}
+		//#endif
     final Displayable d = getHighScore();
     BaseApp.show(null, d, true);
   }
@@ -338,6 +475,9 @@ public abstract class GameApp extends Application {
    * Show game options
    */
   public void doShowOptions() {
+		//#ifdef DLOGGING
+//@		if (finestLoggable) {logger.finest("doShowOptions");}
+		//#endif
     if (gameOptions == null) {
       gameOptions = getOptions();
     }
@@ -348,6 +488,9 @@ public abstract class GameApp extends Application {
    * Apply the game options
    */
   public void doApplyOptions() {
+		//#ifdef DLOGGING
+//@		if (finestLoggable) {logger.finest("doApplyOptions");}
+		//#endif
     BaseApp.back(null);
   }
 
@@ -355,6 +498,9 @@ public abstract class GameApp extends Application {
    * Show game settings
    */
   public void doShowSettings() {
+		//#ifdef DLOGGING
+//@		if (finestLoggable) {logger.finest("doShowSettings gameSettings=" + gameSettings);}
+		//#endif
     if (gameSettings == null) {
       gameSettings = getSettings();
     }
@@ -366,6 +512,9 @@ public abstract class GameApp extends Application {
    * Apply new game settings
    */
   public void doApplySettings() {
+		//#ifdef DLOGGING
+//@		if (finestLoggable) {logger.finest("doApplySettings");}
+		//#endif
     GameUISettings.getVals();
     BaseApp.back(null);
   }
@@ -375,7 +524,7 @@ public abstract class GameApp extends Application {
    * @return
    */
   protected Displayable getSplash() {
-    return new SplashScreen(GameApp.RES_SPLASH, gameMenu, 3000);
+    return new SplashScreen(GameApp.resSplash, gameMenu, 3000);
   }
 
   /**
@@ -383,7 +532,10 @@ public abstract class GameApp extends Application {
    * @return
    */
   protected Displayable getHighScore() {
-    final Form form = new Form(BaseApp.messages[GameApp.MSG_MENU_MAIN_HIGHSCORE]);
+		//#ifdef DLOGGING
+//@		if (finestLoggable) {logger.finest("getHighScore");}
+		//#endif
+    final Form form = new FeatureForm(BaseApp.messages[GameApp.MSG_MENU_MAIN_HIGHSCORE]);
     final Vector scores = GameApp.highscore.getList(GameApp.hsLevel);
     if (scores.size() == 0) {
       form.append(BaseApp.messages[GameApp.MSG_TEXT_HIGHSCORE_01]);
@@ -406,9 +558,17 @@ public abstract class GameApp extends Application {
    * @return
    */
   protected Displayable getNewHighScore() {
-    final Form form = new Form(BaseApp.messages[GameApp.MSG_TEXT_HIGHSCORE_02]);
+		//#ifdef DLOGGING
+//@		if (finestLoggable) {logger.finest("getNewHighScore");}
+		//#endif
+    final Form form = new FeatureForm(BaseApp.messages[GameApp.MSG_TEXT_HIGHSCORE_02]);
     tScore = new StringItem(BaseApp.messages[GameApp.MSG_TEXT_HIGHSCORE_03], null);
-    tName = new TextField(BaseApp.messages[GameApp.MSG_TEXT_HIGHSCORE_04], "", 8, TextField.INITIAL_CAPS_SENTENCE);
+    tName = new TextField(BaseApp.messages[GameApp.MSG_TEXT_HIGHSCORE_04], "", 8,
+		//#ifdef DMIDP20
+				TextField.INITIAL_CAPS_SENTENCE);
+		//#else
+//@				TextField.ANY);
+		//#endif
     form.append(tScore);
     form.append(tName);
     BaseApp.setup(form, BaseApp.cOK, null);
@@ -438,12 +598,29 @@ public abstract class GameApp extends Application {
   abstract protected GameScreen getGameScreen();
 
   /**
+   * Build main game menu
+   * @return
+   */
+  abstract protected List getGameMenu();
+
+  /**
+   * Handle preparation for presenting menu to the user
+   */
+  abstract protected void prepGameMenu(boolean canContinue);
+
+  /**
    * Vibrate the handset
    * @param millis
    */
   public static void vibrate(final int millis) {
+		//#ifdef DLOGGING
+//@		Logger logger = Logger.getLogger("GameApp");
+//@		logger.finest("vibrate millis,GameApp.usVibrate=" + millis + "," + GameApp.usVibrate);
+		//#endif
     if (GameApp.usVibrate) {
+			//#ifdef DMIDP20
       BaseApp.display.vibrate(millis);
+			//#endif
     }
   }
 
@@ -452,8 +629,14 @@ public abstract class GameApp extends Application {
    * @param millis
    */
   public static void flashBacklight(final int millis) {
+		//#ifdef DLOGGING
+//@		Logger logger = Logger.getLogger("GameApp");
+//@		logger.finest("flashBacklight millis=" + millis);
+		//#endif
     if (GameApp.usBackLight) {
+			//#ifdef DMIDP20
       BaseApp.display.flashBacklight(millis);
+			//#endif
     }
   }
 
@@ -463,12 +646,17 @@ public abstract class GameApp extends Application {
    * @param p
    */
   public static void play(final Player p) {
+		//#ifdef DLOGGING
+//@		Logger logger = Logger.getLogger("GameApp");
+//@		logger.finest("play p,GameApp.usVolume=" + p + "," + GameApp.usVolume);
+		//#endif
     if (GameApp.usVolume > 0) {
       try {
         p.start();
       }
       catch (final Exception e) {
         // Nothing to do
+				e.printStackTrace();
       }
     }
   }
