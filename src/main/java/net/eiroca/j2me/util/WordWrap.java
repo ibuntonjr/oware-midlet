@@ -58,6 +58,9 @@
  * IN THE SOFTWARE.
  *
  */
+/**
+ * This was modified no later than 2009-01-29
+ */
 package net.eiroca.j2me.util;
 
 import javax.microedition.lcdui.Font;
@@ -100,14 +103,12 @@ public class WordWrap {
         i++;
       }
       final int w = font.stringWidth(txt.substring(start, i));
-      if (pos == start) {
-        if (w > width) {
-          while (font.stringWidth(txt.substring(start, --i)) > width) {
-            //
-          }
-          pos = i;
-          break;
-        }
+      if ((pos == start) && (w > width)) {
+				while (font.stringWidth(txt.substring(start, --i)) > width) {
+					//
+				}
+				pos = i;
+				break;
       }
       if (w <= width) {
         pos = i;
