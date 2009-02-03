@@ -16,6 +16,9 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+/**
+ * This was modified no later than 2009-01-29
+ */
 package net.eiroca.j2me.app;
 
 import javax.microedition.lcdui.Command;
@@ -23,7 +26,12 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
 
-public class TextScreen extends Form implements CommandListener {
+import com.substanceofcode.rssreader.presentation.FeatureForm;
+
+/**
+	* Show text screen (form).
+	*/
+public class TextScreen extends FeatureForm implements CommandListener {
 
   private final Displayable next;
 
