@@ -16,6 +16,9 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+/**
+ * This was modified no later than 2009-01-29
+ */
 package net.eiroca.j2me.game;
 
 import javax.microedition.lcdui.Choice;
@@ -23,8 +26,13 @@ import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Gauge;
 import net.eiroca.j2me.app.BaseApp;
+import com.substanceofcode.rssreader.presentation.FeatureForm;
 
-public class GameUISettings extends Form {
+
+/**
+	* Game UI settings such as vibrate, audio, backlight, 
+	*/
+public class GameUISettings extends FeatureForm {
 
   public static ChoiceGroup stVibrate = null;
   public static ChoiceGroup stBackLight = null;
