@@ -40,6 +40,9 @@
  * IN THE SOFTWARE.
  *
  */
+/**
+ * This was modified no later than 2009-01-29
+ */
 // Expand to define JMUnit test define
 @DJMTESTDEF@
 // Expand to define logging define
@@ -48,6 +51,7 @@ package net.eiroca.j2me.app;
 
 import java.util.Vector;
 import javax.microedition.lcdui.Choice;
+import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Form;
@@ -353,7 +357,6 @@ public abstract class Application extends BaseApp implements CommandListener
    * @param question
    * @param yes
    * @param no
-   * @author Irv Bunton
    */
   public void confirm(final int title, final int question, final Command yes, final Command no) {
 		//#ifdef DLOGGING
@@ -371,5 +374,57 @@ public abstract class Application extends BaseApp implements CommandListener
     qform.setCommandListener(this);
     BaseApp.show(null, qform, true);
   }
+
+  /**
+   * If the new settings value (newValue) != the previous value (prevValue)
+	 * update the value in settings.  This allows valuesChanged to be set in
+	 * settings, and to store only if changed.
+   *
+   * @param newValue
+   * @param settingsKey
+   * @param prevValue
+   * @return    int
+   * @author Irv Bunton
+   */
+  public static int settingsUpd(int newValue, String settingsKey, int prevValue) {
+		//#ifdef DLOGGING
+		Logger logger = Logger.getLogger("Application");
+		logger.finest("settingsUpd newValue,settingsKey prevValue=" + newValue + "," + settingsKey + "," + prevValue);
+		//#endif
+	  if (newValue != prevValue) {
+		  BaseApp.settings.putInt(settingsKey, newValue);
+		}
+		return newValue;
+	}
+
+	public static ChoiceGroup createChoiceGroup(int msgNbr, int choiceType,
+			int[] choiceMsgNbrs) {
+		ChoiceGroup choiceGrp = new ChoiceGroup(BaseApp.messages[msgNbr],
+					choiceType);
+
+		for (int i = 0; i < choiceMsgNbrs.length; i++) {
+			choiceGrp.append(BaseApp.messages[choiceMsgNbrs[i]], null);
+		}
+		return choiceGrp;
+	}
+
+	public static ChoiceGroup createNumRange(int msgNbr, int start, int end, int incr) {
+		//#ifdef DLOGGING
+		Logger logger = Logger.getLogger("Application");
+		logger.finest("createNumRange msgNbr,start,end,incr=" + msgNbr + "," + start + "," + end + "," + incr);
+		//#endif
+		ChoiceGroup numRange = new ChoiceGroup(BaseApp.messages[msgNbr],
+			//#ifdef DMIDP20
+					Choice.POPUP
+			//#else
+					Choice.EXCLUSIVE
+			//#endif
+					);
+			for (int i = start; i <= end;) {
+				numRange.append(Integer.toString(i), null);
+				 i+= incr;
+			}
+			return numRange;
+	}
 
 }
