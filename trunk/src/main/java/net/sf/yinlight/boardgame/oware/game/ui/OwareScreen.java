@@ -306,25 +306,22 @@ public final class OwareScreen extends BoardGameScreen {
 		//#ifdef DMIDP10
 //@		super.wakeup(3);
 		//#endif
-    while (!gameEnded && !isHuman[BoardGameScreen.actPlayer]) {
-      mtt = new MinimaxTimerTask();
-      final OwareMove computerMove = (OwareMove)computerTurn(move);
-			//#ifdef DLOGGING
-//@			if (finerLoggable) {logger.finer("nextTurn computerMove.row,computerMove.col,BoardGameScreen.actPlayer=" + ((computerMove == null) ? "computerMoves null" : (computerMove.row + "," + computerMove.col)) + "," + BoardGameScreen.actPlayer);}
-			//#endif
-      if (computerMove == null) {
-				break;
-			}
-      selx = computerMove.col;
-      sely = computerMove.row;
-      processMove(computerMove, preCalculateMoves);
-      updatePossibleMoves();
-			//#ifdef DMIDP10
-//@			super.wakeup(3);
-			//#endif
-      GameMinMax.clearPrecalculatedMoves();
+  mtt = new MinimaxTimerTask();
+  final OwareMove computerMove = (OwareMove)computerTurn(move);
+		//#ifdef DLOGGING
+//@		if (finerLoggable) {logger.finer("nextTurn computerMove.row,computerMove.col,BoardGameScreen.actPlayer=" + ((computerMove == null) ? "computerMoves null" : (computerMove.row + "," + computerMove.col)) + "," + BoardGameScreen.actPlayer);}
+		//#endif
+  if (computerMove == null) {
 			break;
-    }
+		}
+  selx = computerMove.col;
+  sely = computerMove.row;
+  processMove(computerMove, preCalculateMoves);
+  updatePossibleMoves();
+		//#ifdef DMIDP10
+//@		super.wakeup(3);
+		//#endif
+  GameMinMax.clearPrecalculatedMoves();
 		//#ifdef DLOGGING
 //@		if (finerLoggable) {logger.finer("nextTurn end loop gameEnded,isHuman[BoardGameScreen.actPlayer],BoardGameScreen.actPlayer=" + gameEnded + "," + isHuman[BoardGameScreen.actPlayer] + "," + BoardGameScreen.actPlayer);}
 		//#endif
