@@ -1,5 +1,8 @@
 /** GPL >= 2.0
+	* FIX use get factory for table and move.
+	* Put in more factory calls
  * Based upon jtReversi game written by Jataka Ltd.
+ *
  * This software was modified 2008-12-07.  The original file was ReversiGame.java
  * in mobilesuite.sourceforge.net project.
  *
@@ -20,223 +23,406 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+/**
+ * This was modified no later than 2009-01-29
+ */
+// Expand to define logging define
+//#define DNOLOGGING
 package net.sf.yinlight.boardgame.oware.game;
 
 import java.util.Vector;
+import java.util.Stack;
 import net.eiroca.j2me.game.tpg.GameMinMax;
 import net.eiroca.j2me.game.tpg.GameMove;
 import net.eiroca.j2me.game.tpg.GameTable;
 import net.eiroca.j2me.game.tpg.TwoPlayerGame;
+import net.sf.yinlight.boardgame.oware.midlet.OwareMIDlet;
 
-public final class OwareGame extends TwoPlayerGame {
+//#ifdef DLOGGING
+//@import net.sf.jlogmicro.util.logging.Logger;
+//@import net.sf.jlogmicro.util.logging.Level;
+//#endif
 
-  protected int evalNum = 0;
-  protected int[][] heurMatrix;
-  protected int libertyPenalty;
-  protected int numFirstFreeNeighbours;
-  protected int numSecondFreeNeighbours;
-  public int numFirstPlayer;
-  public int numSecondPlayer;
-  protected int point;
-  protected int pointFirstPlayer;
-  protected int pointSecondPlayer;
-  protected int s01;
-  protected int s11;
-  protected int sBonus;
-  protected boolean squareErase;
-  protected byte rPlayer;
-  protected OwareTable rTable;
-  protected int[][] tableIntArray = new int[8][8];
+/**
+	* Oware two player game.
+	*/
+public final class OwareGame extends BoardGame {
 
-  public OwareGame(final int[][] heurMatrix) {
-    this(heurMatrix, 0, 0, false);
+  public final static int NBR_MAX_STACK = 6;
+  protected static int maxHouses = OwareTable.NBR_COL;
+  public static final int GRAND_SLAM_ILLEGAL = 0;
+  public static final int GRAND_SLAM_LEGAL_NO_CAPTURE = 1;
+  public static final int GRAND_SLAM_LEGAL_OPPONENT = 2;
+  public static final int GRAND_SLAM_LEGAL_LAST = 3;
+  public static final int GRAND_SLAM_LEGAL_FIRST = 4;
+  public static final int GRAND_SLAM_LEGAL_24 = 5;
+  public static final int GRAND_SLAM_LEGAL_MAX = 24;
+
+	//#ifdef DLOGGING
+//@	private Logger logger = Logger.getLogger("OwareGame");
+//@	private boolean fineLoggable = logger.isLoggable(Level.FINE);
+//@  private boolean finerLoggable = logger.isLoggable(Level.FINER);
+//@	private boolean finestLoggable = logger.isLoggable(Level.FINEST);
+//@	private boolean traceLoggable = logger.isLoggable(Level.TRACE);
+	//#endif
+
+  /**
+   * Use the table to determine if a move is possible, then create the
+	 * simulation of the move and put it into newTable (table is not modified)
+	 * and return an array.  If animated, return 
+   *
+   * @param table
+   * @param player
+   * @param move
+   * @param newTable
+   * @param animated
+   * @return    GameTable[]
+   * @author Irv Bunton
+   */
+  private static GameTable[] _turn(final OwareTable table, final byte player, final OwareMove move, final OwareTable newTable, final boolean animated,
+			boolean captureAll, boolean noCapture, int captureIx
+			//#ifdef DLOGGING
+//@			,Logger logger
+			//#endif
+			) {
+		GameTable tables[] = null;
+		try {
+			final int row = move.row;
+			final int col = move.col;
+			//#ifdef DLOGGING
+//@			logger.finest("_turn start row,col,player,OwareTable.getPlayerItem(player),table.getItem(row, col),table.getSeeds(row, col),captureAll,captureIx=" + row + "," + col + "," + player + "," + OwareTable.getPlayerItem(player) + "," + table.getItem(row, col) + "," + table.getSeeds(row, col) + "," + captureAll + "," + captureIx);
+			//#endif
+			/* If the cup is not for the current player, we are not allowed to
+				 do anything with it.  Also, if there are no seeds, you cannot
+				 take the turn. */
+			if ((row != table.nbrRow) &&
+					((table.getItem(row, col) != OwareTable.getPlayerItem(player)) ||
+					(table.getSeeds(row, col) == 0))) { return null; }
+			Vector vTables = null;
+			if (animated) {
+				vTables = new Vector();
+			}
+			newTable.copyDataFrom(table);
+			if (row == table.nbrRow) {
+				// pass.  Leave table as is
+				newTable.setPassNum(newTable.getPassNum() + 1);
+				tables = new GameTable[1];
+				tables[0] = newTable;
+					//#ifdef DLOGGING
+//@					logger.finest("_turn newTable.getPassNum()=" + newTable.getPassNum());
+					//#endif
+				return tables;
+			}
+			newTable.setPassNum(0);
+			boolean changed = false;
+			int seeds = newTable.getSeeds(row, col);
+			newTable.setSeeds(row, col, (byte)0);
+			move.setPoint((byte)seeds);
+			newTable.setLastMove(player, move);
+			int ccol = col;
+			int crow = row;
+			boolean first = true;
+			int lastRow = crow;
+			int lastCol = ccol;
+			while (seeds > 0) {
+				if (first) {
+					first = false;
+				} else {
+					crow = 1 - crow;
+					ccol = (crow == 1) ? 0 : (table.nbrCol - 1);
+				}
+				int dir = (crow == 0) ? -1 : 1;
+				for (; (ccol >= 0) && (ccol < table.nbrCol); ccol += dir) {
+					if ((crow != row) || (ccol != col)) {
+						int cseeds = newTable.getSeeds(crow, ccol);
+						newTable.setSeeds(crow, ccol, (byte)(cseeds + 1));
+						//#ifdef DLOGGING
+//@						logger.finest("_turn crow,ccol,dir,(cseeds + 1),seeds=" + crow + "," + ccol + "," + dir + "," + (cseeds + 1) + "," + seeds);
+						//#endif
+						changed = true;
+						lastRow = crow;
+						lastCol = ccol;
+						if (--seeds <= 0) {
+							break;
+						}
+					//#ifdef DLOGGING
+//@					} else {
+//@						logger.finest("_turn skipping as it is the same row,col,crow,ccol,dir=" + row + "," + col + "," + crow + "," + ccol + "," + dir + "," + seeds);
+						//#endif
+					}
+				}
+			}
+
+			//#ifdef DLOGGING
+//@			logger.finest("_turn finished for crow,ccol,lastRow,lastCol,seeds=" + crow + "," + ccol + "," + lastRow + "," + lastCol + "," + seeds);
+			//#endif
+			/* Score points/capture. */
+			int holesCaptured = 0;
+			int lastCaptureCol = lastCol;
+			if ((captureAll || (captureIx >= 0)) && (lastRow != row)) {
+				// Move in the opposite direction this time
+				crow = lastRow;
+				ccol = lastCol;
+				int dir = (crow == 0) ? 1 : -1;
+				for (; (ccol >= 0) && (ccol < table.nbrCol); ccol += dir) {
+					final int cseeds = newTable.getSeeds(crow, ccol);
+					if ((cseeds == 2) || (cseeds == 3)) {
+						if ((captureIx >= 0) && (captureIx == ccol)) {
+							continue;
+						}
+						newTable.setPoint(player, (byte)(newTable.getPoint(player) +
+								newTable.getSeeds(crow, ccol)));
+						//#ifdef DLOGGING
+//@						logger.finest("_turn capturing crow,ccol,dir,newTable.getSeeds(crow, ccol=" + crow + "," + ccol + "," + dir + "," + newTable.getSeeds(crow, ccol));
+						//#endif
+						newTable.setSeeds(crow, ccol, (byte)0);
+						lastCaptureCol = ccol;
+						if (++holesCaptured > maxHouses) {
+							//#ifdef DLOGGING
+//@							logger.finest("_turn capturing over max crow,ccol,holesCaptured=" + crow + "," + ccol + "," + holesCaptured);
+							//#endif
+							break;
+						}
+					} else {
+						break;
+					}
+				}
+			}
+
+			boolean emptyHoles = allEmptyHoles(newTable, (1 - player));
+
+			if (captureAll && changed && (holesCaptured > 0) && emptyHoles) {
+					switch (OwareMIDlet.gsGrandSlam) {
+					case GRAND_SLAM_ILLEGAL:
+					default:
+						//#ifdef DLOGGING
+//@						logger.finest("_turn return illegal grand slam player=" + player);
+						//#endif
+						return null;
+					case GRAND_SLAM_LEGAL_NO_CAPTURE:
+						//#ifdef DLOGGING
+//@						logger.finest("_turn return legal grand slam no capture player=" + player);
+						//#endif
+						return _turn(table, player, move, newTable, animated, false, true,
+							-1	
+							//#ifdef DLOGGING
+//@							,logger
+							//#endif
+							);
+					case GRAND_SLAM_LEGAL_OPPONENT:
+						// Give seeds to the opponent
+						giveToPlayer(player, (byte)(1 - player), newTable);
+						break;
+					case GRAND_SLAM_LEGAL_LAST:
+						//#ifdef DLOGGING
+//@						logger.finest("_turn return legal grand slam take last player=" + player);
+						//#endif
+						return _turn(table, player, move, newTable, animated, false, false,
+							lastCaptureCol	
+							//#ifdef DLOGGING
+//@							,logger
+							//#endif
+							);
+					case GRAND_SLAM_LEGAL_FIRST:
+						//#ifdef DLOGGING
+//@						logger.finest("_turn return legal grand slam take first player=" + player);
+						//#endif
+						return _turn(table, player, move, newTable, animated, false, false,
+								lastCol
+							//#ifdef DLOGGING
+//@							,logger
+							//#endif
+							);
+					case GRAND_SLAM_LEGAL_24:
+						if (newTable.getPoint(player) <= GRAND_SLAM_LEGAL_MAX) {
+							//#ifdef DLOGGING
+//@							logger.finest("_turn return illegal grand slam not > 24 =" + player);
+							//#endif
+							return null;
+						}
+					}
+			} else if (allEmptyHoles(newTable, 1 - player)) {
+					//#ifdef DLOGGING
+//@					logger.finest("_turn return illegal opponent has no seeds player=" + player);
+					//#endif
+					return null;
+			}
+			
+			if (animated) {
+				vTables.addElement((OwareTable)newTable.getBoardGameTable(newTable));
+			}
+			if (changed) {
+				if (animated) {
+					tables = new GameTable[vTables.size()];
+					try {
+						vTables.copyInto(tables);
+					} catch (Throwable e) {
+						for (int i = 0; i < vTables.size(); ++i) {
+							tables[i] = (GameTable) vTables.elementAt(i);
+						}
+					}
+				}
+				else {
+					tables = new GameTable[1];
+					tables[0] = newTable;
+				}
+				return tables;
+			}
+			return null;
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+//@			logger.severe("_turn error", e);
+			//#endif
+			return null;
+			//#ifdef DLOGGING
+//@		} finally {
+//@			logger.finest("_turn return player,tables.length=" + player + "," + ((tables == null) ? "tables is null" : String.valueOf(tables.length)));
+			//#endif
+		}
   }
 
-  public OwareGame(final int[][] heurMatrix, final int libertyPenalty, final int sBonus, final boolean squareErase) {
-    this.heurMatrix = heurMatrix;
-    this.libertyPenalty = libertyPenalty;
-    this.sBonus = sBonus;
-    this.squareErase = squareErase;
-  }
+	static public void giveToPlayer(final byte player, final byte opPlayer,
+			OwareTable table) {
+		//#ifdef DLOGGING
+//@		Logger logger = Logger.getLogger("OwareGame");
+		//#endif
+		for (int crow = 0; crow < table.nbrRow; crow++) {
+			for (int ccol = 0; ccol < table.nbrCol; ccol++) {
+				int ix = table.getItem(crow, ccol) - 1;
+				if (ix == player) {
+					table.setPoint((byte)(1 - opPlayer),
+								(byte)(table.getPoint((byte)(1 - opPlayer)) +
+								table.getSeeds(crow, ccol)));
+						//#ifdef DLOGGING
+//@						logger.finest("_turn capturing opponent crow,ccol,table.getSeeds(crow, ccol=" + crow + "," + ccol + "," + table.getSeeds(crow, ccol));
+						//#endif
+						table.setSeeds(crow, ccol, (byte)0);
+				}
+			}
+			}
+		}
 
-  private GameTable[] _turn(final OwareTable table, final byte player, final OwareMove move, final OwareTable newTable, final boolean animated) {
-    final int row = move.row;
-    final int col = move.col;
-    if ((row != 8) && (table.getItem(row, col) != 0)) { return null; }
-    Vector vTables = null;
-    GameTable tables[];
-    if (animated) {
-      vTables = new Vector();
-    }
-    newTable.copyDataFrom(table);
-    if (row == 8) {
-      // pass
-      newTable.setPassNum(newTable.getPassNum() + 1);
-      tables = new GameTable[1];
-      tables[0] = newTable;
-      return tables;
-    }
-    newTable.setPassNum(0);
-    newTable.setItem(row, col, OwareTable.getPlayerItem(player));
-    if (animated) {
-      vTables.addElement(new OwareTable(newTable));
-    }
-    boolean flipped = false;
-    for (int dirrow = -1; dirrow <= 1; ++dirrow) {
-      for (int dircol = -1; dircol <= 1; ++dircol) {
-        if ((dirrow == 0) && (dircol == 0)) {
-          continue;
-        }
-        int c = 1;
-        while (OwareMove.valid(row + c * dirrow, col + c * dircol) && (newTable.getItem(row + c * dirrow, col + c * dircol) == OwareTable.getPlayerItem((byte) (1 - player)))) {
-          ++c;
-        }
-        if ((c > 1) && OwareMove.valid(row + c * dirrow, col + c * dircol) && (newTable.getItem(row + c * dirrow, col + c * dircol) == OwareTable.getPlayerItem(player))) {
-          flipped = true;
-          for (int s1 = 1; s1 < c; ++s1) {
-            newTable.flip(row + s1 * dirrow, col + s1 * dircol);
-            if (animated) {
-              vTables.addElement(new OwareTable(newTable));
-            }
-          }
-        }
-      }
-    }
-    if (flipped) {
-      if (animated) {
-        tables = new GameTable[vTables.size()];
-        for (int i = 0; i < vTables.size(); ++i) {
-          tables[i] = (GameTable) vTables.elementAt(i);
-        }
-      }
-      else {
-        tables = new GameTable[1];
-        tables[0] = newTable;
-      }
-      return tables;
-    }
-    return null;
-  }
+	public static boolean allEmptyHoles(OwareTable table, int player) {
+		int crow = player;
+		int ccol = 0;
+		for (; (ccol >= 0) && (ccol < table.nbrCol); ccol++) {
+			if (table.getSeeds(crow, ccol) > 0) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+  /**
+   * Use the table to determine if a move is possible, then create the
+	 * simulation of the move and put it into newTable (table is not modified)
+	 * and return an array.  If animated, return 
+   *
+   * @param table
+   * @param player
+   * @param move
+   * @param newTable
+   * @param animated
+   * @param animated
+   * @return    GameTable[]
+   * @author Irv Bunton
+   */
+  private static GameTable[] _turn(final OwareTable table, final byte player, final OwareMove move, final OwareTable newTable, final boolean animated
+			//#ifdef DLOGGING
+//@			,Logger logger
+			//#endif
+			) {
+		return _turn(table, player, move, newTable, animated, true, false, -1
+			//#ifdef DLOGGING
+//@			,logger
+			//#endif
+			);
+	}
 
   /*
+   * Take the turn for the given move for the given player.
+	 *
    * @Override
    * @see net.eiroca.j2me.minmax.TwoPlayerGame#animatedTurn(net.eiroca.j2me.minmax.Table,
    *      byte, net.eiroca.j2me.minmax.Move, net.eiroca.j2me.minmax.Table)
    */
   public GameTable[] animatedTurn(final GameTable table, final byte player, final GameMove move, final GameTable newt) {
-    return _turn((OwareTable) table, player, (OwareMove) move, (OwareTable) newt, true);
+		try {
+			return _turn((OwareTable) table, player, (OwareMove) move, (OwareTable) newt, true, true, false, -1
+		//#ifdef DLOGGING
+//@				, logger
+		//#endif
+				);
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+//@			logger.severe("animatedTurn error", e);
+			//#endif
+			return null;
+		}
   }
 
-  protected void eraseSquareHeuristic(final int i, final int j, final int id, final int jd) {
-    s01 = heurMatrix[i][j + jd];
-    s11 = heurMatrix[i + id][j + jd];
-    heurMatrix[i][j + jd] = 0;
-    heurMatrix[i + id][j] = 0;
-    heurMatrix[i + id][j + jd] = 0;
+  /**
+   * Evaluate the board to determine points.
+	 *
+   * @param fullProcess
+   * @param endGame
+   * @author Irv Bunton
+   */
+  public void eval(boolean lazyProcess, BoardGame bg, GameTable t,
+			final byte player, boolean endGame) {
+		try {
+			OwareTable rTable = (OwareTable)t;
+			int pointFirstPlayer = rTable.getPoint((byte)0);
+			int pointSecondPlayer = rTable.getPoint((byte)1);
+			if (endGame) {
+				for (int i = 0; i < rTable.nbrRow; ++i) {
+					for (int j = 0; j < rTable.nbrCol; ++j) {
+						int ix = rTable.getItem(i, j) - 1;
+						int cseeds = rTable.getSeeds(i, j);
+						if (cseeds > 0) {
+							if (endGame) {
+								rTable.setPoint((byte)ix, (byte)(rTable.getPoint((byte)ix) +
+										cseeds));
+								rTable.setSeeds(i, j, (byte)0);
+							}
+						}
+						if (ix == 0) {
+							pointFirstPlayer += cseeds;
+						} else {
+								pointSecondPlayer += cseeds;
+						}
+					}
+				}
+			}
+			//#ifdef DLOGGING
+//@			if (finestLoggable) {logger.finest("eval pointFirstPlayer,pointSecondPlayer,rTable.getPassNum()=" + pointFirstPlayer + "," + pointSecondPlayer + "," +  rTable.getPassNum());}
+			//#endif
+			point = pointFirstPlayer - pointSecondPlayer;
+			if (rPlayer == 1) {
+				point = -point;
+			}
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+//@			logger.severe("eval error", e);
+			//#endif
+		}
   }
 
-  protected void eval(boolean fullProcess) {
-    rTable.convertToIntArray(tableIntArray);
-    boolean lazyProcess = !fullProcess || isGameEnded() || (numFirstPlayer + numSecondPlayer > 58);
-    numFirstPlayer = 0;
-    numSecondPlayer = 0;
-    pointFirstPlayer = 0;
-    pointSecondPlayer = 0;
-    numFirstFreeNeighbours = 0;
-    numSecondFreeNeighbours = 0;
-    if (!lazyProcess && squareErase) {
-      if (tableIntArray[0][0] != 0) {
-        eraseSquareHeuristic(0, 0, 1, 1);
-      }
-      if (tableIntArray[0][7] != 0) {
-        eraseSquareHeuristic(0, 7, 1, -1);
-      }
-      if (tableIntArray[7][7] != 0) {
-        eraseSquareHeuristic(7, 7, -1, -1);
-      }
-      if (tableIntArray[7][0] != 0) {
-        eraseSquareHeuristic(7, 0, -1, 1);
-      }
-    }
-    for (int i = 0; i < 8; ++i) {
-      for (int j = 0; j < 8; ++j) {
-        final int item = tableIntArray[i][j];
-        switch (item) {
-          case 1:
-            ++numFirstPlayer;
-            if (!lazyProcess) {
-              pointFirstPlayer += heurMatrix[i][j];
-              if (libertyPenalty != 0) {
-                numFirstFreeNeighbours += freeNeighbours(i, j);
-              }
-            }
-            break;
-          case 2:
-            ++numSecondPlayer;
-            if (!lazyProcess) {
-              pointSecondPlayer += heurMatrix[i][j];
-              if (libertyPenalty != 0) {
-                numSecondFreeNeighbours += freeNeighbours(i, j);
-              }
-            }
-            break;
-        }
-      }
-    }
-    if (!lazyProcess && squareErase) {
-      restoreSquareHeuristic(0, 0, 1, 1);
-      restoreSquareHeuristic(0, 7, 1, -1);
-      restoreSquareHeuristic(7, 7, -1, -1);
-      restoreSquareHeuristic(7, 0, -1, 1);
-    }
-    int squareBonusPoint = 0;
-    if (!lazyProcess && (sBonus != 0)) {
-      squareBonusPoint = squareBonus();
-    }
-    if (lazyProcess) {
-      point = numFirstPlayer - numSecondPlayer;
-      if (isGameEnded()) {
-        if (point > 0) {
-          point += GameMinMax.MAX_POINT;
-        }
-        else if (point < 0) {
-          point -= GameMinMax.MAX_POINT;
-        }
-      }
-    }
-    else {
-      point = pointFirstPlayer - pointSecondPlayer + libertyPenalty * (numSecondFreeNeighbours - numFirstFreeNeighbours) + sBonus * squareBonusPoint;
-    }
-    if (rPlayer == 1) {
-      point = -point;
-    }
-  }
-
-  protected int freeNeighbours(final int i, final int j) {
-    int freeNeighbours = 0;
-    for (int id = -1; id <= 1; ++id) {
-      for (int jd = -1; jd <= 1; ++jd) {
-        if ((i + id >= 0) && (i + id < 8) && (j + jd >= 0) && (j + jd < 8) && (tableIntArray[i + id][j + jd] == 0)) {
-          ++freeNeighbours;
-        }
-      }
-    }
-    return freeNeighbours;
-  }
-
-  public int getEvalNum() {
-    return evalNum;
-  }
+  protected void eval(boolean fullProcess, boolean endGame) {
+    boolean lazyProcess = !fullProcess || isGameEnded();
+		eval(lazyProcess, this, rTable, rPlayer, endGame);
+	}
 
   public int getGameResult() {
-    int piecediff = numFirstPlayer - numSecondPlayer;
-    if (rPlayer == 1) {
-      piecediff = -piecediff;
-    }
-    if (piecediff > 0) {
+		eval(false, true);
+    int score = point;
+    if (score >= 0) {
       return TwoPlayerGame.WIN;
     }
-    else if (piecediff < 0) {
+    else if (score <= 0) {
       return TwoPlayerGame.LOSS;
     }
     else {
@@ -244,62 +430,119 @@ public final class OwareGame extends TwoPlayerGame {
     }
   }
 
-  public int getPoint() {
-    return point;
+  public int getTblPoint(final GameTable table, final byte player) {
+    if (!(table instanceof OwareTable)) { return 0; }
+    return (((OwareTable)rTable).getPoint(player) -
+				((OwareTable)rTable).getPoint((byte)(1 - player)));
   }
 
   public boolean hasPossibleMove(final GameTable table, final byte player) {
-    final OwareMove[] moves = (OwareMove[]) possibleMoves(table, player);
-    return (moves != null) && ((moves.length > 1) || (moves[0].row != 8));
+		try {
+			final OwareMove[] moves = (OwareMove[]) possibleMoves(table, player);
+			return (moves != null) && ((moves.length > 1) || (moves[0].row !=
+						((BoardGameTable)table).nbrRow));
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+//@			logger.severe("hasPossibleMove error", e);
+			//#endif
+			return false;
+		}
   }
 
-  public boolean isGameEnded() {
-    if ((numFirstPlayer + numSecondPlayer == 64) || (numFirstPlayer == 0) || (numSecondPlayer == 0) || (rTable.getPassNum() == 2)) { return true; }
+  public boolean isGameEnded(BoardGame bg, BoardGameTable t, byte player) {
+    if (!(bg instanceof OwareGame)) { return false; }
+    if (!(t instanceof OwareTable)) { return false; }
+    OwareTable ot = (OwareTable)t;
+    if ((ot.getPoint((byte)0) >= OwareTable.WINNING_SCORE) || (ot.getPoint((byte)1) >= OwareTable.WINNING_SCORE) || (t.getPassNum() == 2) ||
+				(allEmptyHoles(ot, player) && allEmptyHoles(ot, (1 - player)))) { return true; }
     return false;
   }
 
+  public boolean isGameEnded() {
+		return isGameEnded(this, rTable, rPlayer);
+  }
+
+  /**
+   * Get possible moves by simulating the move for the given row/col and if
+	 * it has a result (is allowed), return the moves.  
+	 * Except 2 passes is end of game
+   *
+   * @param table
+   * @param player
+   * @return    GameMove[]
+   * @author Irv Bunton
+   */
   public GameMove[] possibleMoves(final GameTable table, final byte player) {
-    if (!(table instanceof OwareTable)) { return null; }
-    final Vector moves = new Vector();
-    if (((OwareTable) table).getPassNum() == 2) {
-      // two passes: end of the game
-      return null;
-    }
-    final OwareTable newTable = new OwareTable();
-    final OwareMove move = new OwareMove(0, 0);
-    boolean hasMove = false;
-    for (int row = 0; row < 8; ++row) {
-      for (int col = 0; col < 8; ++col) {
-        move.setCoordinates(row, col);
-        if (!hasMove && (((OwareTable) table).getItem(row, col) == 0)) {
-          hasMove = true;
-        }
-        final boolean goodMove = turn(table, player, move, newTable);
-        if (goodMove) {
-          moves.addElement(new OwareMove(move));
-        }
-      }
-    }
-    if (!hasMove) { return null; }
-    if (moves.size() == 0) {
-      // need to pass
-      moves.addElement(new OwareMove(8, 8));
-    }
-    final GameMove[] retMoves = new OwareMove[moves.size()];
-    for (int m = 0; m < moves.size(); ++m) {
-      retMoves[m] = (GameMove) moves.elementAt(m);
-    }
-    return retMoves;
-  }
+		try {
+			if (!(table instanceof OwareTable)) { return null; }
+			final Vector moves = new Vector();
+			if (((OwareTable) table).getPassNum() == 2) {
+				//#ifdef DLOGGING
+//@				if (finestLoggable) {logger.finest("possibleMoves pass num == 2");}
+				//#endif
+				// two passes: end of the game
+				return null;
+			}
+			// This has no values, but they are put in when _turn does a copy
+			// to this table.
+			OwareTable newTable = (OwareTable)((OwareTable)table).getEmptyTable();
 
-  public void resetEvalNum() {
-    evalNum = 0;
-  }
-
-  protected void restoreSquareHeuristic(final int i, final int j, final int id, final int jd) {
-    heurMatrix[i][j + jd] = s01;
-    heurMatrix[i + id][j] = s01;
-    heurMatrix[i + id][j + jd] = s11;
+			// Possible moves can only be in the current row.
+			OwareMove move = null;
+			boolean hasMove = false;
+			//#ifdef DLOGGING
+//@			if (finestLoggable) {logger.finest("possibleMoves starting player=" + player);}
+			//#endif
+			int col = 0;
+			for (int row = player; col < ((BoardGameTable)table).nbrCol; ++col) {
+					if (move == null) {
+						move = new OwareMove(row, col);
+					} else {
+						move.setCoordinates(row, col);
+					}
+					// FIX
+					if (!hasMove && (((OwareTable) table).getSeeds(row, col) > 0)) {
+						hasMove = true;
+					}
+					OwareTable oldTable = new OwareTable(newTable);
+					final boolean goodMove = turn(table, player, move, newTable);
+					if (goodMove) {
+						moves.addElement(new OwareMove(move));
+					}
+					newTable = oldTable;
+			}
+			//#ifdef DLOGGING
+//@			if (finestLoggable) {logger.finest("possibleMoves player,hasMove,moves.size()=" + player + "," + hasMove + "," + moves.size());}
+			//#endif
+			if (!hasMove) {
+				if (OwareMIDlet.gsOpponentEmpty) {
+					// Give seeds to the current player (who is the opponent of the
+					// previous player).
+					giveToPlayer((byte)(1 - player), player, (OwareTable)table);
+				} else {
+					// Give seeds to the current player.
+					giveToPlayer(player, (byte)(1 - player), (OwareTable)table);
+				}
+				return null;
+			}
+			// Oware does not have pass.  May need later for other Mancala.
+			final GameMove[] retMoves = new OwareMove[moves.size()];
+			try {
+				moves.copyInto(retMoves);
+			} catch (Throwable e) {
+				for (int m = 0; m < moves.size(); ++m) {
+					retMoves[m] = (GameMove) moves.elementAt(m);
+				}
+			}
+			return retMoves;
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+//@			logger.severe("possibleMoves error player=" + player, e);
+			//#endif
+			return null;
+		}
   }
 
   protected void setTable(final GameTable table, final byte player, final boolean fullProcess) {
@@ -307,97 +550,51 @@ public final class OwareGame extends TwoPlayerGame {
     rTable = (OwareTable) table;
     rPlayer = player;
     ++evalNum;
-    eval(fullProcess);
+		//#ifdef DLOGGING
+//@		if (finestLoggable) {logger.finest("setTable rTable != null,rPlayer,player,evalNum=" + (rTable != null) + "," + rPlayer + "," + player + "," + OwareTable.getPlayerItem(player) + "," + evalNum);}
+		//#endif
+    eval(fullProcess, false);
   }
 
-  protected int squareBonus() {
-    boolean c1 = true;
-    boolean c2 = true;
-    boolean c3 = true;
-    boolean c4 = true;
-    final int bonus[] = new int[3];
-    bonus[1] = 0;
-    bonus[2] = 0;
-    final int corner1 = tableIntArray[0][0];
-    if (corner1 != 0) {
-      int c1r = 1;
-      while ((c1r < 8) && (tableIntArray[0][c1r] == corner1)) {
-        ++c1r;
-      }
-      bonus[corner1] += c1r - 1;
-      if (c1r == 8) {
-        c2 = false;
-      }
-    }
-    final int corner2 = tableIntArray[0][7];
-    if (corner2 != 0) {
-      if (c2) {
-        int c2l = 1;
-        while ((c2l < 8) && (tableIntArray[0][7 - c2l] == corner2)) {
-          ++c2l;
-        }
-        bonus[corner2] += c2l - 1;
-        if (c2l == 8) {
-          c1 = false;
-        }
-      }
-      int c2r = 1;
-      while ((c2r < 8) && (tableIntArray[c2r][7] == corner2)) {
-        ++c2r;
-      }
-      bonus[corner2] += c2r - 1;
-      if (c2r == 8) {
-        c3 = false;
-      }
-    }
-    final int corner3 = tableIntArray[7][7];
-    if (corner3 != 0) {
-      if (c3) {
-        int c3l = 1;
-        while ((c3l < 8) && (tableIntArray[7 - c3l][7] == corner3)) {
-          ++c3l;
-        }
-        bonus[corner3] += c3l - 1;
-      }
-      int c3r = 1;
-      while ((c3r < 8) && (tableIntArray[7][7 - c3r] == corner3)) {
-        ++c3r;
-      }
-      bonus[corner3] += c3r - 1;
-      if (c3r == 8) {
-        c4 = false;
-      }
-    }
-    final int corner4 = tableIntArray[7][0];
-    if (corner4 != 0) {
-      if (c4) {
-        int c4l = 1;
-        while ((c4l < 8) && (tableIntArray[7][c4l] == corner4)) {
-          ++c4l;
-        }
-        bonus[corner4] += c4l - 1;
-      }
-      int c4r = 1;
-      while ((c4r < 8) && (tableIntArray[7 - c4r][0] == corner4)) {
-        ++c4r;
-      }
-      bonus[corner4] += c4r - 1;
-      if (c4r == 8) {
-        c1 = false;
-      }
-    }
-    if ((corner1 != 0) && c1) {
-      int c1l = 1;
-      while ((c1l < 8) && (tableIntArray[c1l][0] == corner1)) {
-        ++c1l;
-      }
-      bonus[corner1] += c1l - 1;
-    }
-    return bonus[1] - bonus[2];
+	public void procEndGame() {
+		//#ifdef DLOGGING
+//@		if (finerLoggable) {logger.finer("procEndGame");}
+		//#endif
+		try {
+			eval(false, true);
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+//@			logger.severe("procEndGame error", e);
+			//#endif
+		}
+	}
+
+  public static boolean turn(final OwareTable table, final byte player, final OwareMove move, final OwareTable newt) {
+		//#ifdef DLOGGING
+//@		Logger logger = Logger.getLogger("OwareGame");
+		//#endif
+    return OwareGame._turn(table, player, move, newt, false, true, false, -1
+		//#ifdef DLOGGING
+//@				, logger
+		//#endif
+				) != null;
   }
 
   public boolean turn(final GameTable table, final byte player, final GameMove move, final GameTable newt) {
-    return _turn((OwareTable) table, player, (OwareMove) move, (OwareTable) newt, false) != null;
+    return OwareGame._turn((OwareTable) table, player, (OwareMove) move, (OwareTable) newt, false, true, false, -1
+		//#ifdef DLOGGING
+//@				, logger
+		//#endif
+				) != null;
   }
+
+	public void setMaxHouses(int maxHouses) {
+			OwareGame.maxHouses = maxHouses;
+	}
+
+	public int getMaxHouses() {
+			return (OwareGame.maxHouses);
+	}
 
 }
