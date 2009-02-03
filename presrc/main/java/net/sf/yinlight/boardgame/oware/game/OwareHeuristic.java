@@ -18,6 +18,10 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+/**
+ * This was modified no later than 2009-01-29.  Based on mobilesuite and
+ * oware by Ivory City
+ */
 // Expand to define logging define
 @DLOGDEF@
 package net.sf.yinlight.boardgame.oware.game;
