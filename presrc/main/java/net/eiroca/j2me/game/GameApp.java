@@ -19,6 +19,9 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+/**
+ * This was modified no later than 2009-01-29
+ */
 // Expand to define MIDP define
 @DMIDPVERS@
 // Expand to define JMUnit test define
@@ -28,6 +31,7 @@
 package net.eiroca.j2me.game;
 
 import java.util.Vector;
+import javax.microedition.midlet.MIDletStateChangeException;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
@@ -111,6 +115,7 @@ public abstract class GameApp extends Application {
   public static final String RES_HELP = "help.txt";
   public static final String RES_MSGS = "messages.txt";
   public static final String RES_SPLASH = "splash.png";
+  public static String resSplash = RES_SPLASH;
 
   public static boolean usVibrate = true;
   public static boolean usBackLight = true;
@@ -163,9 +168,9 @@ public abstract class GameApp extends Application {
 			GameApp.graphics = ((gval == null) || gval.equals("true"));
 			BaseApp.messages = BaseApp.readStrings(GameApp.RES_MSGS);
 			if (GameApp.graphics) {
-				BaseApp.icons = BaseApp.splitImages(GameApp.RES_MENUICON, 7, 12, 12);
+				BaseApp.icons = BaseApp.splitImages(GameApp.RES_MENUICON, 9, 12, 12);
 			} else {
-				BaseApp.icons = new Image[7];
+				BaseApp.icons = new Image[9];
 				for (int i = 0; i < BaseApp.icons.length; i++) {
 					BaseApp.icons[i] = null;
 				}
@@ -262,6 +267,11 @@ public abstract class GameApp extends Application {
 				}
 			}
 			if (c == BaseApp.cEXIT) {
+				try {
+					BaseApp.midlet.destroyApp(true);
+				} catch (MIDletStateChangeException e) {
+					e.printStackTrace();
+				};
 				BaseApp.midlet.notifyDestroyed();
 			}
 			else if (c == BaseApp.cBACK) {
@@ -514,7 +524,7 @@ public abstract class GameApp extends Application {
    * @return
    */
   protected Displayable getSplash() {
-    return new SplashScreen(GameApp.RES_SPLASH, gameMenu, 3000);
+    return new SplashScreen(GameApp.resSplash, gameMenu, 3000);
   }
 
   /**
