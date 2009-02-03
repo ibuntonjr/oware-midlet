@@ -39,11 +39,17 @@
  * IN THE SOFTWARE.
  *
  */
+/**
+ * This was modified no later than 2009-01-29
+ */
 package net.eiroca.j2me.util;
 
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+	* Bound input stream
+	*/
 public class BoundInputStream extends InputStream {
 
   int remaining;
@@ -82,6 +88,7 @@ public class BoundInputStream extends InputStream {
     }
     catch (final IOException ignored) {
       //
+			ignored.printStackTrace();
     }
   }
 
