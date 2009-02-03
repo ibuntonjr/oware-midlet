@@ -308,7 +308,7 @@ public class FeatureMgr implements CommandListener, Runnable {
 		if ( (netThread == null) || !netThread.isAlive() ) {
 			try {
 				//#ifdef DCLDCV11
-				netThread = new Thread(this, disp.getClass().getName());
+				netThread = new Thread(this, "T" + disp.getClass().getName());
 				//#else
 				netThread = new Thread(this);
 				//#endif
@@ -341,31 +341,6 @@ public class FeatureMgr implements CommandListener, Runnable {
     public void setBackground(boolean background) {
         this.background = background;
     }
-
-	public static ChoiceGroup createChoiceGroup(int msgNbr, int choiceType,
-			int[] choiceMsgNbrs) {
-		ChoiceGroup choiceGrp = new ChoiceGroup(BaseApp.messages[msgNbr],
-					choiceType);
-
-		for (int i = 0; i < choiceMsgNbrs.length; i++) {
-			choiceGrp.append(BaseApp.messages[choiceMsgNbrs[i]], null);
-		}
-		return choiceGrp;
-	}
-
-	public static ChoiceGroup createNumRange(int msgNbr, int nbr) {
-		ChoiceGroup numRange = new ChoiceGroup(BaseApp.messages[msgNbr],
-			//#ifdef DMIDP20
-					Choice.POPUP
-			//#else
-					Choice.EXCLUSIVE
-			//#endif
-					);
-			for (int i = 1; i <= nbr; i++) {
-				numRange.append(Integer.toString(i), null);
-			}
-			return numRange;
-	}
 
 	//#ifdef DMIDP20
 	/* Get the font size. This is the actual size of the font */
