@@ -16,6 +16,9 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
+/**
+ * This was modified no later than 2009-01-29
+ */
 package net.eiroca.j2me.game.tpg;
 
 /**
@@ -94,6 +97,14 @@ public abstract class TwoPlayerGame {
   }
 
   /**
+   * Calculates the point (goodness) of the table.
+   * @param t Table (position) to be checked.
+   * @param player Player.
+   * @return Goodness of the position.
+   */
+  public abstract int getTblPoint(final GameTable t, final byte player);
+
+  /**
    * List of possible moves.
    * @param t Table to be checked.
    * @param player Next player.
@@ -111,6 +122,10 @@ public abstract class TwoPlayerGame {
   public abstract void resetEvalNum();
 
   protected abstract void setTable(GameTable table, byte player, boolean fullProcess);
+
+  protected abstract GameTable getTable();
+
+  protected abstract byte getPlayer();
 
   /**
    * Calculates a turn of the game.
