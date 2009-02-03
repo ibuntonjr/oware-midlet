@@ -41,6 +41,7 @@
 	<property name="build.midp20.jsr75.jsr238" value="${target}/build/midp20_jsr75.jsr238" />
 	<property name="classes" value="${target}/classes" />
 	<property name="tmppreprocess" value="${target}/tmppreprocess" />
+	<property name="tmpconcat" value="${target}/tmpconcat" />
 	<property name="util.tmppreprocess" value="${target}/util.tmppreprocess" />
 	<property name="ext.drive" value="${env.EXT_DRIVE}" />
 	<property file="${basedir}/wtk-build${device.props}.properties${build.template}" />
@@ -74,6 +75,7 @@
 	    <echo message="Using test properties" />
 	    <echo message="no.release=${no.release}" />
 		<property file="${basedir}/test.properties${test.template}" />
+		<property name="jlogmicro.jad" value="${jlogmicro.jad}" />
 		<antcall target="test.buildno" />
 		<property file="${basedir}/test_buildinfo.properties${test.template}" />
 	    <echo message="build.number=${build.number}" />
@@ -116,7 +118,6 @@
 		<property name="propdir" value="${basedir}" />
 		<property file="${basedir}/${wtk.properties}" />
 		<property name="PERMISSIONS" value="" />
-		<property name="jlogmicro.jad" value="${jlogmicro.jad}" />
 		<property name="log.subdir" value="jlogmicro" />
 		<property name="GRAPHICS" value="true" />
 		<!-- undo
@@ -505,7 +506,7 @@
 		</copy>
 	</target>
 
-	<target name="copy.res" if="need.res" >
+	<target name="copy.res" if="need.res" depends="prepare" >
 		<copy todir="${tmpres}/${res.todir}" >
 			<fileset dir="${icon.dir}" >
 				<include name="**/*.png" />
@@ -517,12 +518,12 @@
 				<include name="**/*.png" />
 			</fileset>
 		</copy>
+		undo? -->
 		<copy todir="${tmpres}/en" >
 			<fileset dir="${icon.dir}" >
 				<include name="**/*.png" />
 			</fileset>
 		</copy>
-		-->
 		<copy todir="${tmpres}/${msg.todir}" >
 			<filterset refid="midlet.info" />
 			<fileset dir="${msg.dir}" >
@@ -580,6 +581,7 @@
 		</copy>
 
 		<antcall target="cat.logging.midlet" />
+		<antcall target="cat.reversi.midlet" />
 
 		<echo message="MIDLETVERS=${MIDLETVERS}" />
 
@@ -636,6 +638,23 @@
 		</concat>
 		<concat destfile="${bin}/manifest.mf" append="true" >
 			<fileset file="${res}/${jlogmicro.jad}" />
+		</concat>
+	</target>
+
+	<target name="cat.reversi.midlet" depends="prepare" if="reversi.concat.jad" >
+	    <echo message="res=${res}" />
+	    <echo message="reversi.concat.jad=${reversi.concat.jad}" />
+	    <echo message="project.name=${project.name}" />
+		<delete dir="${tmpconcat}" />
+		<copy todir="${tmpconcat}" >
+			<filterset refid="midlet.info" />
+			<fileset file="${res}/${reversi.concat.jad}" />
+		</copy>
+		<concat destfile="${bin}/${project.name}.jad" append="true" >
+			<fileset file="${tmpconcat}/${reversi.concat.jad}" />
+		</concat>
+		<concat destfile="${bin}/manifest.mf" append="true" >
+			<fileset file="${tmpconcat}/${reversi.concat.jad}" />
 		</concat>
 	</target>
 
@@ -731,7 +750,7 @@
 
 	<target name="dist.svn.dirs" depends="prepare" if="need.dist.svn.dirs" >
 		<antcall target="svn.op.dist" >
-			<param name="svn.op" value="checkout" />
+			<param name="svn.op" value="export" />
 			<param name="op.dir" value="${main}" />
 		</antcall>
 	</target>
