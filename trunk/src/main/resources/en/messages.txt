@@ -20,7 +20,6 @@ About
 Volume
 Vibrate
 Backlight
-Oware
 Undo
 Redo
 Pause
@@ -36,13 +35,9 @@ Hard
 hard
 Red
 Blue
-Max holes eaten(captured from)
-Grand Slam variation
-Illegal
-OK no capture
-OK remaining stones go to opponent
-OK last hole not captured
-OK first hole not captured
+Rows
+Columns
+Number of Players
 Good Luck
 Thinking
 Invalid Move
@@ -56,3 +51,17 @@ Computer
 L
 M
 H
+Oware
+Initial seeds
+Max holes eaten(captured from)
+Grand Slam variations
+Illegal
+No capture
+Remaining stones go to opponent
+Last hole not captured
+First hole not captured
+Only > 24
+Opponent no seeds variation
+Player get seeds
+Opponent gets seeds
+Reversi
