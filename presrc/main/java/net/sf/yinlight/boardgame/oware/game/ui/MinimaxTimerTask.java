@@ -21,20 +21,31 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+/**
+ * This was modified no later than 2009-01-29
+ */
 package net.sf.yinlight.boardgame.oware.game.ui;
 
 import java.util.TimerTask;
 import net.eiroca.j2me.game.tpg.GameMinMax;
 import net.eiroca.j2me.game.tpg.GameTable;
+import net.sf.yinlight.boardgame.oware.game.BoardGame;
 
 /**
-	* Task to run min/max algorithms.
+	* TimerTask to run min/max algorithms.
 	*/
 public class MinimaxTimerTask extends TimerTask {
 
   public boolean ended;
+  protected GameMinMax gminMax;
+  protected int startActSkill;
+  protected byte player;
   protected GameTable startTable;
-  protected GameMinMax gMiniMax;
+  protected BoardGame startBoardGame;
+
+  public MinimaxTimerTask() {
+    //
+  }
 
   public boolean cancel() {
     GameMinMax.cancel(true);
@@ -43,14 +54,18 @@ public class MinimaxTimerTask extends TimerTask {
 
   public void run() {
     ended = false;
-    gMiniMax.foreMinimax(OwareScreen.getActSkill(), startTable, OwareScreen.getActPlayer(), OwareScreen.rgame, true, 0, true, true);
+    gminMax.foreMinimax(startActSkill, startTable, player, startBoardGame, true, 0, true, true);
     System.gc();
     ended = true;
   }
 
-  public void setStartTable(final GameMinMax gMiniMax, final GameTable startTable) {
+  public void setStartGame(GameMinMax gminMax, BoardGame bg, GameTable startTable,
+			int startActSkill, byte player) {
+		this.gminMax = gminMax;
+		this.startBoardGame = bg;
     this.startTable = startTable;
-    this.gMiniMax = gMiniMax;
+    this.startActSkill = startActSkill;
+    this.player = player;
   }
 
 }
