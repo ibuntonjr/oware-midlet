@@ -16,6 +16,9 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+/**
+ * This was modified no later than 2009-01-29
+ */
 package net.eiroca.j2me.debug;
 
 import java.util.Vector;
@@ -23,7 +26,12 @@ import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.StringItem;
 import net.eiroca.j2me.app.BaseApp;
+import com.substanceofcode.rssreader.presentation.FeatureForm;
 
+
+/**
+	* Support debugging
+	*/
 public class Debug {
 
   private final static int MAX_MESSAGES = 50;
@@ -37,7 +45,7 @@ public class Debug {
   }
 
   public void showMessageScreen(final Command back) {
-    final Form f = new Form("Debug messages");
+    final Form f = new FeatureForm("Debug messages");
     DebugMessage msg;
     StringItem si;
     for (int i = messages.size() - 1; i >= 0; i--) {
