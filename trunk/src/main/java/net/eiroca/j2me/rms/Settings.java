@@ -17,6 +17,9 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+/**
+ * This was modified no later than 2009-01-29
+ */
 package net.eiroca.j2me.rms;
 
 import java.io.ByteArrayInputStream;
@@ -31,10 +34,17 @@ import javax.microedition.rms.RecordStore;
 import javax.microedition.rms.RecordStoreException;
 import net.eiroca.j2me.app.BaseApp;
 
+/**
+	* Application settings class.
+	*/
 public class Settings {
 
   private static final String RMS_PROPERTIES = "properties";
   private static final Hashtable properties = new Hashtable();
+	private static boolean valuesChanged = false;
+
+	public Settings() {
+	}
 
   /**
    * Load properties
@@ -55,6 +65,7 @@ public class Settings {
     }
     catch (final Exception e) {
       //
+			e.printStackTrace();
     }
   }
 
@@ -70,7 +81,12 @@ public class Settings {
     else {
       Settings.properties.remove(name);
     }
+		Settings.valuesChanged = true;
   }
+
+	public void putInt( String name, int value ) {
+		put( name, Integer.toString( value ) );
+	}
 
   /**
    * @param name
@@ -80,6 +96,19 @@ public class Settings {
     return (String) Settings.properties.get(name);
   }
 
+	/** Get integer property */
+	public int getInt( String name, int defaultValue ) {
+		String value = get( name );
+		if( value != null ) {
+			try {
+				return Integer.parseInt( value );
+			} catch( NumberFormatException e ) {
+				e.printStackTrace();
+			}
+		}
+		return defaultValue;
+	}
+	
   /**
    * Get property count.
    * @return
@@ -119,12 +148,22 @@ public class Settings {
       }
       catch (final RecordStoreException e) {
         //
+				e.printStackTrace();
       }
     }
     catch (final IOException e) {
       //
+			e.printStackTrace();
     }
     return false;
   }
+
+	public static boolean saveUpdated() {
+		if (Settings.valuesChanged) {
+			return save();
+		} else {
+			return false;
+		}
+	}
 
 }
