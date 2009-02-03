@@ -15,8 +15,14 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+/**
+ * This was modified no later than 2009-01-29
+ */
 package net.eiroca.j2me.util;
 
+/**
+	* Info class for name, category, and value.
+	*/
 public class Info {
 
   public String category;
