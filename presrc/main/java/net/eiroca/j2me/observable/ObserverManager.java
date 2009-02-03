@@ -17,7 +17,12 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-//#ifdef LARGE_APP
+/**
+ * This was modified no later than 2009-01-29
+ */
+// Expand to define memory size define
+@DMEMSIZEDEF@
+//#ifdef DLARGEMEM
 package net.eiroca.j2me.observable;
 
 import java.util.Vector;
