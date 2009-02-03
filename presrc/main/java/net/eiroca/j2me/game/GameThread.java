@@ -19,6 +19,9 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+/**
+ * This was modified no later than 2009-01-29
+ */
 // Expand to define MIDP define
 @DMIDPVERS@
 // Expand to define CLDC define
@@ -66,7 +69,7 @@ public class GameThread extends Thread {
   public GameThread(final GameScreen canvas, final String name) {
 		super(name);
 		//#ifdef DLOGGING
-		if (finestLoggable) {logger.finest("constructor byteArray.length=" + byteArray.length);}
+		if (finestLoggable) {logger.finest("constructor name=" + name);}
 		//#endif
     screen = canvas;
   }
