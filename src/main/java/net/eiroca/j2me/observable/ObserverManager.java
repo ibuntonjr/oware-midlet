@@ -17,34 +17,44 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package net.eiroca.j2me.observable;
-
-import java.util.Vector;
-
-public class ObserverManager {
-
-  private final Vector observers;
-
-  public ObserverManager() {
-    observers = new Vector();
-  }
-
-  public void addObserver(final Observer observer) {
-    if (!observers.contains(observer)) {
-      observers.addElement(observer);
-    }
-  }
-
-  public void removeObserver(final Observer observer) {
-    if (observers.contains(observer)) {
-      observers.removeElement(observer);
-    }
-  }
-
-  public void notifyObservers(final Observable observable) {
-    for (int i = 0; i < observers.size(); i++) {
-      ((Observer) observers.elementAt(i)).changed(observable);
-    }
-  }
-
-}
+/**
+ * This was modified no later than 2009-01-29
+ */
+// Expand to define memory size define
+//#define DREGULARMEM
+//#ifdef DLARGEMEM
+//@package net.eiroca.j2me.observable;
+//@
+//@import java.util.Vector;
+//@
+//@/**
+//@	* Observer manager.  This allows objects to listen for changes.
+//@	*/
+//@public class ObserverManager {
+//@
+//@  private final Vector observers;
+//@
+//@  public ObserverManager() {
+//@    observers = new Vector();
+//@  }
+//@
+//@  public void addObserver(final Observer observer) {
+//@    if (!observers.contains(observer)) {
+//@      observers.addElement(observer);
+//@    }
+//@  }
+//@
+//@  public void removeObserver(final Observer observer) {
+//@    if (observers.contains(observer)) {
+//@      observers.removeElement(observer);
+//@    }
+//@  }
+//@
+//@  public void notifyObservers(final Observable observable) {
+//@    for (int i = 0; i < observers.size(); i++) {
+//@      ((Observer) observers.elementAt(i)).changed(observable);
+//@    }
+//@  }
+//@
+//@}
+//#endif
