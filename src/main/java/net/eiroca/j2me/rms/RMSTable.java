@@ -39,6 +39,9 @@
  * IN THE SOFTWARE.
  *
  */
+/**
+ * This was modified no later than 2009-01-29
+ */
 package net.eiroca.j2me.rms;
 
 import javax.microedition.rms.RecordStore;
