@@ -30,6 +30,7 @@
 	<property name="dist.midp20.jsr75" value="${target}/dist/midp20_jsr75" />
 	<property name="dist.midp20.cldc11.jsr75" value="${target}/dist/midp20_cldc11_jsr75" />
 	<property name="dist.midp20.cldc11.jsr75.largemem" value="${target}/dist/midp20_cldc11_jsr75.largemem" />
+	<property name="dist.midp20.cldc11.largemem" value="${target}/dist/midp20_cldc11_largemem" />
 	<property name="dist.midp20.jsr75_jsr238" value="${target}/dist/midp20_jsr75_jsr238" />
 	<property name="build" value="${target}/build" />
 	<property name="build.midp10" value="${target}/build/midp10" />
@@ -38,6 +39,7 @@
 	<property name="build.midp20.jsr75" value="${target}/build/midp20_jsr75" />
 	<property name="build.midp20.cldc11.jsr75" value="${target}/build/midp20_cldc11_jsr75" />
 	<property name="build.midp20.cldc11.jsr75.largemem" value="${target}/build/midp20_cldc11_jsr75.largemem" />
+	<property name="build.midp20.cldc11.largemem" value="${target}/build/midp20_cldc11_largemem" />
 	<property name="build.midp20.jsr75.jsr238" value="${target}/build/midp20_jsr75.jsr238" />
 	<property name="classes" value="${target}/classes" />
 	<property name="tmppreprocess" value="${target}/tmppreprocess" />
@@ -1092,6 +1094,16 @@
 		</antcall>
 	</target>
 
+	<target name="dist.midp.2.0.cldc.1.1.largemem" unless="no.2.0.cldc.1.1.largemem" >
+		<antcall target="dist.version" inheritAll="true" >
+			<param name="wtk.properties" value="wtk2.0large.cldc1.1.properties${wtk.template}" />
+			<param name="dist.vers" value="${dist.midp20.cldc11.largemem}" />
+			<param name="build.vers" value="${build.midp20.cldc11.largemem}" />
+			<param name="no.test" value="true" />
+			<param name="no.staging" value="true" />
+		</antcall>
+	</target>
+
 	<target name="log.midp.2.0.cldc.1.1.jsr75" unless="no.2.0.cldc.1.1.jsr75" >
 		<property name="obfuscate" value="yes" />
 		<property file="${basedir}/test.properties${test.template}" />
@@ -1181,23 +1193,8 @@
 			<param name="build.number" value="${build.number}" />
 			<param name="release.buildno" value="true" />
 		</antcall>
-		<antcall target="dist.midp.2.0.jsr75" >
-			<param name="build.number" value="${build.number}" />
-			<param name="release.buildno" value="true" />
-		</antcall>
-		<antcall target="dist.midp.2.0.cldc.1.1.jsr75" >
-			<param name="build.number" value="${build.number}" />
-			<param name="release.buildno" value="true" />
-		</antcall>
-		<antcall target="dist.midp.2.0.jsr75" >
-			<param name="build.number" value="${build.number}" />
-			<param name="release.buildno" value="true" />
-		</antcall>
-		<antcall target="dist.midp.2.0.cldc.1.1.jsr75" >
-			<param name="build.number" value="${build.number}" />
-			<param name="release.buildno" value="true" />
-		</antcall>
-		<antcall target="dist.midp.2.0.cldc.1.1.jsr75.largemem" >
+		<!-- Don't need JSR-75 -->
+		<antcall target="dist.midp.2.0.cldc.1.1.largemem" >
 			<param name="build.number" value="${build.number}" />
 			<param name="release.buildno" value="true" />
 		</antcall>
