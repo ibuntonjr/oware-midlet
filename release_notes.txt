@@ -59,3 +59,8 @@
 + Added comments
 + More logging
 + Fix saving/loading of initial seeds for Oware
+
+1.0 2009-02-04 Alpha 6 Version
++ Fix exception when setting options
++ Optionally modify game parameters based on limit < 0
++ More logging
