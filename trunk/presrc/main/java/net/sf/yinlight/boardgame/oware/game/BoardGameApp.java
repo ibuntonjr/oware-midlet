@@ -300,15 +300,15 @@ abstract public class BoardGameApp extends GameApp {
 						Choice.EXCLUSIVE, BoardGameApp.gsLevelMsg);
 			}
 			opDept = Application.createNumRange(BoardGameApp.MSG_AILEVEL, 1, 14, 1);
-			if (BoardGameApp.gsRow < 0) {
+			if (BoardGameApp.gsRowLimit < 0) {
 				opRow = Application.createNumRange(BoardGameApp.MSG_ROW, 2,
 						Math.abs(BoardGameApp.gsRowLimit), 2);
 			}
-			if (BoardGameApp.gsCol < 0) {
+			if (BoardGameApp.gsColLimit < 0) {
 				opCol = Application.createNumRange(BoardGameApp.MSG_COL, 2,
 						Math.abs(BoardGameApp.gsColLimit), 1);
 			}
-			if (BoardGameApp.gsNbrPlayers < 0) {
+			if (BoardGameApp.gsNbrPlayersLimit < 0) {
 				opNbrPlayers = Application.createNumRange(BoardGameApp.MSG_NBR_PLAYERS, 2,
 						Math.abs(BoardGameApp.gsNbrPlayersLimit), 1);
 			}
@@ -321,13 +321,13 @@ abstract public class BoardGameApp extends GameApp {
 				form.append(opLevel);
 			}
 			form.append(opDept);
-			if (BoardGameApp.gsRow < 0) {
+			if (BoardGameApp.gsRowLimit < 0) {
 				form.append(opRow);
 			}
-			if (BoardGameApp.gsCol < 0) {
+			if (BoardGameApp.gsColLimit < 0) {
 				form.append(opCol);
 			}
-			if (BoardGameApp.gsNbrPlayers < 0) {
+			if (BoardGameApp.gsNbrPlayersLimit < 0) {
 				form.append(opNbrPlayers);
 			}
 			//#ifdef DLOGGING
@@ -426,13 +426,13 @@ abstract public class BoardGameApp extends GameApp {
 				opLevel.setSelectedIndex(BoardGameApp.gsLevel, true);
 			}
 			opDept.setSelectedIndex(BoardGameApp.gsDept - 1, true);
-			if (BoardGameApp.gsRow < 0) {
+			if (BoardGameApp.gsRowLimit < 0) {
 				opRow.setSelectedIndex((Math.abs(BoardGameApp.gsRow) - 2) / 2, true);
 			}
-			if (BoardGameApp.gsCol < 0) {
+			if (BoardGameApp.gsColLimit < 0) {
 				opCol.setSelectedIndex(Math.abs(BoardGameApp.gsCol) - 2, true);
 			}
-			if (BoardGameApp.gsNbrPlayers < 0) {
+			if (BoardGameApp.gsNbrPlayersLimit < 0) {
 				opNbrPlayers.setSelectedIndex(Math.abs(BoardGameApp.gsNbrPlayers) - 2, true);
 			}
 			//#ifdef DLOGGING
@@ -481,15 +481,15 @@ abstract public class BoardGameApp extends GameApp {
 			BoardGameApp.gsDept = settingsGameUpd(opDept.getSelectedIndex() + 1,
 				BoardGameApp.BOARD_GAME_DEPT, BoardGameApp.gsDept);
 			((BoardGameScreen) GameApp.game).updateSkillInfo();
-			if (BoardGameApp.gsRow < 0) {
+			if (BoardGameApp.gsRowLimit < 0) {
 				BoardGameApp.gsRow = settingsGameUpd(-(opRow.getSelectedIndex() + 2),
 					BoardGameApp.BOARD_GAME_ROW, BoardGameApp.gsRow);
 			}
-			if (BoardGameApp.gsCol < 0) {
+			if (BoardGameApp.gsColLimit < 0) {
 				BoardGameApp.gsCol = settingsGameUpd(-(opCol.getSelectedIndex() + 2),
 					BoardGameApp.BOARD_GAME_COL, BoardGameApp.gsCol);
 			}
-			if (BoardGameApp.gsNbrPlayers < 0) {
+			if (BoardGameApp.gsNbrPlayersLimit < 0) {
 				BoardGameApp.gsNbrPlayers = settingsGameUpd(-(opNbrPlayers.getSelectedIndex() + 2),
 					BoardGameApp.BOARD_GAME_NBR_PLAYERS, BoardGameApp.gsNbrPlayers);
 			}
