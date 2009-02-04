@@ -392,10 +392,18 @@ public abstract class Application extends BaseApp implements CommandListener
 //@		Logger logger = Logger.getLogger("Application");
 //@		logger.finest("settingsUpd newValue,settingsKey prevValue=" + newValue + "," + settingsKey + "," + prevValue);
 		//#endif
-	  if (newValue != prevValue) {
-		  BaseApp.settings.putInt(settingsKey, newValue);
+		try {
+			if (newValue != prevValue) {
+				BaseApp.settings.putInt(settingsKey, newValue);
+			}
+			return newValue;
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+//@			logger.severe("settingsUpd error", e);
+			//#endif
+			return prevValue;
 		}
-		return newValue;
 	}
 
 	public static ChoiceGroup createChoiceGroup(int msgNbr, int choiceType,
