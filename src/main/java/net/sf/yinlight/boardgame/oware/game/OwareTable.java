@@ -109,38 +109,38 @@ public final class OwareTable extends BoardGameTable {
 					lastMove[i] = null;
 					coffset+= 3;
 					//#ifdef DLOGGING
-//@					if (finestLoggable) {logger.finest("i,lastMove[i] null,coffset=" + i + "," + lastMove[i].getPoint() + "," + coffset);}
+//@					if (finestLoggable) {logger.finest("constructor i,lastMove[i] null,coffset=" + i + "," + lastMove[i].getPoint() + "," + coffset);}
 					//#endif
 				} else {
 					lastMove[i] = new OwareMove(byteArray[coffset++],
 							byteArray[coffset++]);
 					lastMove[i].setPoint(byteArray[coffset++]);
 					//#ifdef DLOGGING
-//@					if (finestLoggable) {logger.finest("i,lastMove[i].getPoint(),coffset=" + i + "," + lastMove[i].getPoint() + "," + coffset);}
+//@					if (finestLoggable) {logger.finest("constructor i,lastMove[i].getPoint(),coffset=" + i + "," + lastMove[i].getPoint() + "," + coffset);}
 					//#endif
 				}
 			}
 			initSeeds = byteArray[coffset++];
 			//#ifdef DLOGGING
-//@			if (finestLoggable) {logger.finest("coffset=" + coffset);}
+//@			if (finestLoggable) {logger.finest("constructor initSeeds,coffset=" + initSeeds + "," + coffset);}
 			//#endif
 			for (int i = 0; i < nbrPlayers; i++) {
 				point[i] = byteArray[coffset++];
 				//#ifdef DLOGGING
-//@				if (finestLoggable) {logger.finest("i,point[i],coffset=" + i + "," + point[i] + "," + coffset);}
+//@				if (finestLoggable) {logger.finest("constructor i,point[i],coffset=" + i + "," + point[i] + "," + coffset);}
 				//#endif
 			}
 			for (int i = 0; i < nbrPlayers; i++) {
 				reserve[i] = byteArray[coffset++];
 				//#ifdef DLOGGING
-//@				if (finestLoggable) {logger.finest("i,reserve[i],coffset=" + i + "," + reserve[i] + "," + coffset);}
+//@				if (finestLoggable) {logger.finest("constructor i,reserve[i],coffset=" + i + "," + reserve[i] + "," + coffset);}
 				//#endif
 			}
 			for (int i = 0; i < NBR_ATTRIBUTES; i++) {
 				System.arraycopy(byteArray, coffset, board[i], 0, nbrCol * nbrRow);
 				coffset += (nbrCol * nbrRow);
 				//#ifdef DLOGGING
-//@				if (finestLoggable) {logger.finest("coffset=" + coffset);}
+//@				if (finestLoggable) {logger.finest("constructor board i,coffset=" + i + "," + coffset);}
 				//#endif
 			}
 		} catch (Throwable e) {
@@ -159,7 +159,7 @@ public final class OwareTable extends BoardGameTable {
 		//#ifdef DLOGGING
 //@		if (finestLoggable) {logger.finest("constructor board[0].length,board[1].length,board[1].length=" + board[0].length + "," + board[1].length);}
 		//#endif
-		this.initSeeds = table.initSeeds;
+		initSeeds = table.initSeeds;
 		try {
 			for (int i = 0; i < NBR_ATTRIBUTES; i++) {
 				System.arraycopy(table.board[i], 0, board[i], 0, board[i].length);
@@ -209,7 +209,7 @@ public final class OwareTable extends BoardGameTable {
 		try {
 			final OwareTable rtable = (OwareTable) table;
 			super.copyDataFrom(rtable);
-			this.initSeeds = rtable.initSeeds;
+			initSeeds = rtable.initSeeds;
 			for (int i = 0; i < NBR_ATTRIBUTES; i++) {
 				System.arraycopy(rtable.board[i], 0, board[i], 0, rtable.nbrCol * rtable.nbrRow);
 			}
@@ -413,6 +413,9 @@ public final class OwareTable extends BoardGameTable {
 				//#endif
 			}
 			byteArray[coffset++] = (byte)initSeeds;
+			//#ifdef DLOGGING
+//@			if (finestLoggable) {logger.finest("toByteArray initSeeds,offset,coffset=" + initSeeds + "," + offset + "," + coffset);}
+			//#endif
 			for (int i = 0; i < nbrPlayers; i++) {
 				byteArray[coffset++] = point[i];
 				//#ifdef DLOGGING
