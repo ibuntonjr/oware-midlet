@@ -194,7 +194,7 @@ public class OwareMIDlet extends BoardGameApp {
   protected Displayable getOptions() {
 		try {
 			final Form form = (Form)super.getOptions();
-			if (OwareMIDlet.gsInitSeeds < 0) {
+			if (OwareMIDlet.gsInitSeedsLimit < 0) {
 				opInitSeeds = Application.createNumRange(OwareMIDlet.MSG_INIT_SEEDS,
 						1, Math.abs(OwareMIDlet.gsInitSeedsLimit), 1);
 			}
@@ -211,7 +211,7 @@ public class OwareMIDlet extends BoardGameApp {
 					Choice.EXCLUSIVE,
 					new int[] { OwareMIDlet.MSG_OPPONENT_EMPTY1,
 			OwareMIDlet.MSG_OPPONENT_EMPTY2});
-			if (OwareMIDlet.gsInitSeeds < 0) {
+			if (OwareMIDlet.gsInitSeedsLimit < 0) {
 				form.append(opInitSeeds);
 			}
 			form.append(opMaxHouses);
@@ -233,7 +233,7 @@ public class OwareMIDlet extends BoardGameApp {
 		//#endif
 		try {
 			super.doShowOptions();
-			if (OwareMIDlet.gsInitSeeds < 0) {
+			if (OwareMIDlet.gsInitSeedsLimit < 0) {
 				opInitSeeds.setSelectedIndex(Math.abs(OwareMIDlet.gsInitSeeds) - 1,
 						true);
 			}
@@ -254,9 +254,12 @@ public class OwareMIDlet extends BoardGameApp {
 //@		if (finestLoggable) {logger.finest("doApplyOptions");}
 		//#endif
 		try {
-			OwareMIDlet.gsInitSeeds = Application.settingsUpd(
-					opInitSeeds.getSelectedIndex() + 1, 
-				OwareMIDlet.OWARE_INIT_SEEDS, OwareMIDlet.gsInitSeeds);
+			super.doApplyOptions();
+			if (OwareMIDlet.gsInitSeedsLimit < 0) {
+				OwareMIDlet.gsInitSeeds = Application.settingsUpd(
+						opInitSeeds.getSelectedIndex() + 1, 
+					OwareMIDlet.OWARE_INIT_SEEDS, OwareMIDlet.gsInitSeeds);
+			}
 			OwareMIDlet.gsMaxHouses = Application.settingsUpd(
 					opMaxHouses.getSelectedIndex() + 1, 
 				OwareMIDlet.OWARE_MAX_HOUSES, OwareMIDlet.gsMaxHouses);
@@ -267,7 +270,6 @@ public class OwareMIDlet extends BoardGameApp {
 				opOpponentEmpty.getSelectedIndex(),
 				OwareMIDlet.OWARE_OPP_NO_SEEDS,
 				(OwareMIDlet.gsOpponentEmpty ? 1 : 0)) == 1);
-			super.doApplyOptions();
 		} catch (Throwable e) {
 			e.printStackTrace();
 			//#ifdef DLOGGING
