@@ -64,3 +64,6 @@
 + Fix exception when setting options
 + Optionally modify game parameters based on limit < 0
 + More logging
++ Don't produce versions that are functionally the same as others (i.e. have
+  JSR's that are not used)
++ Fix JSR75 properties file (Not used)
