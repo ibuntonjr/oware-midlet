@@ -67,3 +67,11 @@
 + Don't produce versions that are functionally the same as others (i.e. have
   JSR's that are not used)
 + Fix JSR75 properties file (Not used)
+
+1.0 2009-02-14 Alpha 7 Version
++ Add end game so people can decide to end the game.
++ Make Reversi more thread safe
++ Share more code with BoardGameScreen.
++ Fix end of game scoring and allow first player be top or bottom.
++ Allow prompt command from list used as command menu (not finished).
+
