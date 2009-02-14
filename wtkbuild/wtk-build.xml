@@ -714,7 +714,10 @@
 			<move todir="${op.dir}/wtkbuild" >
 				<fileset dir="${op.dir}/${svn.src}/wtkbuild" />
 			</move>
-			<copy todir="${dist}" file="${op.dir}/${svn.src}/gpl.txt" />
+			<copy todir="${dist}" >
+				<fileset file="${op.dir}/${svn.src}/release_notes.txt" />
+				<fileset file="${op.dir}/${svn.src}/gpl.txt" />
+			</copy>
 			<move todir="${op.dir}" >
 				<fileset file="${op.dir}/${svn.src}/release_notes.txt" />
 				<fileset file="${op.dir}/${svn.src}/gpl.txt" />
