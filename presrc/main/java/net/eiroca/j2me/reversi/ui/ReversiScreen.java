@@ -213,28 +213,9 @@ public final class ReversiScreen extends BoardGameScreen {
   }
 
 	public void procEndGame() {
-		final int result = BoardGameScreen.rgame.getGameResult();
-		String endMessage;
-		final boolean firstWin = ((result == TwoPlayerGame.LOSS) && (BoardGameScreen.actPlayer == 0)) || ((result == TwoPlayerGame.WIN) && (BoardGameScreen.actPlayer == 1));
-		final int winner = firstWin ? 1 : 0;
-		if (!BoardGameScreen.twoplayer && firstWin) {
-			endMessage = BaseApp.messages[Reversi.MSG_WONCOMPUTER];
-		}
-		else if (result == TwoPlayerGame.DRAW) {
-			endMessage = BaseApp.messages[Reversi.MSG_DRAW];
-		}
-		else {
-			if (BoardGameScreen.twoplayer) {
-				endMessage = Reversi.playerNames[winner] + BaseApp.messages[Reversi.MSG_PLAYERWON];
-			}
-			else {
-				endMessage = BaseApp.messages[Reversi.MSG_HUMANWON];
-			}
-		}
-		final int firstNum = ((ReversiGame)BoardGameScreen.rgame).numFirstPlayer;
-		final int secondNum = ((ReversiGame)BoardGameScreen.rgame).numSecondPlayer;
-		endMessage += BoardGameScreen.NL + Reversi.playerNames[0] + BoardGameScreen.SEP + firstNum + BoardGameScreen.NL + Reversi.playerNames[1] + BoardGameScreen.SEP + secondNum;
-		setMessage(endMessage);
+		BoardGameScreen.rgame.procEndGame();
+		super.procEndGame(((ReversiGame)BoardGameScreen.rgame).numFirstPlayer,
+			((ReversiGame)BoardGameScreen.rgame).numSecondPlayer);
 	}
 
   //#ifdef DTEST
