@@ -458,33 +458,9 @@ public final class OwareScreen extends BoardGameScreen {
 //@		if (finerLoggable) {logger.finer("procEndGame");}
 		//#endif
 		try {
-					OwareTable ot = (OwareTable)BoardGameScreen.table;
-					BoardGameScreen.rgame.procEndGame();
-					final int result = BoardGameScreen.rgame.getGameResult();
-					String endMessage;
-					final boolean firstWin = ((result == TwoPlayerGame.LOSS) && (BoardGameScreen.actPlayer == 0)) || ((result == TwoPlayerGame.WIN) && (BoardGameScreen.actPlayer == 1));
-					final int winner = firstWin ? 1 : 0;
-					if (!BoardGameScreen.twoplayer && firstWin) {
-						endMessage = BaseApp.messages[OwareMIDlet.MSG_WONCOMPUTER];
-					}
-					else if (result == TwoPlayerGame.DRAW) {
-						endMessage = BaseApp.messages[OwareMIDlet.MSG_DRAW];
-					}
-					else {
-						if (BoardGameScreen.twoplayer) {
-							endMessage = OwareMIDlet.playerNames[winner] + BaseApp.messages[OwareMIDlet.MSG_PLAYERWON];
-						}
-						else {
-							endMessage = BaseApp.messages[OwareMIDlet.MSG_HUMANWON];
-						}
-					}
-					final int firstNum = ot.getPoint((byte)0);
-					final int secondNum = ot.getPoint((byte)1);
-					endMessage += BoardGameScreen.NL + OwareMIDlet.playerNames[0] + BoardGameScreen.SEP + firstNum + BoardGameScreen.NL + OwareMIDlet.playerNames[1] + BoardGameScreen.SEP + secondNum;
-					setMessage(endMessage);
-					//#ifdef DLOGGING
-//@					if (finestLoggable) {logger.finest("processMove game ended result,firstWin,winner,firstNum,secondNum=" + result + "," + firstWin + "," + winner + firstNum + "," + secondNum);}
-					//#endif
+			BoardGameScreen.rgame.procEndGame();
+			OwareTable ot = (OwareTable)BoardGameScreen.table;
+			super.procEndGame(ot.getPoint((byte)0), ot.getPoint((byte)1));
 		} catch (Throwable e) {
 			e.printStackTrace();
 			//#ifdef DLOGGING
