@@ -22,6 +22,7 @@ Vibrate
 Backlight
 Undo
 Redo
+End Game
 Pause
 Test
 Logging
