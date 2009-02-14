@@ -83,6 +83,7 @@ abstract public class BoardGameApp extends GameApp {
   public static short msgOffset = 0;
   final public static short MSG_MENU_MAIN_UNDO = (short)(GameApp.MSG_USERDEF + msgOffset++);
   final public static short MSG_MENU_MAIN_REDO = (short)(GameApp.MSG_USERDEF + msgOffset++);
+  final public static short MSG_MENU_MAIN_ENDGAME = (short)(GameApp.MSG_USERDEF + msgOffset++);
   final public static short MSG_MENU_MAIN_PAUSE = (short)(GameApp.MSG_USERDEF + msgOffset++);
   final public static short MSG_MENU_MAIN_TEST = (short)(GameApp.MSG_USERDEF + msgOffset++);
   final public static short MSG_MENU_MAIN_LOGGING = (short)(GameApp.MSG_USERDEF + msgOffset++);
@@ -111,17 +112,19 @@ abstract public class BoardGameApp extends GameApp {
   final public static int MSG_COMPUTER = GameApp.MSG_USERDEF + msgOffset++;
   final public static int MSG_PASS = GameApp.MSG_USERDEF + msgOffset++;
   final public static int MSG_LEVELPREFIX = GameApp.MSG_USERDEF + msgOffset++;
+  final public static short MSG_SURE_END = (short)(GameApp.MSG_USERDEF + msgOffset++);
   final public static int MSG_USERDEF = GameApp.MSG_USERDEF + msgOffset + 2;
 
   public static short ACTION_OFFSET = 0;
   public static final int GA_UNDO = GameApp.GA_USERDEF + 0;
   public static final int GA_REDO = GameApp.GA_USERDEF + 1;
+  public static final int GA_ENDGAME = GameApp.GA_USERDEF + 2;
 	//#ifdef DMIDP10
-//@  public static final int GA_PAUSE = GameApp.GA_USERDEF + 2;
+//@  public static final int GA_PAUSE = GameApp.GA_USERDEF + 3;
 	//#endif
 	//#ifdef DTEST
-//@  public static final int GA_TEST = GameApp.GA_USERDEF + 3;
-//@  public static final int GA_PERFORMTEST = GameApp.GA_USERDEF + 4;
+//@  public static final int GA_TEST = GameApp.GA_USERDEF + 4;
+//@  public static final int GA_PERFORMTEST = GameApp.GA_USERDEF + 5;
 	//#endif
 	//#ifdef DLOGGING
 //@  public static final int GA_LOGGING = GameApp.GA_USERDEF + 5;
@@ -210,6 +213,8 @@ abstract public class BoardGameApp extends GameApp {
             GameApp.ME_MAINMENU, BoardGameApp.MSG_MENU_MAIN_UNDO, (short)BoardGameApp.GA_UNDO, 7
         }, {
             GameApp.ME_MAINMENU, BoardGameApp.MSG_MENU_MAIN_REDO, (short)BoardGameApp.GA_REDO, 8
+        }, {
+            GameApp.ME_MAINMENU, BoardGameApp.MSG_MENU_MAIN_ENDGAME, (short)BoardGameApp.GA_ENDGAME, -1, MSG_SURE_END
 		//#ifdef DLOGGING
 //@        }, {
 //@            GameApp.ME_MAINMENU, BoardGameApp.MSG_MENU_MAIN_TEST, (short)BoardGameApp.GA_TEST, 0
@@ -595,6 +600,9 @@ abstract public class BoardGameApp extends GameApp {
 							Application.insertMenuItem(gameMenu, GA_REDO);
 							canRedo = true;
 						}
+						if (canUndo || canRedo) {
+							Application.insertMenuItem(gameMenu, GA_ENDGAME);
+						}
 					}
 				}
 			} else {
@@ -605,6 +613,9 @@ abstract public class BoardGameApp extends GameApp {
 			}
 			if (!canRedo) {
 				Application.deleteMenuItem(gameMenu, GA_REDO);
+			}
+			if (!canUndo && !canRedo) {
+				Application.deleteMenuItem(gameMenu, GA_ENDGAME);
 			}
 			//#ifdef DLOGGING
 //@			if (finestLoggable) {logger.finest("prepGameMenu canUndo,canRedo=" + canUndo + "," + canRedo);}
@@ -647,6 +658,10 @@ abstract public class BoardGameApp extends GameApp {
 					break;
 				case GA_REDO: // Redo last move
 					((BoardGameScreen) GameApp.game).redoTable();
+					doGameResume();
+					break;
+				case GA_ENDGAME: // Redo last move
+					((BoardGameScreen)GameApp.game).procEndGame();
 					doGameResume();
 					break;
 				//#ifdef DTEST
