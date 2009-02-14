@@ -145,6 +145,10 @@ public abstract class Application extends BaseApp implements CommandListener
 				BaseApp.menuShown.addElement(ix);
 			}
 			list.insert(ps, BaseApp.messages[def[BaseApp.MD_MENUTX]], icon);
+			if ((BaseApp.MD_PROMPTX < def.length) && (def[BaseApp.MD_PROMPTX] >= 0) &&
+					(list instanceof FeatureList)) {
+				((FeatureList)list).insertPrompt(ps, def[BaseApp.MD_PROMPTX]);
+			}
 			return true;
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -215,6 +219,11 @@ public abstract class Application extends BaseApp implements CommandListener
 				icon = BaseApp.icons[cdef[BaseApp.MD_MENUIC]];
 			}
 			list.insert(j, BaseApp.messages[cdef[BaseApp.MD_MENUTX]], icon);
+			if ((BaseApp.MD_PROMPTX < cdef.length) &&
+				(cdef[BaseApp.MD_PROMPTX] >= 0) &&
+					(list instanceof FeatureList)) {
+				((FeatureList)list).insertPrompt(j, cdef[BaseApp.MD_PROMPTX]);
+			}
 			return true;
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -264,7 +273,7 @@ public abstract class Application extends BaseApp implements CommandListener
 		boolean traceLoggable = logger.isLoggable(Level.TRACE);
 		logger.finest("getMenu title,special,cmd=" + title + "," + special + "," + cmd.getLabel());
 		//#endif
-		final List list = new FeatureList(title, Choice.IMPLICIT);
+		final FeatureList list = new FeatureList(title, Choice.IMPLICIT);
 		try {
 			BaseApp.menuShown = new Vector();
 			BaseApp.menuCombined = new Vector();
