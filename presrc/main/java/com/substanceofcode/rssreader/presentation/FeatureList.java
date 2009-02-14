@@ -1,5 +1,6 @@
 /*
    FIX font size
+   FIX insertPrompt
  * FeatureList.java
  *
  * Copyright (C) 2007 Irving Bunton
@@ -113,6 +114,10 @@ public class FeatureList extends List {
 	final public void addPromptCommand(Command cmd, int prompt) {
 		super.addCommand(cmd);
 		featureMgr.addPromptCommand(cmd, prompt);
+	}
+
+	final public void insertPrompt(int ps, int prompt) {
+		featureMgr.addPromptIndex(ps, prompt);
 	}
 
 	final public void removeCommand(Command cmd) {
