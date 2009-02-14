@@ -815,6 +815,46 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 
 	abstract public void procEndGame();
 
+	public void procEndGame(final int firstNum, final int secondNum) {
+		try {
+			final int result = BoardGameScreen.rgame.getGameResult();
+			String endMessage;
+			final boolean firstWin = ((result == TwoPlayerGame.LOSS) && (BoardGameScreen.actPlayer == 1)) || ((result == TwoPlayerGame.WIN) && (BoardGameScreen.actPlayer == 0));
+			final int winner;
+			if (firstWin) {
+				winner = (BoardGameApp.gsFirst == 0) ? 0 : 1;
+			} else {
+				winner = (BoardGameApp.gsFirst == 1) ? 0 : 1;
+			}
+			if (!BoardGameScreen.twoplayer &&
+					((firstWin && (BoardGameApp.gsFirst != 0)) ||
+					 (!firstWin && (BoardGameApp.gsFirst == 0)))) {
+				endMessage = BaseApp.messages[BoardGameApp.MSG_WONCOMPUTER];
+			}
+			else if (result == TwoPlayerGame.DRAW) {
+				endMessage = BaseApp.messages[BoardGameApp.MSG_DRAW];
+			}
+			else {
+				if (BoardGameScreen.twoplayer) {
+					endMessage = BoardGameApp.playerNames[winner] + BaseApp.messages[BoardGameApp.MSG_PLAYERWON];
+				}
+				else {
+					endMessage = BaseApp.messages[BoardGameApp.MSG_HUMANWON];
+				}
+			}
+			endMessage += BoardGameScreen.NL + BoardGameApp.playerNames[0] + BoardGameScreen.SEP + firstNum + BoardGameScreen.NL + BoardGameApp.playerNames[1] + BoardGameScreen.SEP + secondNum;
+			setMessage(endMessage);
+			//#ifdef DLOGGING
+//@			if (finestLoggable) {logger.finest("processMove game ended result,firstWin,winner,firstNum,secondNum=" + result + "," + firstWin + "," + winner + firstNum + "," + secondNum);}
+			//#endif
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+//@			logger.severe("procEndGame error", e);
+			//#endif
+		}
+	}
+
   public int saveGameParameters(final byte[] b, final int offset) {
     int index = offset;
     // isHuman
