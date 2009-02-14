@@ -151,7 +151,9 @@ public final class ReversiGame extends BoardGame {
     return _turn((ReversiTable) table, player, (ReversiMove) move, (ReversiTable) newt, true);
   }
 
-  protected void eraseSquareHeuristic(final int[] savedCells, final int i, final int j, final int id, final int jd) {
+  protected void eraseSquareHeuristic(final int[][] heurMatrix,
+			final int[] savedCells, final int i, final int j, final int id,
+			final int jd) {
     savedCells[S01_IX] = heurMatrix[i][j + jd];
     savedCells[S11_IX] = heurMatrix[i + id][j + jd];
     heurMatrix[i][j + jd] = 0;
@@ -174,16 +176,16 @@ public final class ReversiGame extends BoardGame {
 		int[] savedCells = new int[2];
     if (!lazyProcess && squareErase) {
       if (tableIntArray[0][0] != 0) {
-        eraseSquareHeuristic(savedCells, 0, 0, 1, 1);
+        rg.eraseSquareHeuristic(rg.heurMatrix, savedCells, 0, 0, 1, 1);
       }
       if (tableIntArray[0][7] != 0) {
-        eraseSquareHeuristic(savedCells, 0, 7, 1, -1);
+        rg.eraseSquareHeuristic(rg.heurMatrix, savedCells, 0, 7, 1, -1);
       }
       if (tableIntArray[7][7] != 0) {
-        eraseSquareHeuristic(savedCells, 7, 7, -1, -1);
+        rg.eraseSquareHeuristic(rg.heurMatrix, savedCells, 7, 7, -1, -1);
       }
       if (tableIntArray[7][0] != 0) {
-        eraseSquareHeuristic(savedCells, 7, 0, -1, 1);
+        rg.eraseSquareHeuristic(rg.heurMatrix, savedCells, 7, 0, -1, 1);
       }
     }
     for (int i = 0; i < bgt.nbrRow; ++i) {
@@ -193,18 +195,18 @@ public final class ReversiGame extends BoardGame {
           case 1:
             ++rg.numFirstPlayer;
             if (!lazyProcess) {
-              pointFirstPlayer += heurMatrix[i][j];
+              pointFirstPlayer += rg.heurMatrix[i][j];
               if (libertyPenalty != 0) {
-                numFirstFreeNeighbours += freeNeighbours(tableIntArray, i, j);
+                numFirstFreeNeighbours += rg.freeNeighbours(tableIntArray, i, j);
               }
             }
             break;
           case 2:
             ++rg.numSecondPlayer;
             if (!lazyProcess) {
-              pointSecondPlayer += heurMatrix[i][j];
+              pointSecondPlayer += rg.heurMatrix[i][j];
               if (libertyPenalty != 0) {
-                numSecondFreeNeighbours += freeNeighbours(tableIntArray, i, j);
+                numSecondFreeNeighbours += rg.freeNeighbours(tableIntArray, i, j);
               }
             }
             break;
@@ -212,18 +214,18 @@ public final class ReversiGame extends BoardGame {
       }
     }
     if (!lazyProcess && squareErase) {
-      restoreSquareHeuristic(savedCells, 0, 0, 1, 1);
-      restoreSquareHeuristic(savedCells, 0, 7, 1, -1);
-      restoreSquareHeuristic(savedCells, 7, 7, -1, -1);
-      restoreSquareHeuristic(savedCells, 7, 0, -1, 1);
+      rg.restoreSquareHeuristic(rg.heurMatrix, savedCells, 0, 0, 1, 1);
+      rg.restoreSquareHeuristic(rg.heurMatrix, savedCells, 0, 7, 1, -1);
+      rg.restoreSquareHeuristic(rg.heurMatrix, savedCells, 7, 7, -1, -1);
+      rg.restoreSquareHeuristic(rg.heurMatrix, savedCells, 7, 0, -1, 1);
     }
     int squareBonusPoint = 0;
     if (!lazyProcess && (sBonus != 0)) {
-      squareBonusPoint = squareBonus(tableIntArray);
+      squareBonusPoint = rg.squareBonus(tableIntArray);
     }
     if (lazyProcess) {
       point = rg.numFirstPlayer - rg.numSecondPlayer;
-      if (isGameEnded()) {
+      if (rg.isGameEnded()) {
         if (point > 0) {
           point += GameMinMax.MAX_POINT;
         }
@@ -244,10 +246,8 @@ public final class ReversiGame extends BoardGame {
     boolean lazyProcess = !fullProcess || isGameEnded() || (numFirstPlayer + numSecondPlayer > 58);
 		eval(lazyProcess, this, rTable, rPlayer, isGameEnded());
 	}
-
-  protected int freeNeighbours(int[][] tableIntArray, final int i, final int j) {
-    int freeNeighbours = 0;
-    for (int id = -1; id <= 1; ++id) {
+	protected int freeNeighbours(int[][] tableIntArray, final int i, final int j) { int freeNeighbours = 0;
+			for (int id = -1; id <= 1; ++id) {
       for (int jd = -1; jd <= 1; ++jd) {
         if ((i + id >= 0) && (i + id < rTable.nbrRow) && (j + jd >= 0) && (j + jd < 8) && (tableIntArray[i + id][j + jd] == 0)) {
           ++freeNeighbours;
@@ -342,7 +342,8 @@ public final class ReversiGame extends BoardGame {
     evalNum = 0;
   }
 
-  protected void restoreSquareHeuristic(final int[]savedCells, final int i,
+  protected void restoreSquareHeuristic(final int[][] heurMatrix,
+			final int[]savedCells, final int i,
 			final int j, final int id, final int jd) {
     heurMatrix[i][j + jd] = savedCells[S01_IX];
     heurMatrix[i + id][j] = savedCells[S01_IX];
