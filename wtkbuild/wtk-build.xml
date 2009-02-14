@@ -608,7 +608,6 @@
 		<wtkobfuscate jarfile="${bin}/${project.name}.jar" obfuscator="proguard" if="keep.obfuscate" >
 			<argument value="-keep public class ${obfuscate.classes}" />
 		</wtkobfuscate>
-		<wtkmakeprc jarfile="${bin}/${project.name}.jar" name="${project.name}"  highres="true" creator="${prc.creater}" longname="${prc.longname}" />
 		<!-- Include version in the file so that they can be uploaded to -->
 		<!-- download sites where the name must be unique.  -->
 
@@ -617,9 +616,8 @@
 		<copy file="${bin}/${build.file.root}.jar" todir="${dist}" />
 		<copy file="${bin}/${build.file.root}.jad" todir="${dist}" />
 		<copy file="${bin}/${project.name}.alx" tofile="${dist}/${build.prefix}${project.name}_${FMIDLETVERSROOT}.alx" />
-		<mkdir dir="${dist}/${build.prefix}prc" />
-		<move file="${bin}/${project.name}.prc" todir="${dist}/${build.prefix}prc" />
 		<copy file="${bin}/${project.name}.jar" tofile="${build}/${build.prefix}${build.jar}" />
+		<antcall target="create.prc" inheritAll="true" />
 		<!-- Manifest changes based on MIDP/JSR's so use prefixes to -->
 		<!-- identify which is which -->
 		<copy file="${bin}/manifest.mf" todir="${build}/${build.prefix}manifest-${FMIDLETVERSROOT}.mf" overwrite="true" />
@@ -632,6 +630,12 @@
 			</filterset>
 		</copy>
 		-->
+	</target>
+
+	<target name="create.prc" depends="prepare" if="wtk.wme.home" >
+		<wtkmakeprc jarfile="${bin}/${project.name}.jar" name="${project.name}"  highres="true" creator="${prc.creater}" longname="${prc.longname}" />
+		<mkdir dir="${dist}/${build.prefix}prc" />
+		<move file="${bin}/${project.name}.prc" todir="${dist}/${build.prefix}prc" />
 	</target>
 
 	<target name="cat.logging.midlet" depends="prepare" if="jlogmicro.jad" >
