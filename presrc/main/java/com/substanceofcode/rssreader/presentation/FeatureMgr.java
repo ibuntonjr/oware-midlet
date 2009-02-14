@@ -62,6 +62,7 @@ import net.sf.jlogmicro.util.logging.Level;
 public class FeatureMgr implements CommandListener, Runnable {
 
 	private Hashtable promptCommands = null;
+	private Hashtable promptIndexes = null;
 	//#ifdef DMIDP20
     public static final int DEFAULT_FONT_CHOICE = 0;
     protected int fontChoice = DEFAULT_FONT_CHOICE;
@@ -157,6 +158,15 @@ public class FeatureMgr implements CommandListener, Runnable {
 				promptCommands = new Hashtable();
 			}
 			promptCommands.put(cmd, new Integer(prompt));
+		}
+	}
+
+	public void addPromptIndex(int ps, int prompt) {
+		synchronized(this) {
+			if (promptIndexes == null) {
+				promptIndexes = new Hashtable();
+			}
+			promptIndexes.put(new Integer(ps), new Integer(prompt));
 		}
 	}
 
