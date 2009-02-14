@@ -1110,6 +1110,11 @@ implements CommandListener
   public static final int MD_MENUIC = 3;
 
   /**
+	* Menu prompt message index into menu item definition
+	*/
+  public static final int MD_PROMPTX = 3;
+
+  /**
 	* Index into index definition which holds indexes to menu definitions active
 	*/
   public static final int ID_MENU_IX = 0;
