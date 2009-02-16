@@ -61,7 +61,7 @@ public abstract class TwoPlayerGame {
    * Result of the last processed position.
    * @return Result of the last processed position.
    */
-  public abstract int getGameResult();
+  public abstract int getGameResult(byte player);
 
   // evaluation
 
