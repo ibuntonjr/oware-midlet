@@ -212,10 +212,10 @@ public final class ReversiScreen extends BoardGameScreen {
     }
   }
 
-	public void procEndGame() {
-		BoardGameScreen.rgame.procEndGame();
+	public void procEndGame(byte player) {
+		BoardGameScreen.rgame.procEndGame(player);
 		super.procEndGame(((ReversiGame)BoardGameScreen.rgame).numFirstPlayer,
-			((ReversiGame)BoardGameScreen.rgame).numSecondPlayer);
+			((ReversiGame)BoardGameScreen.rgame).numSecondPlayer, player);
 	}
 
   //#ifdef DTEST
@@ -261,7 +261,7 @@ public final class ReversiScreen extends BoardGameScreen {
 					BoardGameScreen.rgame.process(newTable, BoardGameScreen.actPlayer);
 					if (BoardGameScreen.rgame.isGameEnded()) {
 						gameEnded = true;
-						procEndGame();
+						procEndGame((byte)(1 - BoardGameScreen.actPlayer));
 					}
 					else {
 						BoardGameScreen.actPlayer = (byte) (1 - BoardGameScreen.actPlayer);
