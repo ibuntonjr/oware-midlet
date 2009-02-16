@@ -65,7 +65,7 @@ abstract public class BoardGame extends TwoPlayerGame {
 	private boolean traceLoggable = logger.isLoggable(Level.TRACE);
 	//#endif
 
-  abstract public int getGameResult();
+  abstract public int getGameResult(final byte player);
 
 	public BoardGame() {
 	}
@@ -81,6 +81,9 @@ abstract public class BoardGame extends TwoPlayerGame {
 			this.prevTbls.addElement(bg.prevTbls.elementAt(i));
 		}
 		this.point = bg.point;
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("constructor rPlayer=" + rPlayer);}
+		//#endif
 	}
 
   public int getPoint() {
@@ -140,7 +143,7 @@ abstract public class BoardGame extends TwoPlayerGame {
     return evalNum;
   }
 
-	abstract public void procEndGame();
+	abstract public void procEndGame(byte player);
 
   protected GameTable getTable() {
 		return rTable;
@@ -153,6 +156,9 @@ abstract public class BoardGame extends TwoPlayerGame {
 	//#ifdef DTEST
   public void setPlayer(byte player) {
 		rPlayer = player;
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("setPlayer rPlayer=" + rPlayer);}
+		//#endif
 	}
 	//#endif
 
