@@ -49,6 +49,7 @@ Draw
 Human
 Computer
  pass
+Are you sure you wnat to end the game?
 L
 M
 H
