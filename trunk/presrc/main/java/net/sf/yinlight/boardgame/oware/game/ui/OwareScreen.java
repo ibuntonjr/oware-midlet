@@ -393,11 +393,12 @@ public final class OwareScreen extends BoardGameScreen {
 					/* Process the move. */
 					BoardGameScreen.rgame.process(newTable, BoardGameScreen.actPlayer);
 					//#ifdef DLOGGING
-					if (finerLoggable) {logger.finer("1 loop BoardGameScreen.actPlayer,BoardGameScreen.rgame.isGameEnded()=" + BoardGameScreen.actPlayer + "," + BoardGameScreen.rgame.isGameEnded());}
+					if (finerLoggable) {logger.finer("1 loop BoardGameScreen.actPlayer,BoardGameScreen.rgame.isGameEnded()=" + BoardGameScreen.actPlayer + "," + BoardGameScreen.rgame.isGameEnded(BoardGameScreen.rgame, newTable, (byte)(1 - BoardGameScreen.actPlayer)));}
 					//#endif
-					if (BoardGameScreen.rgame.isGameEnded()) {
+					if (BoardGameScreen.rgame.isGameEnded(BoardGameScreen.rgame, newTable,
+								(byte)(1 - BoardGameScreen.actPlayer))) {
 						gameEnded = true;
-						procEndGame();
+						procEndGame((byte)(1 - BoardGameScreen.actPlayer));
 					}
 					else {
 						/* Change to other player. */
@@ -453,14 +454,14 @@ public final class OwareScreen extends BoardGameScreen {
 		}
   }
 
-	public void procEndGame() {
+	public void procEndGame(byte player) {
 		//#ifdef DLOGGING
 		if (finerLoggable) {logger.finer("procEndGame");}
 		//#endif
 		try {
-			BoardGameScreen.rgame.procEndGame();
+			BoardGameScreen.rgame.procEndGame(player);
 			OwareTable ot = (OwareTable)BoardGameScreen.table;
-			super.procEndGame(ot.getPoint((byte)0), ot.getPoint((byte)1));
+			super.procEndGame(ot.getPoint((byte)0), ot.getPoint((byte)1), player);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			//#ifdef DLOGGING
