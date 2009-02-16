@@ -111,8 +111,8 @@ abstract public class BoardGameApp extends GameApp {
   final public static int MSG_HUMAN = GameApp.MSG_USERDEF + msgOffset++;
   final public static int MSG_COMPUTER = GameApp.MSG_USERDEF + msgOffset++;
   final public static int MSG_PASS = GameApp.MSG_USERDEF + msgOffset++;
-  final public static int MSG_LEVELPREFIX = GameApp.MSG_USERDEF + msgOffset++;
   final public static short MSG_SURE_END = (short)(GameApp.MSG_USERDEF + msgOffset++);
+  final public static int MSG_LEVELPREFIX = GameApp.MSG_USERDEF + msgOffset++;
   final public static int MSG_USERDEF = GameApp.MSG_USERDEF + msgOffset + 2;
 
   public static short ACTION_OFFSET = 0;
