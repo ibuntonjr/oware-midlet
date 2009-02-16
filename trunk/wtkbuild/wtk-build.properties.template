@@ -1,7 +1,7 @@
 #windows.drive = C:
 windows.drive = 
 #windows.ext = .exe
-windows.ext = .exe
+windows.ext = 
 #opt.tools = ${windows.drive}/opt/tools
 opt.tools = /home/irvbopt/opt/tools
 #antenna.home = C:/mostdownloads/j2me/sourceforge/antenna
@@ -64,7 +64,7 @@ wtk.home = ${windows.drive}/opt/WTK2.5.2
 wtk.encoding = UTF-8
 #wtk.proguard.home = ${ext.drive}/mostdownloads/j2me/sourceforge/proguard/proguard4.2
 #wtk.proguard.home = C:/opt/tools/proguard/proguard4.2
-wtk.proguard.home = ${opt.tools}/proguard/proguard4.2
+wtk.proguard.home = ${opt.tools}/proguard/proguard4.3
 #wtk.optionalpda.enabled = false
 midlet.name = Oware
 midlet.class = net.sf.yinlight.boardgame.oware.midlet.${midlet.name}MIDlet
