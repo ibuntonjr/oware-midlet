@@ -396,13 +396,13 @@ public final class OwareGame extends BoardGame {
 					}
 				}
 			}
-			//#ifdef DLOGGING
-//@			if (finestLoggable) {logger.finest("eval pointFirstPlayer,pointSecondPlayer,rTable.getPassNum()=" + pointFirstPlayer + "," + pointSecondPlayer + "," +  rTable.getPassNum());}
-			//#endif
 			point = pointFirstPlayer - pointSecondPlayer;
-			if (rPlayer == 1) {
+			if (player == 1) {
 				point = -point;
 			}
+			//#ifdef DLOGGING
+//@			if (finestLoggable) {logger.finest("eval player,pointFirstPlayer,pointSecondPlayer,point,rTable.getPassNum()=" + player + "," + pointFirstPlayer + "," + pointSecondPlayer + "," +  point + "," + rTable.getPassNum());}
+			//#endif
 		} catch (Throwable e) {
 			e.printStackTrace();
 			//#ifdef DLOGGING
@@ -411,18 +411,18 @@ public final class OwareGame extends BoardGame {
 		}
   }
 
-  protected void eval(boolean fullProcess, boolean endGame) {
+  protected void eval(boolean fullProcess, boolean endGame, byte player) {
     boolean lazyProcess = !fullProcess || isGameEnded();
-		eval(lazyProcess, this, rTable, rPlayer, endGame);
+		eval(lazyProcess, this, rTable, player, endGame);
 	}
 
-  public int getGameResult() {
-		eval(false, true);
+  public int getGameResult(final byte player) {
+		eval(false, true, player);
     int score = point;
-    if (score >= 0) {
+    if (score > 0) {
       return TwoPlayerGame.WIN;
     }
-    else if (score <= 0) {
+    else if (score < 0) {
       return TwoPlayerGame.LOSS;
     }
     else {
@@ -553,15 +553,15 @@ public final class OwareGame extends BoardGame {
 		//#ifdef DLOGGING
 //@		if (finestLoggable) {logger.finest("setTable rTable != null,rPlayer,player,evalNum=" + (rTable != null) + "," + rPlayer + "," + player + "," + OwareTable.getPlayerItem(player) + "," + evalNum);}
 		//#endif
-    eval(fullProcess, false);
+    eval(fullProcess, false, player);
   }
 
-	public void procEndGame() {
+	public void procEndGame(byte player) {
 		//#ifdef DLOGGING
 //@		if (finerLoggable) {logger.finer("procEndGame");}
 		//#endif
 		try {
-			eval(false, true);
+			eval(false, true, player);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			//#ifdef DLOGGING
