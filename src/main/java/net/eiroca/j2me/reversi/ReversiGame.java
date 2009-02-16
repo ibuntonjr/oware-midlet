@@ -261,9 +261,9 @@ public final class ReversiGame extends BoardGame {
     return evalNum;
   }
 
-  public int getGameResult() {
+  public int getGameResult(byte player) {
     int piecediff = numFirstPlayer - numSecondPlayer;
-    if (rPlayer == 1) {
+    if (player == 1) {
       piecediff = -piecediff;
     }
     if (piecediff > 0) {
@@ -358,12 +358,12 @@ public final class ReversiGame extends BoardGame {
     eval(fullProcess);
   }
 
-	public void procEndGame() {
+	public void procEndGame(byte player) {
 		//#ifdef DLOGGING
 //@		if (finerLoggable) {logger.finer("procEndGame");}
 		//#endif
 		try {
-			eval(true, this, rTable, rPlayer, true);
+			eval(true, this, rTable, player, true);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			//#ifdef DLOGGING
