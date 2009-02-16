@@ -813,11 +813,19 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 	//#endif
 		boolean processMove(final BoardGameMove move, final boolean startForeThinking);
 
-	abstract public void procEndGame();
+	abstract public void procEndGame(byte player);
 
-	public void procEndGame(final int firstNum, final int secondNum) {
+	public void procEndGame() {
+		//#ifdef DLOGGING
+//@		if (finerLoggable) {logger.finer("procEndGame() BoardGameScreen.actPlayer=" + BoardGameScreen.actPlayer);}
+		//#endif
+		procEndGame(BoardGameScreen.actPlayer);
+	}
+
+	public void procEndGame(final int firstNum, final int secondNum,
+			final byte player) {
 		try {
-			final int result = BoardGameScreen.rgame.getGameResult();
+			final int result = BoardGameScreen.rgame.getGameResult(player);
 			String endMessage;
 			final boolean firstWin = ((result == TwoPlayerGame.LOSS) && (BoardGameScreen.actPlayer == 1)) || ((result == TwoPlayerGame.WIN) && (BoardGameScreen.actPlayer == 0));
 			final int winner;
@@ -845,7 +853,7 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 			endMessage += BoardGameScreen.NL + BoardGameApp.playerNames[0] + BoardGameScreen.SEP + firstNum + BoardGameScreen.NL + BoardGameApp.playerNames[1] + BoardGameScreen.SEP + secondNum;
 			setMessage(endMessage);
 			//#ifdef DLOGGING
-//@			if (finestLoggable) {logger.finest("processMove game ended result,firstWin,winner,firstNum,secondNum=" + result + "," + firstWin + "," + winner + firstNum + "," + secondNum);}
+//@			if (finestLoggable) {logger.finest("procEndGame game ended BoardGameScreen.actPlayer,result,firstWin,winner,firstNum,secondNum=" + BoardGameScreen.actPlayer + "," + result + "," + firstWin + "," + winner + "," + firstNum + "," + secondNum);}
 			//#endif
 		} catch (Throwable e) {
 			e.printStackTrace();
