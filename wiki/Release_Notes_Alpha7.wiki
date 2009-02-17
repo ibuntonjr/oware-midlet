@@ -81,5 +81,5 @@
     a workaround
   * For Oware, you can change the number of players, but this does not work yet.  Only
     2 players are allowed (either two humans, or human and computer)
-  * Reversi may get into infinate loop if there is no valid move for the computer.  (Unlike
+  * Reversi may get into infinate loop if there is no valid move for the computer. (Unlike
     Oware, Reversi allows a pass to be made.  The pass logic has a bug.)
