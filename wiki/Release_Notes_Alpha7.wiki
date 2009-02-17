@@ -73,3 +73,13 @@
   * Share more code with BoardGameScreen.
   * Fix end of game scoring
   * Allow prompt command from list used as command menu (not finished).
+
+=Issues=
+  * Near the end of the game with Oware, if the computer cannot make a valid move,
+    play will stop there at the computer's turn.  This should cause the game to end.
+    You can make the program total the game by going to the menu and selecting End Game as
+    a workaround
+  * For Oware, you can change the number of players, but this does not work yet.  Only
+    2 players are allowed (either two humans, or human and computer)
+  * Reversi may get into infinate loop if there is no valid move for the computer.  (Unlike
+    Oware, Reversi allows a pass to be made.  The pass logic has a bug.)
