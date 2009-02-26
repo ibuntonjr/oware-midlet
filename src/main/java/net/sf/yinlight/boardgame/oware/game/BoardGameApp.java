@@ -504,8 +504,8 @@ abstract public class BoardGameApp extends GameApp {
 //@			if (logf == null) {
 //@				logf = new LoggerRptForm(logManager, this,
 //@						BaseApp.midlet, "net.sf.jlogmicro.util.logging.FormHandler");
+//@				BaseApp.setup(logf, BaseApp.cBACK, null);
 //@			}
-//@			BaseApp.setup(logf, BaseApp.cBACK, null);
 //@			BaseApp.show(null, logf, true);
 //@		} catch (Throwable e) {
 //@			e.printStackTrace();
@@ -530,7 +530,6 @@ abstract public class BoardGameApp extends GameApp {
 				BoardGameApp.gsDept = settingsGameUpd(
 						opDept.getSelectedIndex() + BoardGameApp.gsDeptInit,
 					BoardGameApp.BOARD_GAME_DEPT, BoardGameApp.gsDept);
-				((BoardGameScreen) GameApp.game).updateSkillInfo();
 			}
 			if (BoardGameApp.gsRowLimit < 0) {
 				BoardGameApp.gsRow = settingsGameUpd(
@@ -589,10 +588,14 @@ abstract public class BoardGameApp extends GameApp {
 			}
 			//#ifdef DLOGGING
 //@			else if (d == logf) {
+				//#ifdef DLOGGING
+//@				if (finestLoggable) {logger.finest("LoggerRptForm");}
+				//#endif
 //@				if (c == BaseApp.cBACK) {
 //@					super.commandAction(c, d);
 //@				} else {
 //@					((CommandListener)logf).commandAction(c, d);
+//@					((Runnable)logf).run();
 //@				}
 //@			}
 			//#endif
