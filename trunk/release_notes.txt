@@ -75,3 +75,23 @@
 + Fix end of game scoring
 + Allow prompt command from list used as command menu (not finished).
 
+1.0 2009-02-25 Alpha 8 Version
++ Introduced bug where Oware no longer works on Nokia
++ Have Reversi use images of squares, light, and dark pieces.
++ Prevent infinate loop if the computer has no move.
++ Optionally precalculate moves based on manifest/jad.
++ Allow user to end the game optionally.  Also, have test option to end the game and set a player to be the computer.
++ Fix display of winner/loser
++ More logging.
++ Reset undo/redo for new game.
++ Fix MIDP 1.0 not having pause.
++ Have logging form for form append.
++ Reduce height for rectangles and increase size of icons.
++ Refer to players as upper/lower
++ Allow setting of defaults.
++ Skill level message for dept.
++ Make game AI threadsafe.
++ Allow both midlets to have optional graphics.
++ Allow change of rows/columns for Reversi.
++ Remove tick as it matches what's in BoardGameScreen 
++ Remove drawSelectionBox as it matches what's in BoardGameScreen 
