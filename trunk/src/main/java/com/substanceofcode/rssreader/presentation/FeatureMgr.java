@@ -93,32 +93,32 @@ public class FeatureMgr implements CommandListener, Runnable {
 	}
 
     public void setRunnable(Runnable runFeatureUser, boolean background) {
-		synchronized(this) {
-			if (background) {
-				if (runFeatureUser != null) {
-					if (!(runFeatureUser instanceof Runnable)) {
-						throw new IllegalArgumentException(
-							"Listener must implement Runnable");
+			synchronized(this) {
+				if (background) {
+					if (runFeatureUser != null) {
+						if (!(runFeatureUser instanceof Runnable)) {
+							throw new IllegalArgumentException(
+								"Listener must implement Runnable");
+						}
+						this.runFeatureUser = runFeatureUser;
+						//#ifdef DLOGGING
+//@						if (fineLoggable) {logger.fine("setRunnable runFeatureUser" + runFeatureUser.getClass().getName() + "," + runFeatureUser);}
+						//#endif
+					} else {
+						//#ifdef DLOGGING
+//@						if (fineLoggable) {logger.fine("setRunnable runFeatureUser=null");}
+						//#endif
+						this.runFeatureUser = runFeatureUser;
 					}
-					this.runFeatureUser = runFeatureUser;
-					//#ifdef DLOGGING
-//@					if (fineLoggable) {logger.fine("setRunnable runFeatureUser" + runFeatureUser.getClass().getName() + "," + runFeatureUser);}
-					//#endif
-				} else {
-					//#ifdef DLOGGING
-//@					if (fineLoggable) {logger.fine("setRunnable runFeatureUser=null");}
-					//#endif
-					this.runFeatureUser = runFeatureUser;
 				}
+				this.background = background;
 			}
-			this.background = background;
-		}
-		if (background) {
-			startWakeup(false);
-		}
-		//#ifdef DLOGGING
-//@		if (fineLoggable) {logger.fine("cmdFeatureUser,background,calling thread,new thread=" + cmdFeatureUser + "," + background + "," + Thread.currentThread() + "," + netThread);}
-		//#endif
+			if (background) {
+				startWakeup(false);
+			}
+			//#ifdef DLOGGING
+//@			if (fineLoggable) {logger.fine("cmdFeatureUser,background,calling thread,new thread=" + cmdFeatureUser + "," + background + "," + Thread.currentThread() + "," + netThread);}
+			//#endif
     }
 
     public void setCommandListener(CommandListener cmdFeatureUser,
