@@ -24,6 +24,8 @@
 /**
  * This was modified no later than 2009-01-29
  */
+// Expand to define MIDP define
+@DMIDPVERS@
 // Expand to define logging define
 @DLOGDEF@
 // Expand to define test define
@@ -66,6 +68,7 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
   protected static final byte STORE_VERS = 2;
   protected static final byte SCREEN_STORE_BYTES = 6;
   protected static final char NL = '\n';
+  protected static final int HEIGHT_SEPARATERS = 2;
   protected static final int COLOR_TEXT_BG = 0xEEEEEE;
   protected static final int COLOR_TEXT_FG = 0x000000;
   protected static final int COLOR_BG = 0xFFFFD0;
@@ -78,7 +81,10 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
   protected static final int ASPECT_LIMIT_B = 300; // 1.5
   protected final String infoLines[] = new String[Math.abs(BoardGameApp.gsNbrPlayers) + 1];
   protected String message = null;
+  protected Image squareImage = null;
+  protected int squareWidth = 0;
   protected Image piece1Image = null;
+  protected Image piece2Image = null;
 	protected Image turnImage;
   protected BoardGameMove[] possibleMoves;
   final protected FeatureMgr featureMgr;
@@ -92,7 +98,6 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
   public static final int INVALID_KEY_CODE = -2000;
   public int keyCode = INVALID_KEY_CODE;
   public int[] pointerPress = new int[] {-1, -1};
-  protected boolean preCalculateMoves = false;
 
   public long messageEnd;
 
@@ -105,7 +110,7 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
   public GameTable[] tables;
   public static int turnNum;
   public static BoardGameTable table;
-	protected GameMinMax gMiniMax;
+	public GameMinMax gMiniMax;
   public static BoardGame rgame;
   public static boolean twoplayer;
 
@@ -114,9 +119,9 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
   protected int off_x;
   protected int pieceWidth;
   protected int pieceHeight;
-  protected int cupWidth;
-  protected int cupHeight;
-  protected int cupImagexOffset;
+  protected int cupWidth = 0;
+  protected int cupHeight = 0;
+  protected int cupImagexOffset = 0;
   protected int piece_offx;
   protected int piece_offy;
   public byte[] bsavedRec = new byte[0];
@@ -137,13 +142,21 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 			final boolean fullScreen, int appName) {
 		/* Do not suppress keys.  However, do full screen. */
     super(midlet, false, true);
-    name = BaseApp.messages[appName];
-		featureMgr = new FeatureMgr(this);
-		//#ifdef DMIDP10
-		featureMgr.setCommandListener(GameApp.midlet, false);
-		super.setCommandListener(featureMgr);
-		//#endif
-		featureMgr.setRunnable(this, true);
+		try {
+			name = BaseApp.messages[appName];
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("init error", e);
+			//#endif
+		} finally {
+			featureMgr = new FeatureMgr(this);
+			//#ifdef DMIDP10
+			featureMgr.setCommandListener(GameApp.midlet, false);
+			super.setCommandListener(featureMgr);
+			//#endif
+			featureMgr.setRunnable(this, true);
+		}
 	}
 
   /**
@@ -168,11 +181,13 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
     width = screenWidth * bcol / (bcol + 1);
     vertWidth = screenWidth - width;
     height = screenHeight;
-    sizex = (width - 1) / Math.abs(bcol);
-    sizey = (height - 1) / Math.abs(brow);
+    sizex = (width - 1) / bcol;
+    sizey = (height - 1) / brow;
 		//#ifdef DLOGGING
-		if (finestLoggable) {logger.finest("initGraphics  width,sizex,vertWidth,sizey" + width + "," + sizex + "," + vertWidth + "," + screenHeight + "," + sizey);}
+		if (finestLoggable) {logger.finest("initGraphics  width,sizex,vertWidth=" + width + "," + sizex + "," + vertWidth);}
+		if (finestLoggable) {logger.finest("initGraphics  screenHeight,height,sizey=" + screenHeight + "," + height  + "," + sizey);}
 		//#endif
+    final int origSizex = sizex;
     final int origSizey = sizey;
 		//#ifdef DLOGGING
 		if (finestLoggable) {logger.finest("initGraphics sizex,sizey=" + sizex + "," + sizey);}
@@ -183,81 +198,113 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
     if (BoardGameScreen.ASPECT_LIMIT_B * sizey > BoardGameScreen.ASPECT_LIMIT_A * sizex) {
       sizey = sizex * BoardGameScreen.ASPECT_LIMIT_A / BoardGameScreen.ASPECT_LIMIT_B;
     }
-    fontHeight = cscreen.getFont().getHeight();
-    pieceWidth = 20 * sizex / 30;
-    pieceHeight = 20 * sizey / 30;
-		if ((BoardGameApp.gsTextRow > 0) &&
-			(pieceHeight < ((BoardGameApp.gsTextRow * fontHeight + 2) + pieceWidth))) {
-			int newSizey = ((BoardGameApp.gsTextRow * (fontHeight + 2)) + pieceWidth ) * 30 / 20;
-			if (newSizey < origSizey) {
-				sizey = newSizey;
-				pieceHeight = 20 * sizey / 30;
-			}
-			//#ifdef DLOGGING
-			if (finestLoggable) {logger.finest("initGraphics origSizey,newSizey,sizey,pieceWidth,pieceHeight=" + origSizey + "," + newSizey + "," + sizey + "," + pieceWidth + "," + pieceHeight);}
-			//#endif
-		}
-    height = sizey * Math.abs(brow);
-    width = sizex * Math.abs(bcol);
-    piece_offx = (sizex - pieceWidth) / 2;
-    piece_offy = (sizey - pieceHeight) / 2;
-    cupWidth = pieceWidth;
-    cupHeight = pieceHeight;
-		if (BoardGameApp.gsTextRow > 0) {
-			cupHeight = pieceHeight - (BoardGameApp.gsTextRow * (fontHeight - 1));
-		}
-    if (cupWidth > cupHeight) {
-			cupWidth = cupHeight;
-		} else {
-			cupHeight = cupWidth;
-		}
-		if (GameApp.graphics) {
-			int ix = BoardGameApp.gsPieceImages.length - 1;
-			while (ix >= 0) {
-				piece1Image = BaseApp.createImage(BoardGameApp.gsPieceImages[ix--]);
-				if ((piece1Image != null) && (piece1Image.getWidth() < cupWidth)) {
-					break;
-				}
-			}
-		}
 		//#ifdef DLOGGING
-		if (finestLoggable) {logger.finest("constructor piece1Image piece1Image.getWidth(),piece1Image.getHeight()=" + ((piece1Image == null) ? "piece1Image is null" : piece1Image.getWidth() + "," + piece1Image.getHeight()));}
+		if (finestLoggable) {logger.finest("initGraphics after sizex,sizey=" + sizex + "," + sizey);}
 		//#endif
-		//undo cup2Image = null; // undo BaseApp.createImage(CUP2);
-		turnImage = piece1Image;
-		if (piece1Image != null) {
-			int imageWidth = piece1Image.getWidth();
-			//#ifdef DLOGGING
-			if (finestLoggable) {logger.finest("imageWidth=" + imageWidth);}
-			//#endif
-			if (imageWidth < cupWidth) {
-				cupImagexOffset = (cupWidth - imageWidth) / 2;
-			} else {
-				piece1Image = null;
-				cupImagexOffset = 0;
+    fontHeight = cscreen.getFont().getHeight();
+    height = sizey * brow;
+    width = sizex * bcol;
+		if (GameApp.graphics && (BoardGameApp.gsSquareImages.length > 0)) {
+			sizex = Math.min(sizex, sizey);
+			sizey = sizex;
+			squareImage = getImageFit(BoardGameApp.gsSquareImages, sizex);
+			if (squareImage != null) {
+				if (squareImage.getWidth() < sizex) {
+					sizex = squareImage.getWidth();
+					sizey = sizex;
+				}
+				squareWidth = sizex * table.nbrRow;
+				piece1Image = getImageFit(BoardGameApp.gsPiece1Images, sizex);
+				piece2Image = getImageFit(BoardGameApp.gsPiece2Images, sizex);
+				//#ifdef DLOGGING
+				if (finestLoggable) {logger.finest("constructor piece1Image,piece1Image.getWidth(),piece1Image.getHeight()=" + ((piece1Image == null) ? "piece1Image is null" : piece1Image.getWidth() + "," + piece1Image.getHeight()));}
+				if (finestLoggable) {logger.finest("constructor piece2Image,piece2Image.getWidth(),piece2Image.getHeight()=" + ((piece2Image == null) ? "piece2Image is null" : piece2Image.getWidth() + "," + piece2Image.getHeight()));}
+				//#endif
+				//#ifdef DLOGGING
+				if (finestLoggable) {logger.finest("initGraphics origSizey,origSizex,sizex,sizey,squareImage.getWidth(),squareImage.getHeight()=" + origSizey + "," + origSizex + "," + sizey + "," + squareImage.getWidth() + "," + squareImage.getHeight());}
+				//#endif
 			}
-			//#ifdef DLOGGING
-			if (finestLoggable) {logger.finest("initGraphics piece1Image piece1Image.getWidth(),piece1Image.getHeight()=" + ((piece1Image == null) ? "piece1Image is null" : piece1Image.getWidth() + "," + piece1Image.getHeight()));}
-			//#endif
-			// FIX for different widths for cup and turn image
-			//#ifdef DLOGGING
-			//if (finestLoggable) {logger.finest("turnImage.getWidth()=" + turnImage.getWidth());}
-			//#endif
-			/*
-			if (turnImage.getWidth() > cupWidth) {
-				turnImage = null;
-			}
-			*/
 		}
+		if (GameApp.graphics && (BoardGameApp.gsSquareImages.length == 0)) {
+			pieceWidth = sizex - fontHeight;
+			pieceHeight = Math.min(sizex, sizey - fontHeight);
+			pieceWidth = pieceHeight;
+			// See if # text rows of text height plus the pieceWidth is < sizey
+			if ((BoardGameApp.gsTextRow > 0) &&
+				(sizey < ((BoardGameApp.gsTextRow * fontHeight + HEIGHT_SEPARATERS) + pieceWidth + 1))) {
+				int newSizey = (BoardGameApp.gsTextRow * (fontHeight + HEIGHT_SEPARATERS)) +
+					pieceWidth  + 1;
+				if (newSizey < origSizey) {
+					sizey = newSizey;
+				}
+				//#ifdef DLOGGING
+				if (finestLoggable) {logger.finest("initGraphics origSizey,newSizey,sizey,pieceWidth,pieceHeight=" + origSizey + "," + newSizey + "," + sizey + "," + pieceWidth + "," + pieceHeight);}
+				//#endif
+			}
+			piece_offx = (sizex - pieceWidth) / 2;
+			piece_offy = 1;
+			cupWidth = pieceWidth;
+			cupHeight = pieceHeight;
+			if (cupWidth > cupHeight) {
+				cupWidth = cupHeight;
+			} else {
+				cupHeight = cupWidth;
+			}
+			piece1Image = getImageFit(BoardGameApp.gsPiece1Images, cupWidth);
+			piece2Image = getImageFit(BoardGameApp.gsPiece2Images, cupWidth);
+			//#ifdef DLOGGING
+			if (finestLoggable) {logger.finest("constructor piece1Image,piece1Image.getWidth(),piece1Image.getHeight()=" + ((piece1Image == null) ? "piece1Image is null" : piece1Image.getWidth() + "," + piece1Image.getHeight()));}
+			if (finestLoggable) {logger.finest("constructor piece2Image,piece2Image.getWidth(),piece2Image.getHeight()=" + ((piece2Image == null) ? "piece2Image is null" : piece2Image.getWidth() + "," + piece2Image.getHeight()));}
+			//#endif
+			//undo cup2Image = null; // undo BaseApp.createImage(CUP2);
+			turnImage = piece1Image;
+			if (piece1Image != null) {
+				int imageWidth = piece1Image.getWidth();
+				//#ifdef DLOGGING
+				if (finestLoggable) {logger.finest("imageWidth=" + imageWidth);}
+				//#endif
+				if (imageWidth <= cupWidth) {
+					cupImagexOffset = (cupWidth - imageWidth) / 2;
+				} else {
+					piece1Image = null;
+					cupImagexOffset = 0;
+				}
+				//#ifdef DLOGGING
+				if (finestLoggable) {logger.finest("initGraphics piece1Image piece1Image.getWidth(),piece1Image.getHeight()=" + ((piece1Image == null) ? "piece1Image is null" : piece1Image.getWidth() + "," + piece1Image.getHeight()));}
+				//#endif
+				// FIX for different widths for cup and turn image
+				//#ifdef DLOGGING
+				//if (finestLoggable) {logger.finest("turnImage.getWidth()=" + turnImage.getWidth());}
+				//#endif
+				/*
+				if (turnImage.getWidth() > cupWidth) {
+					turnImage = null;
+				}
+				*/
+			}
+		}
+		height = sizey * brow;
 		selx = 0;
 		sely = 0;
 		off_y = (screenHeight - height) / 2;
 		off_x = 2;
 		//#ifdef DLOGGING
-		if (finestLoggable) {logger.finest("initGraphics screenWidth,screenHeight,width,vertWidth,height,sizex,off_x,sizey,off_y,pieceWidth,pieceHeight,cupWidth,cupHeight,fontHeight=" + screenWidth + "," + screenHeight + "," + width + "," + vertWidth + "," + height + "," + sizex + "," + sizey + "," + pieceWidth + "," + pieceHeight + "," + cupWidth + "," + cupHeight + "," + fontHeight);}
+		if (finestLoggable) {logger.finest("initGraphics screenWidth,width,vertWidth,sizex,off_x,pieceWidth,cupWidth,fontHeight=" + screenWidth + "," + width + "," + vertWidth + "," + sizex + "," + pieceWidth + "," + cupWidth + "," + fontHeight);}
+		if (finestLoggable) {logger.finest("initGraphics screenHeight,height,sizey,off_y,pieceHeight,cupHeight,fontHeight=" + screenHeight + "," + height + "," + sizey + "," + off_y + "," + pieceHeight + "," + cupHeight + "," + fontHeight);}
 		//#endif
 		return cscreen;
   }
+
+	Image getImageFit(String[] imageNames, int width) {
+		Image cimage = null;
+		for (int ix = imageNames.length - 1; ix >= 0; ix--) {
+			cimage = BaseApp.createImage(imageNames[ix]);
+			if ((cimage != null) && (cimage.getWidth() < width)) {
+				break;
+			}
+		}
+		return cimage;
+	}
 
   /**
    * This does init.  Must create new table before calling this from
@@ -276,6 +323,7 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 			int rtn = 0;
 			if (bsavedRec.length > 0) {
 				rtn = loadRecordStore(bsavedRec);
+				bsavedRec = new byte[0];
 			}
 			if (rtn == 0) {
 				BoardGameScreen.turnNum = 1;
@@ -295,6 +343,7 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 			BoardGameScreen.rgame.process(BoardGameScreen.table, 
 					BoardGameScreen.actPlayer);
 			BoardGameScreen.rgame.resetEvalNum();
+			BoardGameScreen.rgame.resetTables();
 			BoardGameScreen.rgame.saveLastTable(BoardGameScreen.table,
 					(byte)(1 - BoardGameScreen.actPlayer), BoardGameScreen.turnNum);
 			updateSkillInfo();
@@ -413,16 +462,30 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 
   protected void drawBoard() {
     screen.setColor(BoardGameScreen.COLOR_BG);
-    screen.fillRect(off_x, off_y, width, height);
+		if (squareImage != null) {
+			screen.fillRect(off_x, off_y, squareWidth, squareWidth);
+		} else {
+			screen.fillRect(off_x, off_y, width, height);
+		}
     screen.setColor(BoardGameScreen.COLOR_FG);
-	/* Draw horizontal lines of rows. */
-    for (int i = 0; i <= table.nbrRow; ++i) {
-      screen.drawLine(off_x, off_y + i * sizey, off_x + width, off_y + i * sizey);
-	}
-	/* Draw vertical lines of cols. */
-    for (int i = 0; i <= table.nbrCol; ++i) {
-      screen.drawLine(off_x + i * sizex, off_y, off_x + i * sizex, off_y + height);
-    }
+		if (squareImage != null) {
+			/* Draw horizontal lines of rows. */
+			for (int i = 0; i < table.nbrRow; ++i) {
+				for (int j = 0; j < table.nbrCol; ++j) {
+					screen.drawImage(squareImage, off_x + j * sizex, off_y + i * sizey,
+							Graphics.TOP | Graphics.LEFT);
+				}
+			}
+		} else {
+			/* Draw horizontal lines of rows. */
+			for (int i = 0; i <= table.nbrRow; ++i) {
+				screen.drawLine(off_x, off_y + i * sizey, off_x + width, off_y + i * sizey);
+		}
+		/* Draw vertical lines of cols. */
+			for (int i = 0; i <= table.nbrCol; ++i) {
+				screen.drawLine(off_x + i * sizex, off_y, off_x + i * sizex, off_y + height);
+			}
+		}
   }
 
   /**
@@ -481,10 +544,10 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 		try {
 			// two pieces
 			//undo
-			drawPiece(-1, table.nbrCol - 1, 1, false,
-					((BoardGameScreen.actPlayer == 0) ? piece1Image : null), 0); /* y, x */
-			drawPiece(table.nbrRow, table.nbrCol - 1, 0, false,
-					((BoardGameScreen.actPlayer == 1) ? piece1Image : null), 0); /* y, x */
+			drawPiece(0, table.nbrCol, 1, false,
+				((BoardGameApp.gsFirst == 0) ? piece2Image : piece1Image), 0); /* y, x */
+			drawPiece(table.nbrRow - 1, table.nbrCol, 0, false,
+				((BoardGameApp.gsFirst == 1) ? piece2Image : piece1Image), 0); /* y, x */
 			// numbers
 			screen.setColor(BaseApp.foreground);
 			screen.drawString(infoLines[0],
@@ -605,7 +668,7 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 						}
 						break;
 					default:
-						GameMinMax.cancel(true);
+						gMiniMax.cancel(true);
 						midlet.doGamePause();
 						break;
 				}
@@ -716,10 +779,10 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
   }
 
   protected BoardGameMove computerTurn(final BoardGameMove prevMove) {
-    BoardGameMove move = (BoardGameMove) GameMinMax.precalculatedBestMove(prevMove);
+    BoardGameMove move = (BoardGameMove) gMiniMax.precalculatedBestMove(prevMove);
     if (move == null) {
       setMessage(BaseApp.messages[BoardGameApp.MSG_THINKING]);
-      GameMinMax.cancel(false);
+      gMiniMax.cancel(false);
 			//#ifdef DLOGGING
 			if (finerLoggable) {logger.finer("computerTurn 1 prevMove.row,prevMove.col, move.row,move.col,BoardGameScreen.actPlayer=" + prevMove.row + "," + prevMove.col + "," + ((move == null) ? "move null" : move.row + "," + move.col) + "," + BoardGameScreen.actPlayer);}
 			//#endif
@@ -749,7 +812,7 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
   }
 
   public void nextTurn(final int row, final int col) {
-    if ((mtt != null) && preCalculateMoves) {
+    if (mtt != null) {
       mtt.cancel();
       while (mtt.ended == false) {
         synchronized (this) {
@@ -776,7 +839,9 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 		super.wakeup(3);
 		//#endif
     while (!gameEnded && !isHuman[BoardGameScreen.actPlayer]) {
-      mtt = new MinimaxTimerTask();
+			if (BoardGameApp.precalculate) {
+				mtt = new MinimaxTimerTask();
+			}
       final BoardGameMove computerMove = computerTurn(move);
 			//#ifdef DLOGGING
 			if (finerLoggable) {logger.finer("nextTurn computerMove.row,computerMove.col,BoardGameScreen.actPlayer=" + ((computerMove == null) ? "computerMoves null" : (computerMove.row + "," + computerMove.col)) + "," + BoardGameScreen.actPlayer);}
@@ -786,12 +851,12 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 			}
       selx = computerMove.col;
       sely = computerMove.row;
-      processMove(computerMove, preCalculateMoves);
+			processMove(computerMove, BoardGameApp.precalculate);
       updatePossibleMoves();
 			//#ifdef DMIDP10
 			super.wakeup(3);
 			//#endif
-      GameMinMax.clearPrecalculatedMoves();
+      gMiniMax.clearPrecalculatedMoves();
 			break;
     }
 		//#ifdef DLOGGING
@@ -827,12 +892,12 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 		try {
 			final int result = BoardGameScreen.rgame.getGameResult(player);
 			String endMessage;
-			final boolean firstWin = ((result == TwoPlayerGame.LOSS) && (BoardGameScreen.actPlayer == 1)) || ((result == TwoPlayerGame.WIN) && (BoardGameScreen.actPlayer == 0));
+			final boolean firstWin = ((result == TwoPlayerGame.LOSS) && (player == 1)) || ((result == TwoPlayerGame.WIN) && (player == 0));
 			final int winner;
 			if (firstWin) {
-				winner = (BoardGameApp.gsFirst == 0) ? 0 : 1;
+				winner = (BoardGameApp.gsFirst == 0) ? 1 : 0;
 			} else {
-				winner = (BoardGameApp.gsFirst == 1) ? 0 : 1;
+				winner = (BoardGameApp.gsFirst == 1) ? 1 : 0;
 			}
 			if (!BoardGameScreen.twoplayer &&
 					((firstWin && (BoardGameApp.gsFirst != 0)) ||
@@ -853,7 +918,8 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 			endMessage += BoardGameScreen.NL + BoardGameApp.playerNames[0] + BoardGameScreen.SEP + firstNum + BoardGameScreen.NL + BoardGameApp.playerNames[1] + BoardGameScreen.SEP + secondNum;
 			setMessage(endMessage);
 			//#ifdef DLOGGING
-			if (finestLoggable) {logger.finest("procEndGame game ended BoardGameScreen.actPlayer,result,firstWin,winner,firstNum,secondNum=" + BoardGameScreen.actPlayer + "," + result + "," + firstWin + "," + winner + "," + firstNum + "," + secondNum);}
+			if (finestLoggable) {logger.finest("procEndGame game ended BoardGameScreen.actPlayer,player=" + BoardGameScreen.actPlayer + "," + player);}
+			if (finestLoggable) {logger.finest("procEndGame game ended result,firstWin,winner,firstNum,secondNum=" +  result + "," + firstWin + "," + winner + "," + firstNum + "," + secondNum);}
 			//#endif
 		} catch (Throwable e) {
 			e.printStackTrace();
