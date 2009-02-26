@@ -19,10 +19,10 @@
 /**
  * This was modified no later than 2009-01-29
  */
-// Expand to define logging define
-@DLOGDEF@
 // Expand to define MIDP define
 @DMIDPVERS@
+// Expand to define logging define
+@DLOGDEF@
 package net.eiroca.j2me.app;
 
 import java.util.Timer;
