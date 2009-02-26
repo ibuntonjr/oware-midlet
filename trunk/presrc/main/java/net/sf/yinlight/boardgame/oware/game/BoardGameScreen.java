@@ -68,7 +68,7 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
   protected static final byte STORE_VERS = 2;
   protected static final byte SCREEN_STORE_BYTES = 6;
   protected static final char NL = '\n';
-  protected static final int HEIGHT_SEPARATERS = 2;
+  protected static final int HEIGHT_SEPARATERS = 4;
   protected static final int COLOR_TEXT_BG = 0xEEEEEE;
   protected static final int COLOR_TEXT_FG = 0x000000;
   protected static final int COLOR_BG = 0xFFFFD0;
@@ -79,7 +79,7 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
   protected static final int COLOR_DARKBOX = 0x000000;
   protected static final int ASPECT_LIMIT_A = 400; // 1.5
   protected static final int ASPECT_LIMIT_B = 300; // 1.5
-  protected final String infoLines[] = new String[Math.abs(BoardGameApp.gsNbrPlayers) + 1];
+  protected String infoLines[];
   protected String message = null;
   protected Image squareImage = null;
   protected int squareWidth = 0;
@@ -176,8 +176,8 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 		//#endif
 		// FIX turnImage = BaseApp.createImage(TURN_ICON);
 		/* Leave space to the right of the board for putting other info. */
-		int bcol = Math.abs(BoardGameApp.gsCol);
-		int brow = Math.abs(BoardGameApp.gsRow);
+		int bcol = BoardGameApp.gsCol;
+		int brow = BoardGameApp.gsRow;
     width = screenWidth * bcol / (bcol + 1);
     vertWidth = screenWidth - width;
     height = screenHeight;
@@ -204,6 +204,7 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
     fontHeight = cscreen.getFont().getHeight();
     height = sizey * brow;
     width = sizex * bcol;
+		piece_offy = 5;
 		if (GameApp.graphics && (BoardGameApp.gsSquareImages.length > 0)) {
 			sizex = Math.min(sizex, sizey);
 			sizey = sizex;
@@ -213,6 +214,8 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 					sizex = squareImage.getWidth();
 					sizey = sizex;
 				}
+				piece_offy = 0;
+				piece_offx = 0;
 				squareWidth = sizex * table.nbrRow;
 				piece1Image = getImageFit(BoardGameApp.gsPiece1Images, sizex);
 				piece2Image = getImageFit(BoardGameApp.gsPiece2Images, sizex);
@@ -225,13 +228,15 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 				//#endif
 			}
 		}
-		if (GameApp.graphics && (BoardGameApp.gsSquareImages.length == 0)) {
+		if (GameApp.graphics && ((BoardGameApp.gsSquareImages.length == 0) ||
+				(squareImage != null))) {
 			pieceWidth = sizex - fontHeight;
 			pieceHeight = Math.min(sizex, sizey - fontHeight);
 			pieceWidth = pieceHeight;
 			// See if # text rows of text height plus the pieceWidth is < sizey
 			if ((BoardGameApp.gsTextRow > 0) &&
-				(sizey < ((BoardGameApp.gsTextRow * fontHeight + HEIGHT_SEPARATERS) + pieceWidth + 1))) {
+				(sizey < ((BoardGameApp.gsTextRow * fontHeight + HEIGHT_SEPARATERS) +
+									pieceWidth + piece_offy + 1))) {
 				int newSizey = (BoardGameApp.gsTextRow * (fontHeight + HEIGHT_SEPARATERS)) +
 					pieceWidth  + 1;
 				if (newSizey < origSizey) {
@@ -242,7 +247,6 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 				//#endif
 			}
 			piece_offx = (sizex - pieceWidth) / 2;
-			piece_offy = 1;
 			cupWidth = pieceWidth;
 			cupHeight = pieceHeight;
 			if (cupWidth > cupHeight) {
@@ -316,6 +320,7 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 			//#ifdef DLOGGING
 			if (finestLoggable) {logger.finest("init BoardGameApp.gsRow,BoardGameApp.gsCol,BoardGameApp.gsNbrPlayers=" + BoardGameApp.gsRow + "," + BoardGameApp.gsCol + "," + BoardGameApp.gsNbrPlayers);}
 			//#endif
+			infoLines = new String[BoardGameApp.gsNbrPlayers + 1];
 			BaseApp.background = 0x00FFFFFF;
 			BaseApp.foreground = 0x00000000;
 			score.beginGame(1, 0, 0);
@@ -499,7 +504,7 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
    * @param onBoard
    */
   abstract protected void drawPiece(final int row, final int col, final int player,
-			boolean onBoard, Image cupImage, int lastMovePoint);
+			boolean onBoard, Image cupImage, int yadjust, int lastMovePoint);
 
   protected void drawPossibleMoves() {
 		try {
@@ -545,9 +550,10 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 			// two pieces
 			//undo
 			drawPiece(0, table.nbrCol, 1, false,
-				((BoardGameApp.gsFirst == 0) ? piece2Image : piece1Image), 0); /* y, x */
+				((BoardGameApp.gsFirst == 0) ? piece2Image : piece1Image), 0, 0); /* y, x */
 			drawPiece(table.nbrRow - 1, table.nbrCol, 0, false,
-				((BoardGameApp.gsFirst == 1) ? piece2Image : piece1Image), 0); /* y, x */
+				((BoardGameApp.gsFirst == 1) ? piece2Image : piece1Image),
+					sizey - pieceHeight, 0); /* y, x */
 			// numbers
 			screen.setColor(BaseApp.foreground);
 			screen.drawString(infoLines[0],
@@ -742,6 +748,9 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 	}
 
 	public void setMessage(final String message) {
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("setMessage message=" + message);}
+		//#endif
 		synchronized (this) {
 			this.message = message;
 		}
@@ -752,6 +761,9 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 	}
 
   public void setMessage(final String message, final int delay) {
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("setMessage message,delay=" + message + "," + delay);}
+		//#endif
 		synchronized (this) {
 			this.message = message;
 		}
@@ -771,10 +783,10 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 
   public void updateSkillInfo() {
     if (!BoardGameScreen.twoplayer) {
-      infoLines[2] = BaseApp.messages[BoardGameApp.MSG_LEVELPREFIX + BoardGameApp.gsLevel] + BoardGameApp.gsDept;
+      infoLines[BoardGameScreen.table.nbrPlayers] = BaseApp.messages[BoardGameApp.MSG_LEVELPREFIX + BoardGameApp.gsLevel] + BoardGameApp.gsDept;
     }
     else {
-      infoLines[2] = null;
+      infoLines[BoardGameScreen.table.nbrPlayers] = null;
     }
   }
 
