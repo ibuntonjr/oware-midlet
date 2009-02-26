@@ -33,6 +33,8 @@
 /**
  * This was modified no later than 2009-01-29
  */
+// Expand to define MIDP define
+//#define DMIDP20
 // Expand to define test define
 //#define DNOTEST
 // Expand to define JMUnit test define
@@ -46,6 +48,7 @@ package net.sf.yinlight.boardgame.oware.game;
 import javax.microedition.lcdui.Choice;
 import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Command;
+import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.List;
@@ -69,8 +72,7 @@ import net.eiroca.j2me.rms.Settings;
 //@import net.sf.jlogmicro.util.logging.LogManager;
 //@import net.sf.jlogmicro.util.logging.Level;
 //@import net.sf.jlogmicro.util.logging.FormHandler;
-//@import net.sf.jlogmicro.util.logging.RecStoreHandler;
-//@import net.sf.jlogmicro.util.presentation.RecStoreLoggerForm;
+//@import net.sf.jlogmicro.util.presentation.LoggerRptForm;
 //#endif
 
 /**
@@ -79,14 +81,18 @@ import net.eiroca.j2me.rms.Settings;
 	*/ 
 abstract public class BoardGameApp extends GameApp {
 
+  public static String GRAPHICS_PRECALCULATE = "boardgame-precalculate";
+  public static boolean precalculate = true;
   public static String storeName = "BOARD_GAME_STORE";
   public static short msgOffset = 0;
   final public static short MSG_MENU_MAIN_UNDO = (short)(GameApp.MSG_USERDEF + msgOffset++);
   final public static short MSG_MENU_MAIN_REDO = (short)(GameApp.MSG_USERDEF + msgOffset++);
   final public static short MSG_MENU_MAIN_ENDGAME = (short)(GameApp.MSG_USERDEF + msgOffset++);
   final public static short MSG_MENU_MAIN_PAUSE = (short)(GameApp.MSG_USERDEF + msgOffset++);
+  final public static short MSG_MENU_MAIN_TEST_ENDGAME = (short)(GameApp.MSG_USERDEF + msgOffset++);
   final public static short MSG_MENU_MAIN_TEST = (short)(GameApp.MSG_USERDEF + msgOffset++);
   final public static short MSG_MENU_MAIN_LOGGING = (short)(GameApp.MSG_USERDEF + msgOffset++);
+  final public static short MSG_MENU_OPTIONS_DEAULT = (short)(GameApp.MSG_USERDEF + msgOffset++);
   final public static int MSG_GAMEMODE = GameApp.MSG_USERDEF + msgOffset++;
   final public static int MSG_GAMEMODE1 = GameApp.MSG_USERDEF + msgOffset++;
   final public static int MSG_GAMEMODE2 = GameApp.MSG_USERDEF + msgOffset++;
@@ -96,6 +102,7 @@ abstract public class BoardGameApp extends GameApp {
 	// FIX use messages for numbers
   final public static int MSG_AILEVEL3 = GameApp.MSG_USERDEF + msgOffset++;
   final public static int MSG_AILEVEL4 = GameApp.MSG_USERDEF + msgOffset++; // 10
+  final public static int MSG_SKILL_LEVEL = GameApp.MSG_USERDEF + msgOffset++; // 10
   final public static int MSG_NAMEPLAYER1 = GameApp.MSG_USERDEF + msgOffset++;
   final public static int MSG_NAMEPLAYER2 = GameApp.MSG_USERDEF + msgOffset++;
   final public static int MSG_ROW = GameApp.MSG_USERDEF + msgOffset++;
@@ -115,7 +122,7 @@ abstract public class BoardGameApp extends GameApp {
   final public static int MSG_LEVELPREFIX = GameApp.MSG_USERDEF + msgOffset++;
   final public static int MSG_USERDEF = GameApp.MSG_USERDEF + msgOffset + 2;
 
-  public static short ACTION_OFFSET = 0;
+  public static int ACTION_OFFSET = 0;
   public static final int GA_UNDO = GameApp.GA_USERDEF + 0;
   public static final int GA_REDO = GameApp.GA_USERDEF + 1;
   public static final int GA_ENDGAME = GameApp.GA_USERDEF + 2;
@@ -123,11 +130,13 @@ abstract public class BoardGameApp extends GameApp {
 //@  public static final int GA_PAUSE = GameApp.GA_USERDEF + 3;
 	//#endif
 	//#ifdef DTEST
-//@  public static final int GA_TEST = GameApp.GA_USERDEF + 4;
-//@  public static final int GA_PERFORMTEST = GameApp.GA_USERDEF + 5;
+//@  public static final int GA_TEST_ENDGAME = GameApp.GA_USERDEF + 4;
+//@  public static final int GA_TEST = GameApp.GA_USERDEF + 5;
+//@  public static final int GA_PERFORMTEST = GameApp.GA_USERDEF + 6;
 	//#endif
 	//#ifdef DLOGGING
-//@  public static final int GA_LOGGING = GameApp.GA_USERDEF + 5;
+//@  public static final int GA_LOGGING = GameApp.GA_USERDEF + 7;
+//@	private Form logf = null;
 	//#endif
 
   public static String[] playerNames;
@@ -136,7 +145,7 @@ abstract public class BoardGameApp extends GameApp {
 
   protected ChoiceGroup opPlayers;
   protected ChoiceGroup opLevel;
-  protected ChoiceGroup opDept;
+  protected ChoiceGroup opDept = null;
   protected ChoiceGroup opRow = null;
   protected ChoiceGroup opCol = null;
   protected ChoiceGroup opNbrPlayers = null;
@@ -160,22 +169,32 @@ abstract public class BoardGameApp extends GameApp {
   public static int gsPlayer = 1;
   public static int gsFirst = 1;
   //undo static public String[] pieceImage = new String[0];
-  static public String[] gsPieceImages = new String[0];
+  static public String[] gsSquareImages = new String[0];
+  static public String[] gsPiece1Images = new String[0];
+  static public String[] gsPiece2Images = new String[0];
   static public int[] gsLevelMsg = new int[0];
+  public static int gsDeptInit = 1;
+  public static int gsDept = 3;
+  public static int gsDeptLimit = 14;
+  public static int gsDeptIncr = 2;
+  public static int gsRowInit = 2;
   public static int gsRow = 2;
   public static int gsRowLimit = 2;
+  public static int gsRowIncr = 2;
+  public static int gsColInit = 6;
   public static int gsCol = 6;
   public static int gsColLimit = 6;
+  public static int gsColIncr = 1;
+  public static int gsNbrPlayersInit = 2;
   public static int gsNbrPlayers = 2;
   public static int gsNbrPlayersLimit = 2;
+  public static int gsNbrPlayersIncr = 1;
   public static int gsTextRow = 0;
 	/* Skill level. */
   final static public int gsLevelNormal = 0;
   final static public int gsLevelDifficult = 1;
   final static public int gsLevelHard = 2;
   public static int gsLevel = gsLevelDifficult;
-	/* Dept.  Number of moves that the AI tests. */
-  public static int gsDept = 3;
 
 	//#ifdef DLOGGING
 //@  private boolean fineLoggable;
@@ -215,7 +234,9 @@ abstract public class BoardGameApp extends GameApp {
             GameApp.ME_MAINMENU, BoardGameApp.MSG_MENU_MAIN_REDO, (short)BoardGameApp.GA_REDO, 8
         }, {
             GameApp.ME_MAINMENU, BoardGameApp.MSG_MENU_MAIN_ENDGAME, (short)BoardGameApp.GA_ENDGAME, -1, MSG_SURE_END
-		//#ifdef DLOGGING
+	//#ifdef DTEST
+//@        }, {
+//@            GameApp.ME_MAINMENU, BoardGameApp.MSG_MENU_MAIN_TEST_ENDGAME, (short)BoardGameApp.GA_TEST_ENDGAME, -1
 //@        }, {
 //@            GameApp.ME_MAINMENU, BoardGameApp.MSG_MENU_MAIN_TEST, (short)BoardGameApp.GA_TEST, 0
 		//#endif
@@ -243,8 +264,8 @@ abstract public class BoardGameApp extends GameApp {
 				loadBoardGameCustomization();
 			}
 			super.init();
-			BoardGameApp.playerNames = new String[] {
-					BaseApp.messages[BoardGameApp.MSG_NAMEPLAYER1], BaseApp.messages[BoardGameApp.MSG_NAMEPLAYER2]};
+			final String gval = super.getAppProperty(GRAPHICS_PRECALCULATE);
+			BoardGameApp.precalculate = ((gval == null) || gval.equals("true"));
 			if (first) {
 				bsavedRec = ((BoardGameScreen)game).getSavedGameRecord();
 			}
@@ -258,6 +279,8 @@ abstract public class BoardGameApp extends GameApp {
 			first = false;
 		}
   }
+
+	abstract public void setGameDefaults();
 
 	//#ifdef DMIDP10
 //@  public BoardGameScreen updGameScreen(BoardGameScreen bgs) {
@@ -297,6 +320,10 @@ abstract public class BoardGameApp extends GameApp {
   protected Displayable getOptions() {
 		try {
 			final Form form = new FeatureForm(BaseApp.messages[GameApp.MSG_MENU_MAIN_OPTIONS]);
+			Command cdefault = new Command(
+					BaseApp.messages[BoardGameApp.MSG_MENU_OPTIONS_DEAULT],
+					Command.SCREEN, 9);
+			form.addCommand(cdefault);
 			opPlayers = Application.createChoiceGroup(BoardGameApp.MSG_GAMEMODE,
 					Choice.EXCLUSIVE, new int[] {
 			BoardGameApp.MSG_GAMEMODE1, BoardGameApp.MSG_GAMEMODE2});
@@ -304,18 +331,25 @@ abstract public class BoardGameApp extends GameApp {
 				opLevel = Application.createChoiceGroup(BoardGameApp.MSG_AILEVEL,
 						Choice.EXCLUSIVE, BoardGameApp.gsLevelMsg);
 			}
-			opDept = Application.createNumRange(BoardGameApp.MSG_AILEVEL, 1, 14, 1);
+			if (BoardGameApp.gsDeptLimit < 0) {
+				opDept = Application.createNumRange(BoardGameApp.MSG_SKILL_LEVEL,
+						BoardGameApp.gsDeptInit,
+						BoardGameApp.gsDeptLimit, BoardGameApp.gsDeptIncr);
+			}
 			if (BoardGameApp.gsRowLimit < 0) {
-				opRow = Application.createNumRange(BoardGameApp.MSG_ROW, 2,
-						Math.abs(BoardGameApp.gsRowLimit), 2);
+				opRow = Application.createNumRange(BoardGameApp.MSG_ROW,
+						BoardGameApp.gsRowInit,
+						BoardGameApp.gsRowLimit, BoardGameApp.gsRowIncr);
 			}
 			if (BoardGameApp.gsColLimit < 0) {
-				opCol = Application.createNumRange(BoardGameApp.MSG_COL, 2,
-						Math.abs(BoardGameApp.gsColLimit), 1);
+				opCol = Application.createNumRange(BoardGameApp.MSG_COL,
+						BoardGameApp.gsColInit,
+						BoardGameApp.gsColLimit, gsColIncr);
 			}
 			if (BoardGameApp.gsNbrPlayersLimit < 0) {
-				opNbrPlayers = Application.createNumRange(BoardGameApp.MSG_NBR_PLAYERS, 2,
-						Math.abs(BoardGameApp.gsNbrPlayersLimit), 1);
+				opNbrPlayers = Application.createNumRange(BoardGameApp.MSG_NBR_PLAYERS,
+						BoardGameApp.gsNbrPlayers,
+						BoardGameApp.gsNbrPlayersLimit, 1);
 			}
 			//#ifdef DLOGGING
 //@			opLogLevel = new TextField("Logging level",
@@ -325,7 +359,9 @@ abstract public class BoardGameApp extends GameApp {
 			if (BoardGameApp.gsLevelMsg.length > 0) {
 				form.append(opLevel);
 			}
-			form.append(opDept);
+			if (BoardGameApp.gsDeptLimit < 0) {
+				form.append(opDept);
+			}
 			if (BoardGameApp.gsRowLimit < 0) {
 				form.append(opRow);
 			}
@@ -430,15 +466,19 @@ abstract public class BoardGameApp extends GameApp {
 			if (BoardGameApp.gsLevelMsg.length > 0) {
 				opLevel.setSelectedIndex(BoardGameApp.gsLevel, true);
 			}
-			opDept.setSelectedIndex(BoardGameApp.gsDept - 1, true);
+			if (BoardGameApp.gsDeptLimit < 0) {
+				opDept.setSelectedIndex(BoardGameApp.gsDept - BoardGameApp.gsDeptInit, true);
+			}
 			if (BoardGameApp.gsRowLimit < 0) {
-				opRow.setSelectedIndex((Math.abs(BoardGameApp.gsRow) - 2) / 2, true);
+				opRow.setSelectedIndex(BoardGameApp.gsRow - BoardGameApp.gsRowInit,
+						true);
 			}
 			if (BoardGameApp.gsColLimit < 0) {
-				opCol.setSelectedIndex(Math.abs(BoardGameApp.gsCol) - 2, true);
+				opCol.setSelectedIndex(BoardGameApp.gsCol - BoardGameApp.gsColInit, true);
 			}
 			if (BoardGameApp.gsNbrPlayersLimit < 0) {
-				opNbrPlayers.setSelectedIndex(Math.abs(BoardGameApp.gsNbrPlayers) - 2, true);
+				opNbrPlayers.setSelectedIndex(BoardGameApp.gsNbrPlayers -
+						BoardGameApp.gsNbrPlayersInit, true);
 			}
 			//#ifdef DLOGGING
 //@			opLogLevel.setString( logger.getParent().getLevel().getName());
@@ -461,7 +501,10 @@ abstract public class BoardGameApp extends GameApp {
 //@  public void doShowLogging() {
 //@		if (finestLoggable) {logger.finest("doShowLogging");}
 //@		try {
-//@			Form logf = new RecStoreLoggerForm(logManager, this, BaseApp.midlet);
+//@			if (logf == null) {
+//@				logf = new LoggerRptForm(logManager, this,
+//@						BaseApp.midlet, "net.sf.jlogmicro.util.logging.FormHandler");
+//@			}
 //@			BaseApp.setup(logf, BaseApp.cBACK, null);
 //@			BaseApp.show(null, logf, true);
 //@		} catch (Throwable e) {
@@ -483,19 +526,25 @@ abstract public class BoardGameApp extends GameApp {
 						BoardGameApp.BOARD_GAME_LEVEL,
 						BoardGameApp.gsLevel);
 			}
-			BoardGameApp.gsDept = settingsGameUpd(opDept.getSelectedIndex() + 1,
-				BoardGameApp.BOARD_GAME_DEPT, BoardGameApp.gsDept);
-			((BoardGameScreen) GameApp.game).updateSkillInfo();
+			if (BoardGameApp.gsDeptLimit < 0) {
+				BoardGameApp.gsDept = settingsGameUpd(
+						opDept.getSelectedIndex() + BoardGameApp.gsDeptInit,
+					BoardGameApp.BOARD_GAME_DEPT, BoardGameApp.gsDept);
+				((BoardGameScreen) GameApp.game).updateSkillInfo();
+			}
 			if (BoardGameApp.gsRowLimit < 0) {
-				BoardGameApp.gsRow = settingsGameUpd(-(opRow.getSelectedIndex() + 2),
+				BoardGameApp.gsRow = settingsGameUpd(
+						(opRow.getSelectedIndex() + BoardGameApp.gsRowInit),
 					BoardGameApp.BOARD_GAME_ROW, BoardGameApp.gsRow);
 			}
 			if (BoardGameApp.gsColLimit < 0) {
-				BoardGameApp.gsCol = settingsGameUpd(-(opCol.getSelectedIndex() + 2),
+				BoardGameApp.gsCol = settingsGameUpd(
+						opCol.getSelectedIndex() + BoardGameApp.gsColInit,
 					BoardGameApp.BOARD_GAME_COL, BoardGameApp.gsCol);
 			}
 			if (BoardGameApp.gsNbrPlayersLimit < 0) {
-				BoardGameApp.gsNbrPlayers = settingsGameUpd(-(opNbrPlayers.getSelectedIndex() + 2),
+				BoardGameApp.gsNbrPlayers = settingsGameUpd(
+						opNbrPlayers.getSelectedIndex() + BoardGameApp.gsNbrPlayersInit,
 					BoardGameApp.BOARD_GAME_NBR_PLAYERS, BoardGameApp.gsNbrPlayers);
 			}
 			//#ifdef DLOGGING
@@ -503,6 +552,9 @@ abstract public class BoardGameApp extends GameApp {
 //@			logger.getParent().setLevel(Level.parse(logLevel));
 			//#endif
 			super.doApplyOptions();
+			if (BaseApp.settings != null) {
+				BaseApp.settings.saveUpdated();
+			}
 		} catch (Throwable e) {
 			e.printStackTrace();
 			//#ifdef DLOGGING
@@ -516,35 +568,54 @@ abstract public class BoardGameApp extends GameApp {
 				prevValue);
 	}
 
-	//#ifdef DTEST
-//@  /**
-//@   * Command dispatcher
-//@   */
-//@		/*
-//@  public void commandAction(final Command c, final Displayable d) {
+  /**
+   * Command dispatcher
+   */
+  public void commandAction(final Command c, final Displayable d) {
 		//#ifdef DLOGGING
 //@		if (finestLoggable) {logger.finest("commandAction c,d=" + c.getLabel() + "," + c + "," + d);}
 		//#endif
-//@		try {
-//@			if (d == gameTest) {
+		try {
+			if (d == gameOptions) {
+				// The options have only 1 command that is not back or OK.  This
+				// is of type screen.
+				if (c.getCommandType() == Command.SCREEN) {
+					setGameDefaults();
+					doShowOptions();
+					doApplyOptions();
+				} else {
+					super.commandAction(c, d);
+				}
+			}
+			//#ifdef DLOGGING
+//@			else if (d == logf) {
+//@				if (c == BaseApp.cBACK) {
+//@					super.commandAction(c, d);
+//@				} else {
+//@					((CommandListener)logf).commandAction(c, d);
+//@				}
+//@			}
+			//#endif
+			//#ifdef DTEST
+//@			else if (d == gameTest) {
 //@				if (c == BaseApp.cOK) {
 //@					processGameAction(GA_PERFORMTEST);
 //@				} else {
 //@					super.commandAction(c, d);
 //@				}
-//@			} else {
-//@					super.commandAction(c, d);
 //@			}
-//@
-//@		} catch (Throwable e) {
-//@			e.printStackTrace();
+			//#endif
+			else {
+					super.commandAction(c, d);
+			}
+
+		} catch (Throwable e) {
+			e.printStackTrace();
 			//#ifdef DLOGGING
 //@			logger.severe("commandAction error", e);
 			//#endif
-//@		}
-//@  }
-//@	*/
-	//#endif
+		}
+  }
 
   /**
    * Pause the game
@@ -563,8 +634,8 @@ abstract public class BoardGameApp extends GameApp {
 		//#endif
 		try {
 			super.doGameAbort();
-			GameMinMax.cancel(false);
-			GameMinMax.clearPrecalculatedMoves();
+			((BoardGameScreen)GameApp.game).gMiniMax.cancel(false);
+			((BoardGameScreen)GameApp.game).gMiniMax.clearPrecalculatedMoves();
 		} catch (Throwable e) {
 			e.printStackTrace();
 			//#ifdef DLOGGING
@@ -602,6 +673,9 @@ abstract public class BoardGameApp extends GameApp {
 						}
 						if (canUndo || canRedo) {
 							Application.insertMenuItem(gameMenu, GA_ENDGAME);
+							//#ifdef DTEST
+//@							Application.insertMenuItem(gameMenu, GA_TEST_ENDGAME);
+							//#endif
 						}
 					}
 				}
@@ -616,6 +690,9 @@ abstract public class BoardGameApp extends GameApp {
 			}
 			if (!canUndo && !canRedo) {
 				Application.deleteMenuItem(gameMenu, GA_ENDGAME);
+				//#ifdef DTEST
+//@				Application.insertMenuItem(gameMenu, GA_TEST_ENDGAME);
+				//#endif
 			}
 			//#ifdef DLOGGING
 //@			if (finestLoggable) {logger.finest("prepGameMenu canUndo,canRedo=" + canUndo + "," + canRedo);}
@@ -649,6 +726,7 @@ abstract public class BoardGameApp extends GameApp {
 				case GA_NEWGAME: // New game
 					if (bsavedRec.length > 0) {
 						bsavedRec = new byte[0];
+						((BoardGameScreen)game).bsavedRec = bsavedRec;
 					}
 					doGameStart();
 					break;
@@ -660,7 +738,12 @@ abstract public class BoardGameApp extends GameApp {
 					((BoardGameScreen) GameApp.game).redoTable();
 					doGameResume();
 					break;
-				case GA_ENDGAME: // Redo last move
+				//#ifdef DTEST
+//@				case GA_TEST_ENDGAME: // Force end game for computer
+//@					((BoardGameScreen)GameApp.game).isHuman[0] = false;
+//@					((BoardGameScreen)GameApp.game).twoplayer = false;
+				//#endif
+				case GA_ENDGAME: // Force end game
 					((BoardGameScreen)GameApp.game).procEndGame();
 					doGameResume();
 					break;
