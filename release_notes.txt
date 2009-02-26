@@ -13,16 +13,16 @@
 
 1.0 2009-01-04 Alpha 4 Version
 + Save game settings
-+ Convience method for choice group with messages
-+ Convience method for choice group with number range
++ Convenience method for choice group with messages
++ Convenience method for choice group with number range
 + Some setup to use JMUnit
-+ Fix problems with screen on N80, etc
++ Fix problems with screen on N80, etc.
 + Some more logging
 + Put text files under jar root in addition to locale dir
 + Fix problems with undo/redo changing the user to move next
 + Prepare for prompts using message number
 + Allow removal of prompt for command without removing the command
-+ Make sure we don't get infinate loop if no depth.
++ Make sure we don't get infinite loop if no depth.
 + Fix scoring.
 + Fix top piece above table not showing up.
 + Fix grand slam variations
@@ -44,7 +44,7 @@
 + Have images for undo/redo
 + New grand slam variation if captured >= 24, is legal
 + Don't write past the end of array to hold images if they don't match
-+ Call desroy app before quiting
++ Call destroy app before quiting
 + Have separate splash for Oware and Reversi.
 + Have Reversi game.
 + Make Reversi thread safe.
@@ -75,14 +75,28 @@
 + Fix end of game scoring
 + Allow prompt command from list used as command menu (not finished).
 
-1.0 2009-02-25 Alpha 8 Version
-+ Introduced bug where Oware no longer works on Nokia
+1.0 TBD Alpha 8 Version
++ Introduced bug where Oware no longer works on Nokia and Sony Ericsson.  It does work on the emulator.
++ Support feature form for logging report.
++ Simplify support concatenation of Reversi and logging in build file.
++ Simplify build file.
++ Introduced bug where marking of last move on Reversi does not work.
++ Changed initial and current option variables so that they are not negative, only the limit needs to be set negative to indicate that it can be customized.
++ Fixed code to prevent infinite loop.
++ Fix null pointer with updating options.
++ Make some log statements trace instead of finest.
++ Fixed problem where logger report did not do the backward command after the second try.
 + Have Reversi use images of squares, light, and dark pieces.
-+ Prevent infinate loop if the computer has no move.
-+ Optionally precalculate moves based on manifest/jad.
++ Prevent infinite loop if the computer has no move.
++ Take logging out of jad/manifest for releases.
++ Optionally pre calculate moves based on manifest/jad.
 + Allow user to end the game optionally.  Also, have test option to end the game and set a player to be the computer.
 + Fix display of winner/loser
 + More logging.
++ Workaround synchronized problem in VM of Sony Ericsson.
++ More space for numbers in Oware squares.
++ Fix Reversi problem where if the screen was too small for the images, they are not substituted for circles.
++ Fix placement of scores.
 + Reset undo/redo for new game.
 + Fix MIDP 1.0 not having pause.
 + Have logging form for form append.
@@ -90,8 +104,13 @@
 + Refer to players as upper/lower
 + Allow setting of defaults.
 + Skill level message for dept.
-+ Make game AI threadsafe.
++ Make game AI thread safe.
 + Allow both midlets to have optional graphics.
 + Allow change of rows/columns for Reversi.
 + Remove tick as it matches what's in BoardGameScreen 
 + Remove drawSelectionBox as it matches what's in BoardGameScreen 
++ Allow more players in the future.
++ Fix bug where player vs player did a computer move.
++ Remove unnecessary code.
++ Concatenate logging midlet. 
++ Remove logging entries from manifest/jad. 
