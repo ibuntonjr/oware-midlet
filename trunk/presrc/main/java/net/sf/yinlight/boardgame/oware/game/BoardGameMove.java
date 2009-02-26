@@ -47,6 +47,7 @@ abstract public class BoardGameMove implements GameMove {
 	private Logger logger = Logger.getLogger("BoardGameMove");
   private boolean fineLoggable = logger.isLoggable(Level.FINE);
   private boolean finestLoggable = logger.isLoggable(Level.FINEST);
+  private boolean traceLoggable = logger.isLoggable(Level.TRACE);
 	//#endif
 
   public static boolean valid(BoardGameTable bgt, final int row, final int col) {
@@ -75,7 +76,7 @@ abstract public class BoardGameMove implements GameMove {
     this.row = row;
     this.col = col;
 		//#ifdef DLOGGING
-		if (finestLoggable) {logger.finest("constructor row,col=" + row + "," + col);}
+		if (traceLoggable) {logger.trace("constructor row,col=" + row + "," + col);}
 		//#endif
   }
 
