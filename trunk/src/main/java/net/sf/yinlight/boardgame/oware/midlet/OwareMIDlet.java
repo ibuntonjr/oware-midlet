@@ -322,36 +322,6 @@ public class OwareMIDlet extends BoardGameApp {
 		}
 	}
 
-	//#ifdef DTEST
-//@  /**
-//@   * Command dispatcher
-//@   */
-//@	/* UNDO
-//@  public void commandAction(final Command c, final Displayable d) {
-		//#ifdef DLOGGING
-//@		if (finestLoggable) {logger.finest("commandAction c,d=" + c.getLabel() + "," + c + "," + d);}
-		//#endif
-//@		try {
-//@			if (d == gameTest) {
-//@				if (c == BaseApp.cOK) {
-//@					processGameAction(GA_PERFORMTEST);
-//@				} else {
-//@					super.commandAction(c, d);
-//@				}
-//@			} else {
-//@					super.commandAction(c, d);
-//@			}
-//@
-//@		} catch (Throwable e) {
-//@			e.printStackTrace();
-			//#ifdef DLOGGING
-//@			logger.severe("commandAction error", e);
-			//#endif
-//@		}
-//@  }
-//@	*/
-	//#endif
-
   /**
    * Game Shutdown
    */
