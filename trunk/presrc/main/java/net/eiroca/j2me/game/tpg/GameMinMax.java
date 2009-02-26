@@ -40,9 +40,9 @@ import net.sf.jlogmicro.util.logging.Level;
 abstract public class GameMinMax {
 
   public static final int MAX_POINT = 1000000;
-  protected static boolean cancelled;
-  protected static Vector precalculated_OpponentMoves = new Vector();
-  protected static Vector precalculated_ResponseMoves = new Vector();
+  protected boolean cancelled;
+  protected Vector precalculated_OpponentMoves = new Vector();
+  protected Vector precalculated_ResponseMoves = new Vector();
 
   //#ifdef DLOGGING
   private Logger logger = Logger.getLogger("GameMinMax");
@@ -50,8 +50,8 @@ abstract public class GameMinMax {
   private boolean finestLoggable = logger.isLoggable(Level.FINEST);
   //#endif
 
-  public static void cancel(final boolean cancel) {
-    GameMinMax.cancelled = cancel;
+  public void cancel(final boolean cancel) {
+    cancelled = cancel;
   }
 
   abstract public GameMove minimax(final int depth, final GameTable state, final byte player, final TwoPlayerGame tpg, final boolean alphabeta, final int alpha, final boolean order, final boolean kill, final GameMove killerMove);
@@ -73,9 +73,9 @@ abstract public class GameMinMax {
    */
   public void foreMinimax(final int depth, final GameTable state, final byte player, final TwoPlayerGame tpg, final boolean alphabeta, final int alpha, final boolean order, final boolean kill) {
 		try {
-			GameMinMax.cancelled = false;
-			GameMinMax.precalculated_OpponentMoves.removeAllElements();
-			GameMinMax.precalculated_ResponseMoves.removeAllElements();
+			cancelled = false;
+			precalculated_OpponentMoves.removeAllElements();
+			precalculated_ResponseMoves.removeAllElements();
 			//#ifdef DLOGGING
 			if (finestLoggable) {logger.finest("foreMinimax starting depth,player possible from 1 - player=" + depth + "," + player + "," + (1 - player));}
 			//#endif
@@ -87,15 +87,15 @@ abstract public class GameMinMax {
 			if (finestLoggable) {logger.finest("foreMinimax 2 depth,player,pMoves.length=" + depth + "," + player + "," + player + "," + pMoves.length);}
 			//#endif
 			for (int i = 0; i < pMoves.length; ++i) {
-				if (GameMinMax.cancelled) {
+				if (cancelled) {
 					break;
 				}
 				tpg.turn(state, (byte) (1 - player), pMoves[i], newState);
 				// Get the best move.  Start out without a killer move.
 				bestMove = minimax(depth, newState, player, tpg, alphabeta, alpha, order, kill, null);
 				if (bestMove == null) { continue; }
-				GameMinMax.precalculated_OpponentMoves.addElement(pMoves[i]);
-				GameMinMax.precalculated_ResponseMoves.addElement(bestMove);
+				precalculated_OpponentMoves.addElement(pMoves[i]);
+				precalculated_ResponseMoves.addElement(bestMove);
 			}
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -105,18 +105,18 @@ abstract public class GameMinMax {
 		}
   }
 
-  public static void clearPrecalculatedMoves() {
-    GameMinMax.precalculated_OpponentMoves.removeAllElements();
-    GameMinMax.precalculated_ResponseMoves.removeAllElements();
+  public void clearPrecalculatedMoves() {
+    precalculated_OpponentMoves.removeAllElements();
+    precalculated_ResponseMoves.removeAllElements();
   }
 
-  public static GameMove precalculatedBestMove(final GameMove move) {
+  public GameMove precalculatedBestMove(final GameMove move) {
 		//#ifdef DLOGGING
 		Logger logger = Logger.getLogger("GameMinMax");
 		//#endif
 		try {
-			for (int i = 0; i < GameMinMax.precalculated_OpponentMoves.size(); i++) {
-				if (move.equals(GameMinMax.precalculated_OpponentMoves.elementAt(i))) { return (GameMove) GameMinMax.precalculated_ResponseMoves.elementAt(i); }
+			for (int i = 0; i < precalculated_OpponentMoves.size(); i++) {
+				if (move.equals(precalculated_OpponentMoves.elementAt(i))) { return (GameMove) precalculated_ResponseMoves.elementAt(i); }
 			}
 			return null;
 		} catch (Throwable e) {
