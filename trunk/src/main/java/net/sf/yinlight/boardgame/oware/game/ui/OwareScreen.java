@@ -97,17 +97,16 @@ public final class OwareScreen extends BoardGameScreen {
 				gMiniMax = new OwareMinMax(1);
 				break;
 		}
-    updateSkillInfo();
 	}
 
   public void init() {
 		try {
-			BoardGameScreen.table = new OwareTable(Math.abs(BoardGameApp.gsRow),
-					Math.abs(BoardGameApp.gsCol), Math.abs(BoardGameApp.gsNbrPlayers),
-					Math.abs(OwareMIDlet.gsInitSeeds));
+			BoardGameScreen.table = new OwareTable(BoardGameApp.gsRow,
+					BoardGameApp.gsCol, BoardGameApp.gsNbrPlayers,
+					OwareMIDlet.gsInitSeeds);
 			super.init();
 			//#ifdef DLOGGING
-//@			if (finestLoggable) {logger.finest("nextTurn ((OwareTable)BoardGameScreen.table).getPoint((byte)0),col,BoardGameScreen.actPlayer,gameEnded,(mtt != null)=" + ((OwareTable)BoardGameScreen.table).getPoint((byte)0) + "," + ((OwareTable)BoardGameScreen.table).getPoint((byte)1));}
+//@			if (finestLoggable) {tableDraws = 2;}
 			//#endif
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -128,11 +127,11 @@ public final class OwareScreen extends BoardGameScreen {
    * @param onBoard
    */
   protected void drawPiece(final int row, final int col, final int player,
-			boolean onBoard, Image cupImage, int lastMovePoint) {
+			boolean onBoard, Image cupImage, int yadjust, int lastMovePoint) {
 		try {
 			OwareTable ot = (OwareTable)BoardGameScreen.table;
 			final int x = off_x + col * sizex + piece_offx;
-			int y = off_y + row * sizey + piece_offy;
+			int y = off_y + row * sizey + piece_offy + yadjust;
 			if (y < 0) {
 				y = 0;
 			}
@@ -179,43 +178,47 @@ public final class OwareScreen extends BoardGameScreen {
 
   protected void drawTable() {
 		try {
+			//#ifdef DLOGGING
+//@			if ((tableDraws-- > 0) && finestLoggable) {drawItems = true;logger.finest("drawTable up BoardGameScreen.actPlayer=" + BoardGameScreen.actPlayer);}
+			//#endif
 			OwareTable ot = (OwareTable)BoardGameScreen.table;
+
 			int item;
 			for (int i = 0; i < BoardGameScreen.table.nbrRow; ++i) {
-				int lastCol = -10;
-				int lastRow = -10;
-				int lastPoint = 10;
-				OwareMove clastMove = (OwareMove)BoardGameScreen.table.getLastMove(i);
-				if (clastMove != null) {
-					lastRow = clastMove.row;
-					lastCol = clastMove.col;
-					lastPoint = clastMove.getPoint();
-				}
-				//#ifdef DLOGGING
-//@				if ((tableDraws-- > 0) && finestLoggable) {drawItems = true;logger.finest("drawTable up i,lastRow,lastCol,lastPoint,BoardGameScreen.actPlayer=" + i + "," + lastRow + "," + lastCol + "," + lastPoint + "," + BoardGameScreen.actPlayer);}
-				//#endif
 				for (int j = 0; j < BoardGameScreen.table.nbrCol; ++j) {
 					item = BoardGameScreen.table.getItem(i, j);
-					//#ifdef DTEST
-//@					if (debug) {System.out.println("drawTable item=" + item);}
-					//#endif
 					if (item != 0) {
+						int lastCol = -10;
+						int lastRow = -10;
+						int lastPoint = 10;
+						OwareMove clastMove =
+							(OwareMove)BoardGameScreen.table.getLastMove(item - 1);
+						if (clastMove != null) {
+							lastRow = clastMove.row;
+							lastCol = clastMove.col;
+							lastPoint = clastMove.getPoint();
+						}
+						//#ifdef DTEST
+//@						if (debug) {System.out.println("drawTable item=" + item);}
+						//#endif
 						drawPiece(i, j, item, true, (item == 1) ? piece1Image : piece2Image,
-								((i == lastRow) && (j == lastCol)) ? lastPoint : 0);
+								0, ((i == lastRow) && (j == lastCol)) ? lastPoint : 0);
 					}
 				}
 			}
-			infoLines[0] = " " + Integer.toString(ot.getPoint((byte)0));
-			infoLines[1] = " " + Integer.toString(ot.getPoint((byte)1));
-			//#ifdef DLOGGING
-//@			if (drawItems) {
-//@				drawItems = false;
-//@			}
-			//#endif
+			for (int i = 0; i < BoardGameScreen.table.nbrPlayers; ++i) {
+				infoLines[i] = " " + Integer.toString(ot.getPoint((byte)i));
+			}
 		} catch (Throwable e) {
 			e.printStackTrace();
 			//#ifdef DLOGGING
 //@			logger.severe("drawTable error", e);
+			//#endif
+			//#ifdef DLOGGING
+//@		} finally {
+//@			if (drawItems) {
+//@				drawItems = false;
+//@			}
 			//#endif
 		}
   }
@@ -224,27 +227,31 @@ public final class OwareScreen extends BoardGameScreen {
 		try {
 			// two pieces
 			//undo
-			drawPiece(-1, BoardGameScreen.table.nbrCol, 1, false,
-					((BoardGameScreen.actPlayer == 0) ? piece1Image : null), 0); /* y, x */
-			drawPiece(BoardGameScreen.table.nbrRow, BoardGameScreen.table.nbrCol, 0, false,
-					((BoardGameScreen.actPlayer == 1) ? piece1Image : null), 0); /* y, x */
+			drawPiece(0, BoardGameScreen.table.nbrCol, 1, false,
+					((BoardGameScreen.actPlayer == 0) ? piece2Image : piece1Image), 0, 0); /* y, x */
+			int cadjust = -pieceHeight - piece_offy;
+			drawPiece(BoardGameScreen.table.nbrRow, BoardGameScreen.table.nbrCol,
+					0, false,
+					((BoardGameScreen.actPlayer == 1) ? piece2Image : piece1Image),
+					cadjust, 0); /* y, x */
 			// numbers
 			screen.setColor(BaseApp.foreground);
 			screen.drawString(infoLines[0],
-					width + vertWidth, off_y + cupHeight + 1 + piece_offy,
+					width + vertWidth, off_y + pieceHeight + 1 + piece_offy,
 					Graphics.TOP | Graphics.RIGHT);
+			cadjust = off_y + cadjust + (BoardGameScreen.table.nbrRow * sizey) - 1;
 			screen.drawString(infoLines[1], width + vertWidth,
-					off_y + ((BoardGameScreen.table.nbrRow - 1) * sizey) + cupHeight + 1 + piece_offy,
-					Graphics.BOTTOM | Graphics.RIGHT);
+					 cadjust, Graphics.BOTTOM | Graphics.RIGHT);
 			// active player screen.
 			// FIX if height problem as we could put the image in this square
 			if (turnImage == null) {
 				screen.drawRect(width + vertWidth - sizex,
 						off_y + BoardGameScreen.getActPlayer() * ((BoardGameScreen.table.nbrRow - 1) * sizey), sizex, sizey);
 			}
+			cadjust -= (2 * fontHeight) - 2;
 			// skill
 			// Put at middle of height.
-			if (infoLines[2] != null) { screen.drawString(infoLines[2], width + vertWidth, screenHeight / 2, Graphics.BASELINE | Graphics.RIGHT); }
+			if (infoLines[BoardGameApp.gsNbrPlayers] != null) { screen.drawString(infoLines[BoardGameApp.gsNbrPlayers], width + vertWidth, cadjust, Graphics.BASELINE | Graphics.RIGHT); }
 		} catch (Throwable e) {
 			e.printStackTrace();
 			//#ifdef DLOGGING
@@ -254,6 +261,10 @@ public final class OwareScreen extends BoardGameScreen {
   }
 
   public void nextTurn(final int row, final int col) {
+		//#ifdef DLOGGING
+//@		if (finestLoggable) {logger.finest("nextTurn row,col,BoardGameScreen.actPlayer,gameEnded,(mtt != null)=" + row + "," + col + "," + BoardGameScreen.actPlayer + "," + gameEnded + "," + (mtt != null));}
+//@		if (finestLoggable) {tableDraws = 2;}
+		//#endif
     if (mtt != null) {
       mtt.cancel();
       while (mtt.ended == false) {
@@ -268,9 +279,6 @@ public final class OwareScreen extends BoardGameScreen {
         }
       }
     }
-		//#ifdef DLOGGING
-//@		if (finestLoggable) {logger.finest("nextTurn row,col,BoardGameScreen.actPlayer,gameEnded,(mtt != null)=" + row + "," + col + "," + BoardGameScreen.actPlayer + "," + gameEnded + "," + (mtt != null));}
-		//#endif
     if (gameEnded) { return; }
     final OwareMove move = new OwareMove(row, col);
     if (!processMove(move, BoardGameApp.precalculate)) {
@@ -280,10 +288,13 @@ public final class OwareScreen extends BoardGameScreen {
 		//#ifdef DMIDP10
 //@		super.wakeup(3);
 		//#endif
+    if (gameEnded || isHuman[BoardGameScreen.actPlayer]) {
+			return;
+		}
 		if (BoardGameApp.precalculate) {
 			mtt = new MinimaxTimerTask();
 		}
-  final OwareMove computerMove = (OwareMove)computerTurn(move);
+		final OwareMove computerMove = (OwareMove)computerTurn(move);
 		//#ifdef DLOGGING
 //@		if (finerLoggable) {logger.finer("nextTurn computerMove.row,computerMove.col,BoardGameScreen.actPlayer=" + ((computerMove == null) ? "computerMoves null" : (computerMove.row + "," + computerMove.col)) + "," + BoardGameScreen.actPlayer);}
 		//#endif
@@ -423,7 +434,6 @@ public final class OwareScreen extends BoardGameScreen {
 		} finally {
 			//#ifdef DLOGGING
 //@			if (finerLoggable) {logger.finer("processMove return move.row,move.col,BoardGameScreen.actPlayer,startForeThinking,tables.length=" + move.row + "," + move.col + "," + BoardGameScreen.actPlayer + "," + startForeThinking + "," + ((tables == null) ? "tables is null" : String.valueOf(tables.length)));}
-//@			tableDraws = 2;
 			//#endif
 			super.wakeup(3);
 		}
