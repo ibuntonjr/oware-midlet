@@ -1892,12 +1892,27 @@ implements CommandListener
 		//#endif
 		try {
 			if ((d instanceof FeatureForm) || (d instanceof FeatureList)) {
+				//#ifdef DMIDP20
+				//#ifdef DLOGGING
+//@				logger.fine("setup setCommandListener " + d.getTitle());
+				//#endif
+				//#endif
 				d.setCommandListener(BaseApp.midlet);
 			} else {
 				FeatureMgr featureMgr = new FeatureMgr(d);
 				if (d instanceof CommandListener) {
+					//#ifdef DMIDP20
+					//#ifdef DLOGGING
+//@					logger.fine("setup setCommandListener " + d.getTitle());
+					//#endif
+					//#endif
 					featureMgr.setCommandListener((CommandListener)d, false);
 				} else {
+					//#ifdef DMIDP20
+					//#ifdef DLOGGING
+//@					logger.fine("setup setCommandListener " + d.getTitle());
+					//#endif
+					//#endif
 					featureMgr.setCommandListener(BaseApp.midlet, false);
 				}
 				d.setCommandListener(featureMgr);
