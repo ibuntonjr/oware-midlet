@@ -75,7 +75,7 @@ public final class OwareMinMax extends GameMinMax {
 			if (finerLoggable) {logger.finer("alphabetaPly start depth,player,heuristic,bestmax,bestmin=" + depth + "," + player + "," + heuristic + "," + bestmax + "," + bestmin);}
 			//#endif
 
-			if (GameMinMax.cancelled) {
+			if (cancelled) {
 				return null;
 			}
 
@@ -92,7 +92,7 @@ public final class OwareMinMax extends GameMinMax {
 			{
 				OwareTable testTable = new OwareTable(table);
 
-				if (GameMinMax.cancelled) {
+				if (cancelled) {
 					return null;
 				}
 
@@ -197,8 +197,8 @@ public final class OwareMinMax extends GameMinMax {
 			bestmove = 
 			alphabetaPly( depth - 1, testTable, player, (OwareGame)tpg, gheuristic, -GameMinMax.MAX_POINT, GameMinMax.MAX_POINT);
 
-			if (GameMinMax.cancelled) {
-				GameMinMax.cancelled = false;
+			if (cancelled) {
+				cancelled = false;
 				return null;
 			}
 
