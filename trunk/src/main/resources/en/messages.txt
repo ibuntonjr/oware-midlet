@@ -24,8 +24,10 @@ Undo
 Redo
 End Game
 Pause
+Test End Game
 Test
 Logging
+Default
 Game Mode
 player vs A.I.
 player vs player
@@ -34,6 +36,7 @@ Normal
 Difficult
 Hard
 hard
+Skill Level
 Red
 Blue
 Rows
@@ -67,3 +70,5 @@ Opponent no seeds variation
 Player get seeds
 Opponent gets seeds
 Reversi
+Upper
+Lower
