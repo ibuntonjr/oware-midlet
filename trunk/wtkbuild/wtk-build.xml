@@ -17,9 +17,11 @@
 	<echo message="optional.template=${optional.template}" />
 	<echo message="DLOGDEF=${DLOGDEF}" />
 	<echo message="presrc=${presrc}" />
+	<echo message="res=${res}" />
 	<property name="DEBUG" value="DEBUG" />
 	<property name="target" value="../target" />
 	<property name="tmpres" value="${target}/tmpres" />
+	<property name="tmpcat" value="${target}/tmpcat" />
 	<property name="webtestdata" value="${target}/webtestdata" />
 	<property name="filetestdata" value="${target}/filetestdata" />
 	<property name="analyze" value="${target}/analyze" />
@@ -122,6 +124,7 @@
 		<property name="PERMISSIONS" value="" />
 		<property name="log.subdir" value="jlogmicro" />
 		<property name="GRAPHICS" value="true" />
+		<property name="PRECALCULATE" value="false" />
 		<!-- undo
 		<property name="language.file" value="messages_en_US.xml" />
 		<xmlproperty file="${msg.dir}/${language.file}" collapseAttributes="true" />
@@ -147,7 +150,9 @@
 		<property name="obfuscated" value="${build}/${build.prefix}obfuscated" />
 		<filterset id="defile.filter" >
 			<filter token="DMIDPVERS" value="//#define ${DMIDPVERS}" />
+			<filter token="DFEATUREFORMIMPORTDEF" value="${DFEATUREFORMIMPORTDEF}" />
 			<filter token="DCLDCVERS" value="//#define ${DCLDCVERS}" />
+			<filter token="DFEATUREFORMDEF" value="//#define ${DFEATUREFORMDEF}" />
 			<filter token="DMEMSIZEDEF" value="//#define ${DMEMSIZEDEF}" />
 			<filter token="DITUNESDEF" value="//#define ${DITUNESDEF}" />
 			<filter token="DJSR75" value="//#define ${DJSR75}" />
@@ -227,6 +232,8 @@
 	    <echo message="DCLDCVERS=${DCLDCVERS}" />
 	    <echo message="DITUNESDEF=${DITUNESDEF}" />
 	    <echo message="DMEMSIZEDEF=${DMEMSIZEDEF}" />
+	    <echo message="DFEATUREFORMDEF=${DFEATUREFORMDEF}" />
+	    <echo message="DFEATUREFORMIMPORTDEF=${DFEATUREFORMIMPORTDEF}" />
 	    <echo message="DJSR75=${DJSR75}" />
 	    <echo message="DJSR238=${DJSR238}" />
 	    <echo message="DTESTDEF=${DTESTDEF}" />
@@ -242,6 +249,11 @@
 	    <echo message="manifestsrc=${manifestsrc}" />
 	</target>
 
+	<path id="logging.lib" >
+		<fileset dir="../lib" >
+			<include name="*.jar" />
+		</fileset>
+	</path>
 	<!-- Preprocess source using antenna preprocessor.  If preproccess -->
 	<!-- is not used, this copies the src to the directory to compile -->
 	<!-- comp.src. -->
@@ -250,17 +262,19 @@
 		<!-- Copy unpreprocessed source to compiled src dir -->
 		<delete dir="${tmppreprocess}" />
 		<mkdir dir="${tmppreprocess}" />
-		<wtkpreprocess srcdir="${presrc}" destdir="${tmppreprocess}" encoding="${wtk.encoding}" symbols="DEBUG=WARN,${DMIDPVERS},${DCLDCVERS},${DITUNESDEF},${DMEMSIZEDEF},${DJSR75},${DJSR238},${DTESTDEF},${DJMTESTDEF},${DLOGDEF},${DTESTUIDEF},${DCOMPATDEF}" if="presrc" />
+		<property name="preprocess.defines" value="DEBUG=WARN,${DMIDPVERS},${DCLDCVERS},${DITUNESDEF},${DMEMSIZEDEF},${DJSR75},${DJSR238},${DTESTDEF},${DJMTESTDEF},${DLOGDEF},${DTESTUIDEF},${DCOMPATDEF},${DFEATUREFORMDEF}" />
+		<echo message="preprocess.defines=${preprocess.defines}." />
+		<wtkpreprocess srcdir="${presrc}" destdir="${tmppreprocess}" encoding="${wtk.encoding}" symbols="${preprocess.defines}" if="presrc" />
 		<echo message="Preprocess util pre src if set ${presrc.util.src}." />
-		<wtkpreprocess srcdir="${presrc.util.src}" destdir="${util.tmppreprocess}" encoding="${wtk.encoding}" symbols="DEBUG=WARN,${DMIDPVERS},${DCLDCVERS},${DITUNESDEF},${DMEMSIZEDEF},${DJSR75},${DJSR238},${DTESTDEF},${DJMTESTDEF},${DLOGDEF},${DTESTUIDEF},${DCOMPATDEF}" printsymbols="true" if="presrc.util.src" />
+		<wtkpreprocess srcdir="${presrc.util.src}" destdir="${util.tmppreprocess}" encoding="${wtk.encoding}" symbols="${preprocess.defines}" printsymbols="true" if="presrc.util.src" />
 		<echo message="Preprocess JMUnit pre src if set ${jmunit.src}." />
-		<wtkpreprocess srcdir="${jmunit.src}" destdir="${tmppreprocess}" encoding="${wtk.encoding}" symbols="DEBUG=WARN,${DMIDPVERS},${DCLDCVERS},${DITUNESDEF},${DMEMSIZEDEF},${DJSR75},${DJSR238},${DTESTDEF},${DJMTESTDEF},${DLOGDEF},${DTESTUIDEF},${DCOMPATDEF}" printsymbols="true" if="jmunit.src" />
+		<wtkpreprocess srcdir="${jmunit.src}" destdir="${tmppreprocess}" encoding="${wtk.encoding}" symbols="${preprocess.defines}" printsymbols="true" if="jmunit.src" />
 		<echo message="Preprocess test UI if set ${testui.presrc}." />
-		<wtkpreprocess srcdir="${testui.presrc}" destdir="${tmppreprocess}" encoding="${wtk.encoding}" symbols="DEBUG=WARN,${DMIDPVERS},${DCLDCVERS},${DITUNESDEF},${DMEMSIZEDEF},${DJSR75},${DJSR238},${DTESTDEF},${DJMTESTDEF},${DLOGDEF},${DTESTUIDEF},${DCOMPATDEF}" printsymbols="true" if="testui.presrc" />
+		<wtkpreprocess srcdir="${testui.presrc}" destdir="${tmppreprocess}" encoding="${wtk.encoding}" symbols="${preprocess.defines}" printsymbols="true" if="testui.presrc" />
 		<echo message="Preprocess compatiblity code if set ${compat.presrc}." />
-		<wtkpreprocess srcdir="${compat.presrc}" destdir="${tmppreprocess}" encoding="${wtk.encoding}" symbols="DEBUG=WARN,${DMIDPVERS},${DCLDCVERS},${DITUNESDEF},${DMEMSIZEDEF},${DJSR75},${DJSR238},${DTESTDEF},${DJMTESTDEF},${DLOGDEF},${DTESTUIDEF},${DCOMPATDEF}" if="compat.presrc" />
+		<wtkpreprocess srcdir="${compat.presrc}" destdir="${tmppreprocess}" encoding="${wtk.encoding}" symbols="${preprocess.defines}" if="compat.presrc" />
 		<echo message="Preprocess jar src if set ${jar.presrc}." />
-		<wtkpreprocess srcdir="${jar.presrc}" destdir="${tmppreprocess}" encoding="${wtk.encoding}" symbols="DEBUG=WARN,${DMIDPVERS},${DCLDCVERS},${DITUNESDEF},${DMEMSIZEDEF},${DJSR75},${DJSR238},${DTESTDEF},${DJMTESTDEF},${DLOGDEF},${DTESTUIDEF},${DCOMPATDEF}" if="jar.presrc" />
+		<wtkpreprocess srcdir="${jar.presrc}" destdir="${tmppreprocess}" encoding="${wtk.encoding}" symbols="${preprocess.defines}" if="jar.presrc" />
 		<copy todir="${comp.src}" overwrite="true" >
 			<fileset dir="${tmppreprocess}" includes="**/*.java" />
 			<filterset refid="defile.filter" />
@@ -379,7 +393,8 @@
 
 	<target name="copy.unproc.comp" depends="prepare" if="unproc.src" >
 		<copy todir="${comp.src}" overwrite="true" >
-			<fileset dir="${unproc.src}" includes="**/*.java" />
+		<!-- UNDO -->
+			<fileset dir="${unproc.src}" includes="**/*.java" excludes="**/Rever*.java" />
 		</copy>
 	</target>
 
@@ -446,7 +461,13 @@
 		<antcall target="copy.jar.src" />
 		<antcall target="wtk.src.copy" />
 		<antcall target="display.props" />
-		<wtkbuild srcdir="${comp.src}" destdir="${classes}" preverify="false" />
+		<wtkbuild srcdir="${comp.src}" destdir="${classes}" preverify="false" >
+		<!--
+			<classpath>
+				<path refid="logging.lib" />
+			</classpath>
+			-->
+		</wtkbuild>
 		<!--
 		<wtkbuild srcdir="${comp.src}:${util.comp.src}" destdir="${classes}" preverify="false" />
 		-->
@@ -512,6 +533,9 @@
 		<copy todir="${tmpres}/${res.todir}" >
 			<fileset dir="${icon.dir}" >
 				<include name="**/*.png" />
+				<!-- Restrict
+				<exclude name="**/reversi*.png" />
+				-->
 			</fileset>
 		</copy>
 		<!-- undo remove?
@@ -521,9 +545,13 @@
 			</fileset>
 		</copy>
 		undo? -->
+		<!-- UNDO -->
 		<copy todir="${tmpres}/en" >
 			<fileset dir="${icon.dir}" >
 				<include name="**/*.png" />
+				<!-- UNDO 
+				<exclude name="**/reversi*.png" />
+				UNDO -->
 			</fileset>
 		</copy>
 		<copy todir="${tmpres}/${msg.todir}" >
@@ -582,8 +610,15 @@
 			<filterset refid="midlet.info" />
 		</copy>
 
-		<antcall target="cat.logging.midlet" />
-		<antcall target="cat.reversi.midlet" />
+		<antcall target="cat.to.midlet" >
+			<param name="concat.jad" value="logging-concat.jad" />
+		</antcall>
+		<antcall target="cat.to.midlet" >
+			<param name="concat.jad" value="jlogmicro.jad" />
+		</antcall>
+		<antcall target="cat.to.midlet" >
+			<param name="concat.jad" value="Reversi-concat.jad" />
+		</antcall>
 
 		<echo message="MIDLETVERS=${MIDLETVERS}" />
 
@@ -595,6 +630,9 @@
 
 	    <echo message="obfuscate=${obfuscate}" />
 		<!-- package and preverify -->
+		<!-- not needed
+		<property name="libclasspath" value="../lib/midp20_jlogmicro.jar" />
+		-->
 		<wtkpackage jarfile="${bin}/${project.name}.jar" jadfile="${bin}/${project.name}.jad" manifest="${bin}/manifest.mf" cldc="${JCLDCVERS}" profile="${JMIDPVERS}" preverify="true" obfuscate="${obfuscate}" >
 
 			<!-- Package our newly compiled classes and the
@@ -638,29 +676,26 @@
 		<move file="${bin}/${project.name}.prc" todir="${dist}/${build.prefix}prc" />
 	</target>
 
+	<target name="cat.to.midlet" depends="prepare" if="${concat.jad}" >
+		<echo message="concat.jad=${concat.jad}" />
+		<mkdir dir="${tmpcat}" />
+		<copy file="${res}/${concat.jad}" todir="${tmpcat}" >
+			<filterset refid="midlet.info" />
+		</copy>
+		<concat destfile="${bin}/${project.name}.jad" append="true" >
+			<fileset file="${tmpcat}/${concat.jad}" />
+		</concat>
+		<concat destfile="${bin}/manifest.mf" append="true" >
+			<fileset file="${tmpcat}/${concat.jad}" />
+		</concat>
+	</target>
+
 	<target name="cat.logging.midlet" depends="prepare" if="jlogmicro.jad" >
 		<concat destfile="${bin}/${project.name}.jad" append="true" >
 			<fileset file="${res}/${jlogmicro.jad}" />
 		</concat>
 		<concat destfile="${bin}/manifest.mf" append="true" >
 			<fileset file="${res}/${jlogmicro.jad}" />
-		</concat>
-	</target>
-
-	<target name="cat.reversi.midlet" depends="prepare" if="reversi.concat.jad" >
-	    <echo message="res=${res}" />
-	    <echo message="reversi.concat.jad=${reversi.concat.jad}" />
-	    <echo message="project.name=${project.name}" />
-		<delete dir="${tmpconcat}" />
-		<copy todir="${tmpconcat}" >
-			<filterset refid="midlet.info" />
-			<fileset file="${res}/${reversi.concat.jad}" />
-		</copy>
-		<concat destfile="${bin}/${project.name}.jad" append="true" >
-			<fileset file="${tmpconcat}/${reversi.concat.jad}" />
-		</concat>
-		<concat destfile="${bin}/manifest.mf" append="true" >
-			<fileset file="${tmpconcat}/${reversi.concat.jad}" />
 		</concat>
 	</target>
 
