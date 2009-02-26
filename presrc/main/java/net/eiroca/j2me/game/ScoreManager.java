@@ -92,29 +92,31 @@ public class ScoreManager {
     }
   }
 
-  public synchronized void saveScoreList() {
-    final RecordStore rs = BaseApp.getRecordStore(recordName, true, false);
-    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    final DataOutputStream dos = new DataOutputStream(baos);
-    try {
-      dos.writeUTF(gameName);
-      dos.writeInt(scores.length);
-      for (int l = 0; l < scores.length; l++) {
-        dos.writeInt(scores[l].size());
-        for (int i = 0; i < scores[l].size(); i++) {
-          final Score se = (Score) scores[l].elementAt(i);
-          dos.writeUTF(se.name);
-          dos.writeInt(se.level);
-          dos.writeInt(se.score);
-        }
-      }
-    }
-    catch (final IOException e) {
-      //
-			e.printStackTrace();
-    }
-    BaseApp.writeData(rs, baos);
-    BaseApp.close(rs, null, dos);
+  public void saveScoreList() {
+	  synchronized(this) {
+			final RecordStore rs = BaseApp.getRecordStore(recordName, true, false);
+			final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			final DataOutputStream dos = new DataOutputStream(baos);
+			try {
+				dos.writeUTF(gameName);
+				dos.writeInt(scores.length);
+				for (int l = 0; l < scores.length; l++) {
+					dos.writeInt(scores[l].size());
+					for (int i = 0; i < scores[l].size(); i++) {
+						final Score se = (Score) scores[l].elementAt(i);
+						dos.writeUTF(se.name);
+						dos.writeInt(se.level);
+						dos.writeInt(se.score);
+					}
+				}
+			}
+			catch (final IOException e) {
+				//
+				e.printStackTrace();
+			}
+			BaseApp.writeData(rs, baos);
+			BaseApp.close(rs, null, dos);
+		}
   }
 
   private void readHighScoreList() {
