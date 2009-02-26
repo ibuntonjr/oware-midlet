@@ -43,6 +43,8 @@
 /**
  * This was modified no later than 2009-01-29
  */
+// Expand to define MIDP define
+@DMIDPVERS@
 // Expand to define JMUnit test define
 @DJMTESTDEF@
 // Expand to define logging define
@@ -431,17 +433,18 @@ public abstract class Application extends BaseApp implements CommandListener
 		logger.finest("createNumRange msgNbr,start,end,incr=" + msgNbr + "," + start + "," + end + "," + incr);
 		//#endif
 		ChoiceGroup numRange = new ChoiceGroup(BaseApp.messages[msgNbr],
-			//#ifdef DMIDP20
-					Choice.POPUP
-			//#else
-					Choice.EXCLUSIVE
-			//#endif
-					);
-			for (int i = start; i <= end;) {
-				numRange.append(Integer.toString(i), null);
-				 i+= incr;
-			}
-			return numRange;
+				//#ifdef DMIDP20
+				Choice.POPUP
+				//#else
+				Choice.EXCLUSIVE
+				//#endif
+				);
+		int aend = Math.abs(end);
+		for (int i = start; i <= aend;) {
+			numRange.append(Integer.toString(i), null);
+			i+= incr;
+		}
+		return numRange;
 	}
 
 }
