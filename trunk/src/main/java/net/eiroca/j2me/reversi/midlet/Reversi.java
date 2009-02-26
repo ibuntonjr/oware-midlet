@@ -21,6 +21,8 @@
 /**
  * This was modified no later than 2009-01-29
  */
+// Expand to define MIDP define
+//#define DMIDP20
 // Expand to define test define
 //#define DNOTEST
 // Expand to define JMUnit test define
@@ -42,10 +44,27 @@ import net.sf.yinlight.boardgame.oware.game.BoardGameScreen;
 import net.sf.yinlight.boardgame.oware.game.BoardGameApp;
 import net.sf.yinlight.boardgame.oware.midlet.OwareMIDlet;
 
+//#ifdef DLOGGING
+//@import net.sf.jlogmicro.util.logging.Logger;
+//@import net.sf.jlogmicro.util.logging.Level;
+//@import net.sf.jlogmicro.util.logging.FormHandler;
+//@import net.sf.jlogmicro.util.logging.RecStoreHandler;
+//@import net.sf.jlogmicro.util.presentation.RecStoreLoggerForm;
+//#endif
+
 public class Reversi extends BoardGameApp {
 
   public static short msgOffset = 0;
   final public static int MSG_NAME = OwareMIDlet.MSG_USERDEF + msgOffset++; // 0
+  final public static int MSG_UPPER = OwareMIDlet.MSG_USERDEF + msgOffset++; // 0
+  final public static int MSG_LOWER = OwareMIDlet.MSG_USERDEF + msgOffset++; // 0
+
+	//#ifdef DLOGGING
+//@  private boolean fineLoggable;
+//@  private boolean finestLoggable;
+//@  private boolean traceLoggable;
+//@	private Logger logger;
+	//#endif
 
   public Reversi() {
 	//#ifdef DJMTEST
@@ -53,27 +72,96 @@ public class Reversi extends BoardGameApp {
 	//#else
     super();
 	//#endif
-		BoardGameApp.gsRow = 8;
-		BoardGameApp.gsCol = 8;
-		BoardGameApp.gsNbrPlayers = 2;
+		//#ifdef DLOGGING
+//@		logger = Logger.getLogger("Reversi");
+//@		fineLoggable = logger.isLoggable(Level.FINE);
+//@		finestLoggable = logger.isLoggable(Level.FINEST);
+//@		traceLoggable = logger.isLoggable(Level.TRACE);
+		//#endif
 		BoardGameApp.gsTextRow = 0;
-		BoardGameApp.gsPieceImages = new String[0];
+		BoardGameApp.gsSquareImages =
+			new String[] {"reversi_board12.png","reversi_board14.png",
+				"reversi_board16.png","reversi_board18.png","reversi_board20.png",
+			"reversi_board22.png","reversi_board24.png"};
+		BoardGameApp.gsPiece1Images =
+			new String[] {"reversi_black_btn12.png","reversi_black_btn14.png",
+				"reversi_black_btn16.png","reversi_black_btn18.png","reversi_black_btn20.png",
+			"reversi_black_btn22.png","reversi_black_btn24.png"};
+		BoardGameApp.gsPiece2Images =
+			new String[] {"reversi_white_btn12.png","reversi_white_btn14.png",
+				"reversi_white_btn16.png","reversi_white_btn18.png","reversi_white_btn20.png",
+			"reversi_white_btn22.png","reversi_white_btn24.png"};
+		BoardGameApp.storeName = "REVERSI_GAME_STORE";
 		BoardGameApp.gsLevelMsg = new int[0];
     GameApp.hsName = "Reversi";
 		GameApp.resSplash = "reversi_splash.png";
+		setGameDefaults();
   }
 
+	public void setGameDefaults() {
+		BoardGameApp.gsDeptInit = 1;
+		BoardGameApp.gsDeptLimit = -14;
+		BoardGameApp.gsDept = 3;
+		BoardGameApp.gsDeptIncr = 1;
+		BoardGameApp.gsRowInit = 8;
+		BoardGameApp.gsRowLimit = -8;
+		BoardGameApp.gsRow = 8;
+		BoardGameApp.gsRowIncr = 1;
+		BoardGameApp.gsColInit = 8;
+		BoardGameApp.gsCol = 8;
+		BoardGameApp.gsColLimit = -8;
+		BoardGameApp.gsColIncr = 1;
+		BoardGameApp.gsNbrPlayers = 2;
+		BoardGameApp.gsNbrPlayersLimit = 2;
+	}
+
   public void init() {
-    super.init();
+		//#ifdef DLOGGING
+//@		if (finestLoggable) {logger.finest("init");}
+		//#endif
+		try {
+			super.init();
+			BoardGameApp.playerNames = new String[] {
+					BaseApp.messages[Reversi.MSG_UPPER],
+					BaseApp.messages[Reversi.MSG_LOWER]};
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+//@			logger.severe("init error", e);
+			//#endif
+		}
   }
 
   public GameScreen getGameScreen() {
-    return new ReversiScreen(this);
+		//#ifdef DLOGGING
+//@		if (finestLoggable) {logger.finest("getGameScreen");}
+		//#endif
+		try {
+			ReversiScreen rs = new ReversiScreen(this);
+			//#ifdef DMIDP10
+//@			updGameScreen(rs);
+			//#endif
+			return rs;
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+//@			logger.severe("getGameScreen error", e);
+			//#endif
+			return null;
+		}
   }
 
   protected Displayable getOptions() {
-    final Form form = (Form)super.getOptions();
-    return form;
+		try {
+			final Form form = (Form)super.getOptions();
+			return form;
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+//@			logger.severe("getGameScreen error", e);
+			//#endif
+			return null;
+		}
   }
 
   public void doShowOptions() {
