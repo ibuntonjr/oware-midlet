@@ -24,6 +24,8 @@
 /**
  * This was modified no later than 2009-01-29
  */
+// Expand to define MIDP define
+//#define DMIDP20
 // Expand to define logging define
 //#define DNOLOGGING
 // Expand to define test define
@@ -104,31 +106,14 @@ public final class OwareScreen extends BoardGameScreen {
 					Math.abs(BoardGameApp.gsCol), Math.abs(BoardGameApp.gsNbrPlayers),
 					Math.abs(OwareMIDlet.gsInitSeeds));
 			super.init();
+			//#ifdef DLOGGING
+//@			if (finestLoggable) {logger.finest("nextTurn ((OwareTable)BoardGameScreen.table).getPoint((byte)0),col,BoardGameScreen.actPlayer,gameEnded,(mtt != null)=" + ((OwareTable)BoardGameScreen.table).getPoint((byte)0) + "," + ((OwareTable)BoardGameScreen.table).getPoint((byte)1));}
+			//#endif
 		} catch (Throwable e) {
 			e.printStackTrace();
 			//#ifdef DLOGGING
 //@			logger.severe("init error", e);
 			//#endif
-		}
-  }
-
-  public boolean tick() {
-		try {
-			screen.setColor(BaseApp.background);
-			screen.fillRect(0, 0, screenWidth, screenHeight);
-			drawBoard();
-			drawTable();
-			drawSelectionBox();
-			drawPossibleMoves();
-			drawVertInfo();
-			drawMessage();
-			return true;
-		} catch (Throwable e) {
-			e.printStackTrace();
-			//#ifdef DLOGGING
-//@			logger.severe("tick error", e);
-			//#endif
-			return true;
 		}
   }
 
@@ -192,17 +177,6 @@ public final class OwareScreen extends BoardGameScreen {
 		}
   }
 
-  protected void drawSelectionBox() {
-    if (BoardGameScreen.getActPlayer() == 0) {
-      screen.setColor(BoardGameScreen.COLOR_P1);
-    }
-    else {
-      screen.setColor(BoardGameScreen.COLOR_P2);
-    }
-    screen.drawRect(off_x + selx * sizex, off_y + sely * sizey, sizex, sizey);
-    screen.drawRect(off_x + selx * sizex + 1, off_y + sely * sizey + 1, sizex - 2, sizey - 2);
-  }
-
   protected void drawTable() {
 		try {
 			OwareTable ot = (OwareTable)BoardGameScreen.table;
@@ -226,8 +200,8 @@ public final class OwareScreen extends BoardGameScreen {
 //@					if (debug) {System.out.println("drawTable item=" + item);}
 					//#endif
 					if (item != 0) {
-						drawPiece(i, j, item, true, piece1Image, ((i == lastRow) &&
-									(j == lastCol)) ? lastPoint : 0);
+						drawPiece(i, j, item, true, (item == 1) ? piece1Image : piece2Image,
+								((i == lastRow) && (j == lastCol)) ? lastPoint : 0);
 					}
 				}
 			}
@@ -250,9 +224,9 @@ public final class OwareScreen extends BoardGameScreen {
 		try {
 			// two pieces
 			//undo
-			drawPiece(-1, BoardGameScreen.table.nbrCol - 1, 1, false,
+			drawPiece(-1, BoardGameScreen.table.nbrCol, 1, false,
 					((BoardGameScreen.actPlayer == 0) ? piece1Image : null), 0); /* y, x */
-			drawPiece(BoardGameScreen.table.nbrRow, BoardGameScreen.table.nbrCol - 1, 0, false,
+			drawPiece(BoardGameScreen.table.nbrRow, BoardGameScreen.table.nbrCol, 0, false,
 					((BoardGameScreen.actPlayer == 1) ? piece1Image : null), 0); /* y, x */
 			// numbers
 			screen.setColor(BaseApp.foreground);
@@ -280,7 +254,7 @@ public final class OwareScreen extends BoardGameScreen {
   }
 
   public void nextTurn(final int row, final int col) {
-    if ((mtt != null) && preCalculateMoves) {
+    if (mtt != null) {
       mtt.cancel();
       while (mtt.ended == false) {
         synchronized (this) {
@@ -299,14 +273,16 @@ public final class OwareScreen extends BoardGameScreen {
 		//#endif
     if (gameEnded) { return; }
     final OwareMove move = new OwareMove(row, col);
-    if (!processMove(move, false)) {
+    if (!processMove(move, BoardGameApp.precalculate)) {
 			return;
 		}
     updatePossibleMoves();
 		//#ifdef DMIDP10
 //@		super.wakeup(3);
 		//#endif
-  mtt = new MinimaxTimerTask();
+		if (BoardGameApp.precalculate) {
+			mtt = new MinimaxTimerTask();
+		}
   final OwareMove computerMove = (OwareMove)computerTurn(move);
 		//#ifdef DLOGGING
 //@		if (finerLoggable) {logger.finer("nextTurn computerMove.row,computerMove.col,BoardGameScreen.actPlayer=" + ((computerMove == null) ? "computerMoves null" : (computerMove.row + "," + computerMove.col)) + "," + BoardGameScreen.actPlayer);}
@@ -316,12 +292,12 @@ public final class OwareScreen extends BoardGameScreen {
 		}
 		selx = computerMove.col;
 		sely = computerMove.row;
-		processMove(computerMove, preCalculateMoves);
+		processMove(computerMove, BoardGameApp.precalculate);
 		updatePossibleMoves();
 		//#ifdef DMIDP10
 //@		super.wakeup(3);
 		//#endif
-		GameMinMax.clearPrecalculatedMoves();
+		gMiniMax.clearPrecalculatedMoves();
 		//#ifdef DLOGGING
 //@		if (finerLoggable) {logger.finer("nextTurn end loop gameEnded,isHuman[BoardGameScreen.actPlayer],BoardGameScreen.actPlayer=" + gameEnded + "," + isHuman[BoardGameScreen.actPlayer] + "," + BoardGameScreen.actPlayer);}
 		//#endif
@@ -332,7 +308,6 @@ public final class OwareScreen extends BoardGameScreen {
 	 *
    * @param move
    * @param startForeThinking
-   * @author Irv Bunton
    */
   //#ifdef DTEST
 //@  public
@@ -423,7 +398,7 @@ public final class OwareScreen extends BoardGameScreen {
 							setMessage(message + OwareMIDlet.MSG_PASS, 3000);
 							BoardGameScreen.table.setPassNum(BoardGameScreen.table.getPassNum() + 1);
 							// just to be sure
-							GameMinMax.clearPrecalculatedMoves();
+							gMiniMax.clearPrecalculatedMoves();
 							//#ifdef DLOGGING
 //@							if (finestLoggable) {logger.finest("processMove has increase pass number possible move BoardGameScreen.table.getPassNum()=" + BoardGameScreen.table.getPassNum());}
 							//#endif
@@ -459,9 +434,14 @@ public final class OwareScreen extends BoardGameScreen {
 //@		if (finerLoggable) {logger.finer("procEndGame");}
 		//#endif
 		try {
-			BoardGameScreen.rgame.procEndGame(player);
+			byte secondPlayer = (byte)(1 - BoardGameApp.gsFirst);
+			if (player != secondPlayer) {
+				BoardGameScreen.rgame.procEndGame(player);
+			}
+			BoardGameScreen.rgame.procEndGame(secondPlayer);
 			OwareTable ot = (OwareTable)BoardGameScreen.table;
-			super.procEndGame(ot.getPoint((byte)0), ot.getPoint((byte)1), player);
+			super.procEndGame(ot.getPoint((byte)0), ot.getPoint((byte)1),
+					secondPlayer);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			//#ifdef DLOGGING
