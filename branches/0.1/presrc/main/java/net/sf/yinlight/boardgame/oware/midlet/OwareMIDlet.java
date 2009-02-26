@@ -1,0 +1,332 @@
+/** GPL >= 2.0
+	* FIX arc piece shape and size OwareScreen, no vibrate,flashBacklight for 1.0 for GameApp
+	* FIX game menu
+	* FIX Don't assume that a player owns the pits in his role to allow
+	*     capture versions.
+	* TODO do Riversi
+	* FIX no getGraphics for GameScreen 1.0 for GameScreen
+	* FIX no suppress keys for 1.0 for GameApp
+	* FIX take out fromRowString from OwareTable
+ * Based upon jtReversi game written by Jataka Ltd.
+ *
+ * This software was modified 2008-12-07.  The original file was Reversi.java
+ * in mobilesuite.sourceforge.net project.
+ *
+ * Copyright (C) 2002-2004 Salamon Andras
+ * Copyright (C) 2006-2008 eIrOcA (eNrIcO Croce & sImOnA Burzio)
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ *
+ */
+/**
+ * This was modified no later than 2009-01-29
+ */
+// Expand to define test define
+@DTESTDEF@
+// Expand to define JMUnit test define
+@DJMTESTDEF@
+// Expand to define test ui define
+@DTESTUIDEF@
+// Expand to define logging define
+@DLOGDEF@
+package net.sf.yinlight.boardgame.oware.midlet;
+
+import javax.microedition.lcdui.Choice;
+import javax.microedition.lcdui.ChoiceGroup;
+import javax.microedition.lcdui.Command;
+import javax.microedition.lcdui.Displayable;
+import javax.microedition.lcdui.Form;
+import javax.microedition.lcdui.List;
+import javax.microedition.lcdui.TextField;
+import net.eiroca.j2me.app.Application;
+import net.eiroca.j2me.app.BaseApp;
+import net.eiroca.j2me.game.GameApp;
+import net.eiroca.j2me.game.GameScreen;
+import net.eiroca.j2me.game.tpg.GameMinMax;
+import net.sf.yinlight.boardgame.oware.game.ui.OwareScreen;
+import net.sf.yinlight.boardgame.oware.game.OwareGame;
+import net.sf.yinlight.boardgame.oware.game.OwareTable;
+import net.sf.yinlight.boardgame.oware.game.OwareMove;
+import net.sf.yinlight.boardgame.oware.game.BoardGameApp;
+import net.sf.yinlight.boardgame.oware.game.BoardGameScreen;
+import com.substanceofcode.rssreader.presentation.FeatureForm;
+import com.substanceofcode.rssreader.presentation.FeatureMgr;
+
+
+//#ifdef DLOGGING
+import net.sf.jlogmicro.util.logging.Logger;
+import net.sf.jlogmicro.util.logging.Level;
+import net.sf.jlogmicro.util.logging.FormHandler;
+import net.sf.jlogmicro.util.logging.RecStoreHandler;
+import net.sf.jlogmicro.util.presentation.RecStoreLoggerForm;
+//#endif
+
+/**
+	* Oware game application.  Handle game options in addition to standard app
+	* options on form.  Save options.
+	*/ 
+public class OwareMIDlet extends BoardGameApp {
+
+  public static short msgOffset = 0;
+  final public static int MSG_NAME = BoardGameApp.MSG_USERDEF + msgOffset++; // 0
+  final public static int MSG_INIT_SEEDS = BoardGameApp.MSG_USERDEF + msgOffset++;
+  final public static int MSG_MAX_HOUSES = BoardGameApp.MSG_USERDEF + msgOffset++;
+  final public static int MSG_GRAND_SLAM = BoardGameApp.MSG_USERDEF + msgOffset++;
+  final public static int MSG_GRAND_SLAM1 = BoardGameApp.MSG_USERDEF + msgOffset++;
+  final public static int MSG_GRAND_SLAM2 = BoardGameApp.MSG_USERDEF + msgOffset++;
+  final public static int MSG_GRAND_SLAM3 = BoardGameApp.MSG_USERDEF + msgOffset++;
+  final public static int MSG_GRAND_SLAM4 = BoardGameApp.MSG_USERDEF + msgOffset++;
+  final public static int MSG_GRAND_SLAM5 = BoardGameApp.MSG_USERDEF + msgOffset++;
+  final public static int MSG_GRAND_SLAM6 = BoardGameApp.MSG_USERDEF + msgOffset++;
+  final public static int MSG_OPPONENT_EMPTY = BoardGameApp.MSG_USERDEF + msgOffset++;
+  final public static int MSG_OPPONENT_EMPTY1 = BoardGameApp.MSG_USERDEF + msgOffset++;
+  final public static int MSG_OPPONENT_EMPTY2 = BoardGameApp.MSG_USERDEF + msgOffset++;
+  final public static int MSG_USERDEF = BoardGameApp.MSG_USERDEF + msgOffset;
+
+  protected ChoiceGroup opInitSeeds;
+  protected ChoiceGroup opMaxHouses;
+  protected ChoiceGroup opGrandSlam;
+  protected ChoiceGroup opOpponentEmpty;
+
+  final static public String OWARE_INIT_SEEDS = "oware-init-seeds";
+  final static public String OWARE_GRAND_SLAM = "oware-grand-slam";
+  final static public String OWARE_MAX_HOUSES = "oware-max-houses";
+  final static public String OWARE_OPP_NO_SEEDS = "oware-opp-no-seeds";
+	/* How many human players. */
+	/* Skill level. */
+  final static public int LEVEL_NORMAL = 0;
+  final static public int LEVEL_DIFFICULT = 1;
+  final static public int LEVEL_HARD = 2;
+	/* Dept.  Number of moves that the AI tests. */
+  public static int gsInitSeeds = 4;
+  public static int gsInitSeedsLimit = 6;
+  public static int gsMaxHouses = OwareTable.NBR_COL;
+  public static int gsMaxHousesLimit = OwareTable.NBR_COL;
+  public static int gsGrandSlam = 0;
+  public static boolean gsOpponentEmpty = true;
+
+	//#ifdef DLOGGING
+  private boolean fineLoggable;
+  private boolean finestLoggable;
+  private boolean traceLoggable;
+	private Logger logger;
+	//#endif
+
+  public OwareMIDlet() {
+		//#ifdef DJMTEST
+    super("Mancala Test Suite");
+		//#else
+    super();
+		//#endif
+		//#ifdef DLOGGING
+		logger = Logger.getLogger("OwareMIDlet");
+		fineLoggable = logger.isLoggable(Level.FINE);
+		finestLoggable = logger.isLoggable(Level.FINEST);
+		traceLoggable = logger.isLoggable(Level.TRACE);
+		//#endif
+		BoardGameApp.gsRow = -2;
+		BoardGameApp.gsRowLimit = -4;
+		BoardGameApp.gsCol = -6;
+		BoardGameApp.gsColLimit = -8;
+		OwareMIDlet.gsInitSeeds = -OwareTable.INIT_SEEDS;
+		OwareMIDlet.gsInitSeedsLimit = -6;
+		OwareMIDlet.gsMaxHouses = Math.abs(BoardGameApp.gsCol);
+		OwareMIDlet.gsMaxHousesLimit = Math.abs(BoardGameApp.gsColLimit);
+		BoardGameApp.gsNbrPlayers = -2;
+		//UNDO allow > 2 players BoardGameApp.gsNbrPlayers = -2;
+		BoardGameApp.gsNbrPlayersLimit = -4;
+		BoardGameApp.gsTextRow = 2;
+		BoardGameApp.gsLevel = gsLevelDifficult;
+		BoardGameApp.storeName = "OWARE_GAME_STORE";
+		BoardGameApp.gsLevelMsg = new int[] { BoardGameApp.MSG_AILEVEL1,
+			BoardGameApp.MSG_AILEVEL2, BoardGameApp.MSG_AILEVEL3};
+		BoardGameApp.gsPieceImages =
+			new String[] {"icon12.png","icon14.png","icon16.png","icon18.png"};
+    GameApp.hsName = "Oware";
+		GameApp.resSplash = "oware_splash.png";
+  }
+
+  public void init() {
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("init");}
+		//#endif
+		try {
+			super.init();
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("init error", e);
+			//#endif
+		}
+  }
+
+  public GameScreen getGameScreen() {
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("getGameScreen");}
+		//#endif
+		try {
+			OwareScreen ows = new OwareScreen(this, false, true);
+			//#ifdef DMIDP10
+			updGameScreen(ows);
+			//#endif
+			return ows;
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("getGameScreen error", e);
+			//#endif
+			return null;
+		}
+  }
+
+  protected Displayable getOptions() {
+		try {
+			final Form form = (Form)super.getOptions();
+			if (OwareMIDlet.gsInitSeedsLimit < 0) {
+				opInitSeeds = Application.createNumRange(OwareMIDlet.MSG_INIT_SEEDS,
+						1, Math.abs(OwareMIDlet.gsInitSeedsLimit), 1);
+			}
+			opMaxHouses = Application.createNumRange(OwareMIDlet.MSG_MAX_HOUSES,
+					1, OwareMIDlet.gsMaxHousesLimit, 1);
+			opGrandSlam = Application.createChoiceGroup(
+					OwareMIDlet.MSG_GRAND_SLAM,
+					Choice.EXCLUSIVE,
+					new int[] { OwareMIDlet.MSG_GRAND_SLAM1,
+			OwareMIDlet.MSG_GRAND_SLAM2, OwareMIDlet.MSG_GRAND_SLAM3,
+			OwareMIDlet.MSG_GRAND_SLAM4, OwareMIDlet.MSG_GRAND_SLAM5});
+			opOpponentEmpty = Application.createChoiceGroup(
+					OwareMIDlet.MSG_OPPONENT_EMPTY,
+					Choice.EXCLUSIVE,
+					new int[] { OwareMIDlet.MSG_OPPONENT_EMPTY1,
+			OwareMIDlet.MSG_OPPONENT_EMPTY2});
+			if (OwareMIDlet.gsInitSeedsLimit < 0) {
+				form.append(opInitSeeds);
+			}
+			form.append(opMaxHouses);
+			form.append(opGrandSlam);
+			form.append(opOpponentEmpty);
+			return form;
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("getOptions error", e);
+			//#endif
+			return null;
+		}
+  }
+
+  public void doShowOptions() {
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("doShowOptions");}
+		//#endif
+		try {
+			super.doShowOptions();
+			if (OwareMIDlet.gsInitSeedsLimit < 0) {
+				opInitSeeds.setSelectedIndex(Math.abs(OwareMIDlet.gsInitSeeds) - 1,
+						true);
+			}
+			opMaxHouses.setSelectedIndex(OwareMIDlet.gsMaxHouses - 1, true);
+			opGrandSlam.setSelectedIndex(OwareMIDlet.gsGrandSlam, true);
+			opOpponentEmpty.setSelectedIndex(
+					OwareMIDlet.gsOpponentEmpty ? 1 : 0, true);
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("doShowOptions error", e);
+			//#endif
+		}
+  }
+
+  public void doApplyOptions() {
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("doApplyOptions");}
+		//#endif
+		try {
+			super.doApplyOptions();
+			if (OwareMIDlet.gsInitSeedsLimit < 0) {
+				OwareMIDlet.gsInitSeeds = Application.settingsUpd(
+						opInitSeeds.getSelectedIndex() + 1, 
+					OwareMIDlet.OWARE_INIT_SEEDS, OwareMIDlet.gsInitSeeds);
+			}
+			OwareMIDlet.gsMaxHouses = Application.settingsUpd(
+					opMaxHouses.getSelectedIndex() + 1, 
+				OwareMIDlet.OWARE_MAX_HOUSES, OwareMIDlet.gsMaxHouses);
+			OwareMIDlet.gsGrandSlam = Application.settingsUpd(
+				opGrandSlam.getSelectedIndex(),
+				OwareMIDlet.OWARE_GRAND_SLAM, OwareMIDlet.gsGrandSlam);
+			OwareMIDlet.gsOpponentEmpty = (Application.settingsUpd(
+				opOpponentEmpty.getSelectedIndex(),
+				OwareMIDlet.OWARE_OPP_NO_SEEDS,
+				(OwareMIDlet.gsOpponentEmpty ? 1 : 0)) == 1);
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("doApplyOptions error", e);
+			//#endif
+		}
+  }
+
+  public void loadBoardGameCustomization() {
+		try {
+			super.loadBoardGameCustomization();
+			OwareMIDlet.gsInitSeeds = BaseApp.settings.getInt(OwareMIDlet.OWARE_INIT_SEEDS, OwareMIDlet.gsInitSeeds);
+			OwareMIDlet.gsGrandSlam = BaseApp.settings.getInt(OwareMIDlet.OWARE_GRAND_SLAM, OwareMIDlet.gsGrandSlam);
+			OwareMIDlet.gsMaxHouses = BaseApp.settings.getInt(OwareMIDlet.OWARE_MAX_HOUSES, OwareMIDlet.gsMaxHouses);
+			OwareMIDlet.gsOpponentEmpty = (BaseApp.settings.getInt(OwareMIDlet.OWARE_OPP_NO_SEEDS,  (OwareMIDlet.gsOpponentEmpty ? 1 : 0)) == 1);
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("loadBoardGameCustomization error", e);
+			//#endif
+		}
+	}
+
+	//#ifdef DTEST
+  /**
+   * Command dispatcher
+   */
+	/* UNDO
+  public void commandAction(final Command c, final Displayable d) {
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("commandAction c,d=" + c.getLabel() + "," + c + "," + d);}
+		//#endif
+		try {
+			if (d == gameTest) {
+				if (c == BaseApp.cOK) {
+					processGameAction(GA_PERFORMTEST);
+				} else {
+					super.commandAction(c, d);
+				}
+			} else {
+					super.commandAction(c, d);
+			}
+
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("commandAction error", e);
+			//#endif
+		}
+  }
+	*/
+	//#endif
+
+  /**
+   * Game Shutdown
+   */
+  public void doShutdown() {
+  }
+
+}

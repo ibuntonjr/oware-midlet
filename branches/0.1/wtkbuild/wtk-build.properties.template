@@ -1,0 +1,140 @@
+#windows.drive = C:
+windows.drive = 
+#windows.ext = .exe
+windows.ext = 
+#opt.tools = ${windows.drive}/opt/tools
+opt.tools = /home/irvbopt/opt/tools
+#antenna.home = C:/mostdownloads/j2me/sourceforge/antenna
+#antenna.home = ${ext.drive}/mostdownloads/j2me/sourceforge/antenna
+#antenna.home = C:/mostdownloads/j2me/sourceforge/antenna
+antenna.home = ${opt.tools}/antenna
+#antenna.jar = antenna-bin-0.9.15-beta.jar
+#antenna.jar = antenna-bin-1.0.0.jar
+antenna.jar = antenna-bin-1.1.0-beta.jar
+#antcontrib.home = C:/mostdownloads/gnu/sourceforge/ant-contrib/ant-contrib
+#antcontrib.home = ${ext.drive}/mostdownloads/gnu/sourceforge/ant-contrib/ant-contrib
+#antcontrib.home = C:/mostdownloads/gnu/sourceforge/ant-contrib/ant-contrib
+antcontrib.home = ${opt.tools}/ant-contrib/ant-contrib
+#wtk.wme.home = C:\\PROGRA~1\\IBM\\WEME\\571\\PalmOS50\\Tools
+#For phoneMe Windows
+#phoneme.home = ${ext.drive}/mostdownloads/j2me/phoneme.dev.java.net__downloads_page.html/bin/win32_x86_javacall_mvm
+phoneme.home = C:/mostdownloads/j2me/phoneme.dev.java.net__downloads_page.html/bin/win32_x86_javacall_mvm
+#For phoneMe Linux x86
+#phoneme.home = /media/SEA_DISK/linux/src/RSSReader-1_11_1rc2/bin/linux_x86_fb_chameleon_mvm
+#For phoneMe Windows and Linux
+#wtk.midpapi = ${phoneme.home}/classes
+#build.compiler = org.eclipse.jdt.core.JDTCompilerAdapter
+#For phoneMe, if using ecj.jar
+#ecj.jar = ${ext.drive}/mostdownloads/gnu/eclipse/ecj-3.4.jar
+#For phoneMe Windows, if using ecj.jar and Sun JDK
+#rt.jar = C:/opt/bea91/jdk150_04/jre/lib/rt.jar
+#For phoneMe Windows, if using ecj.jar and Kaffe
+#rt.jar = /usr/lib/kaffe/jre/lib/rt.jar
+rt.jar = ${java.home}/../jre/lib/rt.jar
+#emulator.home = ${ext.drive}/mostdownloads/j2me/sourceforge/kobjects
+#emulator.home=${ext.drive}/mostdownloads/j2me/sourceforge/MicroEmulator/microemulator-2.0.2
+emulator.home=C:/mostdownloads/j2me/sourceforge/MicroEmulator/microemulator-2.0.2
+#emulator.jar=${emulator.home}/me4se-2.2.0.zip
+emulator.jar=${emulator.home}/microemulator.jar
+#emulator.class=org.me4se.MIDletRunner
+emulator.class=org.microemu.app.Main
+#svnant.home = C:/mostdownloads/gnu/tigris.org/svnant/svnant-1.0.0/lib
+#svnant.home = C:/mostdownloads/gnu/sourceforge/antxtras/svn4ant_1.1-build68_bin_withdeps
+#
+#Comment out if you do not want to run findbugs
+#findbugs.home = ${ext.drive}/opt/tools/findbugs-1.3.4
+#findbugs.home = C:/opt/tools/findbugs-1.3.4
+#For findbugs
+findbug.classes = ${phoneme.home}/classes
+#Comment out if you do not want to run PMD
+#pmd.home = ${ext.drive}/mostdownloads/gnu/sourceforge/pmd/pmd-4.2.4
+#pmd.home = C:/opt/tools/pmd/pmd-4.2.4
+pmd.xsl = pmd-compile-reduced.xsl
+cat.cmd = cat${windows.ext}
+#svn.home = C:\\PROGRA~1\\COLLAB~1
+#svnant.home = C:/mostdownloads/gnu/tigris.org/svnant/svnant-1.0.0/lib
+#svnant.home = C:/mostdownloads/gnu/sourceforge/antxtras/svn4ant_1.1-build68_bin_withdeps
+#svn.home = C:\\PROGRA~1\\TORTOI~1
+#rim.home = C:\\Program Files\\Research In Motion\\BlackBerry JDE 4.2.1
+#rim.home = C:\\PROGRA~1\\RESEAR~1\\BLACKB~1.1
+svn.pgm = svn${windows.ext}
+#wtk.home = C:/opt/WTK2.5.1
+#wtk.home = ${windows.drive}/WTK2.5.2_01
+wtk.home = ${windows.drive}/opt/WTK2.5.2
+wtk.encoding = UTF-8
+#wtk.proguard.home = ${ext.drive}/mostdownloads/j2me/sourceforge/proguard/proguard4.2
+#wtk.proguard.home = C:/opt/tools/proguard/proguard4.2
+wtk.proguard.home = ${opt.tools}/proguard/proguard4.3
+#wtk.optionalpda.enabled = false
+midlet.name = Oware
+midlet.class = net.sf.yinlight.boardgame.oware.midlet.${midlet.name}MIDlet
+logging.package = net.sf.jlogmicro.util.logging
+obfuscate.classes = ${midlet.class},${logging.package}.ConsoleHandler,${logging.package}.FormHandler,${logging.package}.RecStoreHandler,${logging.package}.SimpleFormatter
+project.test.url = http://mobilerssreader.sourceforge.net/testdata
+file.test.url = file:///root1/testdata
+reversi.concat.jad = Reversi-concat.jad
+project.name = Oware
+wtk.workspace.proj = /DOCUME~1/irvb/j2mewtk/2.5.2/apps
+midlet.home = ${wtk.workspace.proj}/apps/${project.name}
+prc.creater = OURI
+prc.longname = Oware/Reversi
+MIDLETURL_ROOT = http://oware-midlet.googlecode.com/files
+MIDLETVERSROOT = 0.1
+separator = /
+#Need vers with '_' to allow uploading to sites that get confused by to
+#many '.'
+FMIDLETVERSROOT = 0_1
+#Location of manifest source
+manifestsrc = ../manifestsrc
+#? src = src
+#? lib = lib
+#Compile source dir generted by non-preprocessed source and generted source
+#(if needed)
+comp.src = ${target}/oware-midlet/src/main/java
+#util.comp.src = ../../libJ2ME/target/mobilesuite/src
+#comp.src = released/src
+presrc = ../presrc/main/java
+#presrc.util.src = ../../libJ2ME/presrc
+#util.src = ../../libJ2ME/src
+#Unpreprocessed source diretor.  This
+#is usually done to override the unmodified src.
+#If all the files in src are created by the preprocessor, uncomment this.
+#all.src.preprocessed = true
+#Deprecated.  Copy preprocessed src to src directory to allow it to be
+#checked in.  Now, this is done automatically when unproc.src is specified.
+#copy.comp.src = true
+src = ../src/main/java
+unproc.src = ../src/main/java
+res = ../src/main/resources
+src.controlled.copy = true
+#Specify the WTK source directory to be replaced
+#wtk.src = ../../src
+#wtk.src = C:/PROGRA~1/RESEAR~1/BLACKB~1.0/rimwtk
+#wtk.src = /DOCUME~1/irvb/j2mewtk/2.5.2/apps/Oware/src
+wtk.src = ${env.j2mewtk}/${project.name}/src
+#wtk.res = /DOCUME~1/irvb/j2mewtk/2.5.2/apps/Oware/res
+wtk.res = ${env.j2mewtk}/${project.name}/res
+zipdir = ../zipedsrc
+need.svn.preprocessed = true
+#svn.home = C:\\PROGRA~1\\COLLAB~1
+svn.url =  https://oware-midlet.googlecode.com/svn/trunk/
+svn.src =  oware-midlet
+svn.user =  ibuntonjr
+#Need ti distribute the SVN dirs
+need.dist.svn.dirs = true
+need.res = true
+icon.dir = ${res}
+msg.dir = ${res}/en
+msg.todir = en/
+msg.base.todir = 
+res.todir = 
+#add.jars = true
+#copy.jar.src = true
+#jarsrc = ../../../JLogMicro/jlogmicro/src
+#Allows adding of compatiblity classes to test upward compatibility of RMS
+#stored data
+#compat.presrc = ../compatpresrc
+#Compile test ui
+#testui.presrc = ../testpresrc
+docs = ../docs
+debug = debug

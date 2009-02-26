@@ -1,0 +1,69 @@
+OK
+Back
+Exit
+Yes
+No
+GAME OVER
+Score: 
+Best Score: 
+No high score
+New High Score
+Your score: 
+Your name
+Continue
+New game
+High Score
+Settings
+Game Options
+Help
+About
+Volume
+Vibrate
+Backlight
+Undo
+Redo
+End Game
+Pause
+Test
+Logging
+Game Mode
+player vs A.I.
+player vs player
+A.I. Difficulty
+Normal
+Difficult
+Hard
+hard
+Red
+Blue
+Rows
+Columns
+Number of Players
+Good Luck
+Thinking
+Invalid Move
+Computer won
+You won
+ won
+Draw
+Human
+Computer
+ pass
+Are you sure you wnat to end the game?
+L
+M
+H
+Oware
+Initial seeds
+Max holes eaten(captured from)
+Grand Slam variations
+Illegal
+No capture
+Remaining stones go to opponent
+Last hole not captured
+First hole not captured
+Only > 24
+Opponent no seeds variation
+Player get seeds
+Opponent gets seeds
+Reversi

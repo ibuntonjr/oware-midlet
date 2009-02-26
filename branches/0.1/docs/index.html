@@ -1,0 +1,117 @@
+<html lang=en xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv=content-type content="text/html; charset=utf-8"/>
+<title>Oware game for J2ME/Java ME/Mobile/Cell phones</title>
+</head>
+<body>
+<h1>Oware game for J2ME/Java ME/Mobile/Cell phones</h1>
+<h2>Hosted on sourceforge.net
+<a href="http://sourceforge.net"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=249456&amp;type=4" width="125" height="37" border="0" alt="SourceForge.net Logo" /></a></h2>
+<h2>General</h2>
+<li><a href="https://sourceforge.net/projects/oware-midlet">Project Page</a></li>
+<p>
+SEE BELOW
+This is a free GPL game of Oware.  The game program allows users to play on Java enabled cell phones (mobiles) (J2ME/JaveME/PhoneME).  
+Oware is the national game of Ghana and is played in Ghana and other parts of Africa and the Caribbean.  
+Also, called Ayo (Yoruba), Awale (Cote d'lvoire), Wari (Mali), Ouri, Ouril or Uril (Cape Verde), Warri (Caribbean), Adji (Ewe), Awele (Ga), Awari (English).  
+Oware is one version of a Mancala game.  
+Other Mancala games are played throughout Asia, Africa, and the Middle East.  
+Oware is one of the Mancala games suitable to play by adults (in addition to children).  
+Oware and other Mancala games help children learn basic math (adding/subtracting) skills.  
+This project is in the alpha phase.  
+</p>
+<h2>Goals:</h2>
+<li>Automated tests of features</li>
+<li>Finish allowing Oware to be played against Artificial Intelligence and another player.  </li>
+<li>Allow 2 players to play over automated Jabber or Bluetooth communication to allow people to play in different parts of the world or room in the case of Blutooth without passing the phone playing the game back and forth.  </li>
+<p/>
+<h2>Development</h2>
+Currently, I'm using modified GPL code from other projects to develop this game: mobilesuite.sourceforge.net (implements Riversi an Italian game), http://oware.ivorycity.com/source/oware-1.0.10.tar.bz2 (this one is a Linux version using GTK for graphics and C/C++ for programming language).  
+Also, I use some code from mobile-rss-reader at code.google.com.
+<!-- It would help if people would leave issues about the different rules of Mancala games so that I can try to support them.  -->
+Also, if people want to help write or translate the program that would help.  
+I have 2 versions.  
+One for MIDP 1.0 (old phones).  (Using MIDP 1.0 is an enhacement that I made to mobilesuite which did not support MIDP 1.0 games).  
+Although the MIDP 1.0 version will run on all phones, given that it is written
+on MIDP 1.0, it does not allow screen sizes to be as large as the MIDP 2.0
+version as it is not possible to do full screen mode with MIDP 2.0.
+Given that I hope that this program is used in the developing world, these
+users may have more older phones.  Also, MIDP 2.0 for newer phones.  
+
+==start==
+==Overview==
+
+This is a free GPL game of Oware which allows users to play on Java enabled cell phones (mobiles) (J2ME/JaveME/PhoneME).  
+The intent of this project is to implement this game along with other games
+and add functionality to increase the degree of learning (see below).  Also,
+to try to re-create the way these games are culturally played in Africa
+where often groups of people will watch a game and comment on it, chat software
+will be included to enable others to view and comment (or as we say in the U.S.
+"talk trash").
+Oware is the national game of Ghana and is played in Ghana and other parts of Africa and the Caribbean.  
+Also, called Ayo (Yoruba), Awale (Cote d'lvoire), Wari (Mali), Ouri, Ouril or Uril (Cape Verde), Warri (Caribbean), Adji (Ewe), Awele (Ga), Awari (English).  
+Oware is one version of a Mancala game.  
+Other Mancala games are played throughout Asia, Africa, and the Middle East.  
+Oware is one of the Mancala games suitable to play by adults (in addition to children).  
+Oware and other Mancala games help children learn basic math (adding/subtracting) skills.  
+Oware boards are often given as gifts for holidays like "Kwanza."
+
+==Project State==
+  * This project is in the alpha phase.  
+  * The first goal is to finish normal play with two people and artificial
+    intelligence.
+	* There are versions for both MIDP 1.0 (very old phones) and MIDP 2.0.  This
+	  necessary as MIDP 2.0 has more features that make the display, etc better.
+  * Support more Mancala games
+  * Support other board games like Reversi and Sudoku
+  * Give better graphics
+  * Increase educational value by making alterations to the game which are
+    customizable so that users will get the degree and type of difficulty that
+    they want.  The changes will involve testing arithmetic, geometry,
+    * Making the user specify the number of
+      seeds/counters that will end up in a specific hole after move is entered.
+      This is to force the user to do some adding themselves so that they learn.
+      The idea is that the user will select the cup to take the seeds from.  Say
+      there are 5 seeds in the cup.  Then, normally one would take all the seeds
+      from that cup and distribute one in each cup going counter clockwise.  With
+      the change the user still picks the cup, but one of the cups that would get
+      a seed added to it will not have the number of the resulting addition of
+      the one seed.  The user would then have to make some guesses on what the
+      new total would be.  Then, the new seeds will be displayed either because
+      of a correct answer or after so many tries.
+    * Make the user give co-ordinates of the move before doing it.  This would
+      essentially treat the board as an array where each cup represents an
+      increase in one of the co-ordinates based on a point of reference.  For
+      example if the point of reference is the upper left hand corner,  then
+      the cup on the user's side and one cup to the left is (1,-1).  In all
+      cases, if the correct answer is not given after some number of tries,
+      the user gets to make the move without penalty.  This is to make the
+      learning fun.
+    * Make the user pick the degree of a vector originating from a point on
+      the board which would intersect the center of the cup that the user
+      wants to move.  Like the one above, the focal point for the vectors would
+      change for each move depending on the level of difficulty.
+
+  * Allow 2 players to play over automated Jabber, SMS, or Bluetooth
+    communication to allow people to play in different parts of the world or room in the case of Blutooth without passing the phone playing the game back and forth.  
+
+==Credits==
+	* This project uses code from other GPL projects (that's what the GPL is
+		all about).  I intend to take more GPL code to add more features.  
+		Currently used code is
+    mobilesuite.sourceforge.net (implements Riversi an Italian game),
+		http://oware.ivorycity.com/source/oware-1.0.10.tar.bz2 (this one is a
+		Linux version using GTK for graphics and C/C++ for programming language).  
+		It would help if people would leave issues about the different rules of Mancala games so that I can try to support them. 
+
+==Need Help==
+	* If someone can help with translation that would help as people all over
+		the world play these games
+
+==Bugs/Issues==
+  * Some bugs in the game moves.
+  * Sometimes undo/redo gives the wrong answer
+  * Problems with end of game
+
+</body>
+</html>
