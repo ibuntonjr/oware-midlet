@@ -48,7 +48,7 @@ public class MinimaxTimerTask extends TimerTask {
   }
 
   public boolean cancel() {
-    GameMinMax.cancel(true);
+    gminMax.cancel(true);
     return true;
   }
 
