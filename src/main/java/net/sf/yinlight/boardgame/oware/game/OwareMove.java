@@ -47,12 +47,13 @@ public final class OwareMove extends BoardGameMove {
 //@	private Logger logger = Logger.getLogger("OwareMove");
 //@  private boolean fineLoggable = logger.isLoggable(Level.FINE);
 //@  private boolean finestLoggable = logger.isLoggable(Level.FINEST);
+//@  private boolean traceLoggable = logger.isLoggable(Level.TRACE);
 	//#endif
 
   public OwareMove(final int row, final int col) {
 		super(row, col);
 		//#ifdef DLOGGING
-//@		if (finestLoggable) {logger.finest("constructor row,col=" + row + "," + col);}
+//@		if (traceLoggable) {logger.trace("constructor row,col=" + row + "," + col);}
 		//#endif
   }
 
@@ -60,14 +61,14 @@ public final class OwareMove extends BoardGameMove {
 		super(row, col);
 		this.point = point;
 		//#ifdef DLOGGING
-//@		if (finestLoggable) {logger.finest("constructor row,col=" + row + "," + col);}
+//@		if (traceLoggable) {logger.trace("constructor row,col=" + row + "," + col);}
 		//#endif
   }
 
   public OwareMove(final OwareMove move) {
 		super(move.row, move.col);
 		//#ifdef DLOGGING
-//@		if (finestLoggable) {logger.finest("constructor move has row,col=" + row + "," + col);}
+//@		if (traceLoggable) {logger.trace("constructor move has row,col=" + row + "," + col);}
 		//#endif
     point = move.point;
   }
@@ -104,7 +105,7 @@ public final class OwareMove extends BoardGameMove {
   public void setPoint(final int v) {
     point = v;
 		//#ifdef DLOGGING
-//@		if (finestLoggable) {logger.finest("setPoint move has row,col,point=" + row + "," + col + "," + point);}
+//@		if (traceLoggable) {logger.trace("setPoint move has row,col,point=" + row + "," + col + "," + point);}
 		//#endif
   }
 
