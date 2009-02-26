@@ -1,4 +1,5 @@
 /** GPL >= 2.0
+  private boolean traceLoggable = logger.isLoggable(Level.TRACE);
 	* FIX empty move
  * Based upon jtReversi game written by Jataka Ltd.
  *
@@ -89,11 +90,11 @@ abstract public class BoardGameTable implements GameTable {
 			nbrCol = byteArray[coffset++];
 			nbrPlayers = byteArray[coffset++];
 			//#ifdef DLOGGING
-//@			if (finestLoggable) {logger.finest("constructor passNum,nbrRow,nbrCol,nbrPlayers,offset=" + passNum + "," + nbrRow + "," + nbrCol + "," + nbrPlayers + "," + offset);}
+//@			if (traceLoggable) {logger.trace("constructor passNum,nbrRow,nbrCol,nbrPlayers,offset=" + passNum + "," + nbrRow + "," + nbrCol + "," + nbrPlayers + "," + offset);}
 			//#endif
 			lastMove = new BoardGameMove[nbrPlayers];
 			//#ifdef DLOGGING
-//@			if (finestLoggable) {logger.finest("passNum,coffset,nbrRow,nbrCol=" + passNum + "," + coffset + "," + nbrRow + "," + nbrCol);}
+//@			if (traceLoggable) {logger.trace("passNum,coffset,nbrRow,nbrCol=" + passNum + "," + coffset + "," + nbrRow + "," + nbrCol);}
 			//#endif
 		} catch (Throwable e) {
 			e.printStackTrace();
