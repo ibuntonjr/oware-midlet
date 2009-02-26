@@ -120,7 +120,7 @@ public abstract class GameApp extends Application {
   public static boolean usVibrate = true;
   public static boolean usBackLight = true;
   public static int usVolume = 100;
-  public static String GRAPHICS_PROPERY = "oware-graphics";
+  public static String GRAPHICS_PROPERY = "boardgame-graphics";
   public static boolean graphics = true;
 
   public static String RMS_HIGHSCORE = "HighScore";
@@ -327,10 +327,17 @@ public abstract class GameApp extends Application {
 		//#ifdef DLOGGING
 //@		if (finestLoggable) {logger.finest("doGameAbort isActive()=" + isActive());}
 		//#endif
-    if (isActive()) {
-      GameApp.game.done();
-			prepGameMenu(isActive());
-    }
+		try {
+			if (isActive()) {
+				GameApp.game.done();
+				prepGameMenu(isActive());
+			}
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+//@			logger.severe("doAbout error", e);
+			//#endif
+		}
   }
 
   /**
