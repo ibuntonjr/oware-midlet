@@ -2,8 +2,11 @@ RELEASE =
 DTESTDEF = D${RELEASE}TEST
 DJMTESTDEF = D${RELEASE}JMTEST
 DTESTUIDEF = D${RELEASE}TESTUI
+#Use Feature Form for logging report form
+DFEATUREFORMDEF = D${RELEASE}FEATUREFORMDEF
+DFEATUREFORMIMPORTDEF = import com.substanceofcode.rssreader.presentation.FeatureForm;
 DLOGDEF = D${RELEASE}LOGGING
-jlogmicro.jad = JLogMicro.jad
+logging-concat.jad = logging-concat.jad
 #Don't delete jlogmicro by giving bogus directory
 log.subdir = nojlogmicro
 #DLOGDEF = DNOLOGGING
