@@ -116,7 +116,11 @@ public final class ReversiScreen extends BoardGameScreen {
     else {
       screen.setColor(BoardGameScreen.COLOR_P2);
     }
-    screen.fillArc(x, y, pieceWidth, pieceHeight, 0, 360);
+		if (cupImage == null) {
+			screen.fillArc(x, y, pieceWidth, pieceHeight, 0, 360);
+		} else {
+			screen.drawImage(cupImage, x + cupImagexOffset, y, Graphics.TOP | Graphics.LEFT);
+		}
 		if (lastMovePoint > 0) {
       screen.setColor(BoardGameScreen.COLOR_FG);
 			screen.fillRect(x, y + (pieceHeight / 2) + (pieceHeight / 8),
@@ -144,7 +148,8 @@ public final class ReversiScreen extends BoardGameScreen {
 							lastRow = clastMove.row;
 							lastCol = clastMove.col;
 						}
-						drawPiece(i, j, item, true, piece1Image, ((i == lastRow) &&
+						drawPiece(i, j, item, true, (item == 1) ? piece1Image : piece2Image,
+								((i == lastRow) &&
 									(j == lastCol)) ? 1 : 0);
 						pnums[item - 1]++;
 					}
@@ -167,10 +172,11 @@ public final class ReversiScreen extends BoardGameScreen {
 
   public void drawVertInfo() {
     // two pieces
-		drawPiece(-1, BoardGameScreen.table.nbrCol, 1, false,
-				((BoardGameScreen.actPlayer == 0) ? piece1Image : null), 0); /* y, x */
-		drawPiece(BoardGameScreen.table.nbrRow, BoardGameScreen.table.nbrCol, 0, false,
-				((BoardGameScreen.actPlayer == 1) ? piece1Image : null), 0); /* y, x */
+		drawPiece(0, BoardGameScreen.table.nbrCol, 1, false,
+				((BoardGameApp.gsFirst == 0) ? piece2Image : piece1Image), 0); /* y, x */
+		drawPiece(BoardGameScreen.table.nbrRow - 1, BoardGameScreen.table.nbrCol, 0,
+				false,
+				((BoardGameApp.gsFirst == 1) ? piece2Image : piece1Image), 0); /* y, x */
     // numbers
     screen.setColor(BaseApp.foreground);
     screen.drawString(infoLines[0], width + vertWidth, off_y + sizey + 2, Graphics.TOP | Graphics.RIGHT);
@@ -201,21 +207,35 @@ public final class ReversiScreen extends BoardGameScreen {
     final ReversiMove move = new ReversiMove(row, col);
     processMove(move, false);
     updatePossibleMoves();
-    while (!gameEnded && !isHuman[BoardGameScreen.actPlayer]) {
-      mtt = new MinimaxTimerTask();
-      final ReversiMove computerMove = (ReversiMove)computerTurn(move);
-      selx = computerMove.row;
-      sely = computerMove.col;
-      processMove(computerMove, true);
+		boolean hasMove = false;
+    while (!gameEnded && !isHuman[BoardGameScreen.actPlayer] && !hasMove) {
+			if (BoardGameApp.precalculate) {
+				mtt = new MinimaxTimerTask();
+			}
+      ReversiMove computerMove = (ReversiMove)computerTurn(move);
+      if (computerMove == null) {
+				computerMove = (ReversiMove)((ReversiTable)BoardGameScreen.table).getEmptyMove();
+				computerMove.row = ((ReversiTable)BoardGameScreen.table).nbrRow;
+				computerMove.col = ((ReversiTable)BoardGameScreen.table).nbrCol;
+				hasMove = false;
+			} else {
+				selx = computerMove.row;
+				sely = computerMove.col;
+			}
+      processMove(computerMove, BoardGameApp.precalculate);
       updatePossibleMoves();
-      GameMinMax.clearPrecalculatedMoves();
+      gMiniMax.clearPrecalculatedMoves();
     }
   }
 
 	public void procEndGame(byte player) {
-		BoardGameScreen.rgame.procEndGame(player);
+		byte secondPlayer = (byte)(1 - BoardGameApp.gsFirst);
+		if (player != secondPlayer) {
+			BoardGameScreen.rgame.procEndGame(player);
+		}
+		BoardGameScreen.rgame.procEndGame(secondPlayer);
 		super.procEndGame(((ReversiGame)BoardGameScreen.rgame).numFirstPlayer,
-			((ReversiGame)BoardGameScreen.rgame).numSecondPlayer, player);
+			((ReversiGame)BoardGameScreen.rgame).numSecondPlayer, secondPlayer);
 	}
 
   //#ifdef DTEST
@@ -282,7 +302,7 @@ public final class ReversiScreen extends BoardGameScreen {
 							setMessage(message + Reversi.MSG_PASS, 3000);
 							BoardGameScreen.table.setPassNum(BoardGameScreen.table.getPassNum() + 1);
 							// just to be sure
-							GameMinMax.clearPrecalculatedMoves();
+							gMiniMax.clearPrecalculatedMoves();
 							// Save pass
 							BoardGameScreen.rgame.saveLastTable(BoardGameScreen.table,
 									BoardGameScreen.actPlayer, BoardGameScreen.turnNum);
