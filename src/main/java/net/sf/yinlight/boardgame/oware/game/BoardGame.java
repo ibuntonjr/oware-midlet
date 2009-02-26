@@ -162,6 +162,10 @@ abstract public class BoardGame extends TwoPlayerGame {
 //@	}
 	//#endif
 
+	public void resetTables() {
+		prevTbls.removeAllElements();
+	}
+
 	public void saveLastTable(BoardGameTable bgt, byte player, int turnNum) {
 		//#ifdef DLOGGING
 //@		if (finestLoggable) {logger.finest("saveLastTable bgt,player=" + bgt + "," + player);}
