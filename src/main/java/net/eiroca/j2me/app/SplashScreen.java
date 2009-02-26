@@ -19,10 +19,10 @@
 /**
  * This was modified no later than 2009-01-29
  */
-// Expand to define logging define
-//#define DNOLOGGING
 // Expand to define MIDP define
 //#define DMIDP20
+// Expand to define logging define
+//#define DNOLOGGING
 package net.eiroca.j2me.app;
 
 import java.util.Timer;
