@@ -10,5 +10,5 @@ MIDlet-Data-Size: 3000
 MicroEdition-Configuration: @JCLDCVERS@
 MicroEdition-Profile: @JMIDPVERS@
 Program-Version: @PROGVERS@
-oware-graphics: @GRAPHICS@
-oware-precalulate: @PRECALCULATE@
+boardgame-graphics: @GRAPHICS@
+boardgame-precalulate: @PRECALCULATE@
