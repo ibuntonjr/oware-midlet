@@ -184,6 +184,16 @@ public class OwareMIDlet extends BoardGameApp {
 		//#endif
 		try {
 			super.init();
+			//#ifdef DLOGGING
+//@			logger.info("BoardGameApp.precalculate=" + BoardGameApp.precalculate);
+			//#endif
+			// UNDO Fix pre calculate
+			if (BoardGameApp.precalculate) {
+				//#ifdef DLOGGING
+//@				logger.severe("Having precalculate on (or mitted) causes aborts.");
+				//#endif
+				BoardGameApp.precalculate = false;
+			}
 			BoardGameApp.playerNames = new String[] {
 					BaseApp.messages[BoardGameApp.MSG_NAMEPLAYER1], BaseApp.messages[BoardGameApp.MSG_NAMEPLAYER2]};
 		} catch (Throwable e) {
