@@ -75,7 +75,7 @@
 + Fix end of game scoring
 + Allow prompt command from list used as command menu (not finished).
 
-1.0 2009-02-27 Alpha 8 Version
+1.0 2009-02-27 Beta 1 Version
 + Fixed introduced bug where Oware no longer works due to problems with precalculate.  Now, precalculation is turned off for Oware.
 + Support feature form for logging report.
 + Simplify support concatenation of Reversi and logging in build file.
