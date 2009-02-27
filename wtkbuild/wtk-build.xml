@@ -49,6 +49,7 @@
 	<property name="util.tmppreprocess" value="${target}/util.tmppreprocess" />
 	<property name="ext.drive" value="${env.EXT_DRIVE}" />
 	<property file="${basedir}/wtk-build${device.props}.properties${build.template}" />
+	<property name="DFEATUREFORMDEF" value="DFEATUREFORMDEF" />
 	<!-- DCOMPATDEF is used to test compatibility store/restore of date -->
 	<property name="DCOMPATDEF" value="DNOCOMPAT" />
 	<echo message="unproc.src=${unproc.src}" />
@@ -170,6 +171,7 @@
 			<filter token="MIDLETVERS" value="${MIDLETVERS}" />
 			<filter token="PERMISSIONS" value="${PERMISSIONS}" />
 			<filter token="GRAPHICS" value="${GRAPHICS}" />
+			<filter token="PRECALCULATE" value="${PRECALCULATE}" />
 			<filter token="PROGVERS" value="${buildinfo}" />
 			<filter token="ICONDIR" value="${res.todir}" />
 			<filter token="BUILDPREFIX" value="${build.prefix}" />
