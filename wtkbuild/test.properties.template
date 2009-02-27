@@ -3,7 +3,7 @@ DTESTDEF = D${RELEASE}TEST
 DJMTESTDEF = D${RELEASE}JMTEST
 DTESTUIDEF = D${RELEASE}TESTUI
 #Use Feature Form for logging report form
-DFEATUREFORMDEF = D${RELEASE}FEATUREFORMDEF
+DFEATUREFORMDEF = D${RELEASE}FEATUREFORM
 DFEATUREFORMIMPORTDEF = import com.substanceofcode.rssreader.presentation.FeatureForm;
 DLOGDEF = D${RELEASE}LOGGING
 logging-concat.jad = logging-concat.jad
