@@ -13,19 +13,3 @@ MicroEdition-Configuration: @JCLDCVERS@
 MicroEdition-Profile: @JMIDPVERS@
 boardgame-graphics: @GRAPHICS@
 boardgame-precalulate: @PRECALCULATE@
-jlomicro-ConsoleHandler-formatter: SimpleFormatter
-jlomicro-FileHandler-formatter: SimpleFormatter
-jlomicro-FileHandler-limit: 1000
-jlomicro-FileHandler-name: file:///root1/testdata/log1.txt
-jlomicro-FormHandler-append: true
-jlomicro-FormHandler-formatter: SimpleFormatter
-jlomicro-FormHandler-limit: 1000
-jlomicro-FormHandler-name: Log
-jlomicro-RecStoreHandler-append: true
-jlomicro-RecStoreHandler-formatter: SimpleFormatter
-jlomicro-RecStoreHandler-limit: 1000
-jlomicro-FormHandler-formatter: SimpleFormatter
-jlomicro-FormHandler-limit: 1000
-jlomicro-handlers: ConsoleHandler RecStoreHandler FormHandler
-jlomicro-level: FINE
-jlomicro-LoggerRptForm-level: OFF
