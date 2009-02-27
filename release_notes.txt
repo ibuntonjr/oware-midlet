@@ -75,8 +75,8 @@
 + Fix end of game scoring
 + Allow prompt command from list used as command menu (not finished).
 
-1.0 TBD Alpha 8 Version
-+ Introduced bug where Oware no longer works on Nokia and Sony Ericsson.  It does work on the emulator.
+1.0 2009-02-27 Alpha 8 Version
++ Fixed introduced bug where Oware no longer works due to problems with precalculate.  Now, precalculation is turned off for Oware.
 + Support feature form for logging report.
 + Simplify support concatenation of Reversi and logging in build file.
 + Simplify build file.
@@ -114,3 +114,4 @@
 + Remove unnecessary code.
 + Concatenate logging midlet. 
 + Remove logging entries from manifest/jad. 
++ Workedaround exceptions with pre calculate on for Reversi.  Pre calculcate needs to be disabled as it has bugs.
