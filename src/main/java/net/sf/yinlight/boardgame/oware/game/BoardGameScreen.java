@@ -229,7 +229,7 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 			}
 		}
 		if (GameApp.graphics && ((BoardGameApp.gsSquareImages.length == 0) ||
-				(squareImage != null))) {
+				(squareImage == null))) {
 			pieceWidth = sizex - fontHeight;
 			pieceHeight = Math.min(sizex, sizey - fontHeight);
 			pieceWidth = pieceHeight;
