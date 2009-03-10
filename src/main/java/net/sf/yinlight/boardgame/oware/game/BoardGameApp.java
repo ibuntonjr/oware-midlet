@@ -65,6 +65,7 @@ import net.sf.yinlight.boardgame.oware.game.BoardGameScreen;
 import com.substanceofcode.rssreader.presentation.FeatureForm;
 import com.substanceofcode.rssreader.presentation.FeatureMgr;
 import net.eiroca.j2me.rms.Settings;
+import net.eiroca.j2me.reversi.midlet.Reversi;
 
 
 //#ifdef DLOGGING
@@ -121,6 +122,7 @@ abstract public class BoardGameApp extends GameApp {
   final public static short MSG_SURE_END = (short)(GameApp.MSG_USERDEF + msgOffset++);
   final public static int MSG_LEVELPREFIX = GameApp.MSG_USERDEF + msgOffset++;
   final public static int MSG_USERDEF = GameApp.MSG_USERDEF + msgOffset + 2;
+  final public static int MSG_MINE_USERDEF = Reversi.MSG_USERDEF;
 
   public static int ACTION_OFFSET = 0;
   public static final int GA_UNDO = GameApp.GA_USERDEF + 0;
@@ -222,6 +224,8 @@ abstract public class BoardGameApp extends GameApp {
 //@		fineLoggable = logger.isLoggable(Level.FINE);
 //@		finestLoggable = logger.isLoggable(Level.FINEST);
 //@		traceLoggable = logger.isLoggable(Level.TRACE);
+//@		logger.info("BoardGameApp.MSG_USERDEF=" + BoardGameApp.MSG_USERDEF);
+//@		logger.info("Reversi.MSG_USERDEF=" + Reversi.MSG_USERDEF);
 		//#endif
     BaseApp.menu = new short[][] {
         {
