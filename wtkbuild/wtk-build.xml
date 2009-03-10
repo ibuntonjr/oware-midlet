@@ -426,6 +426,7 @@
 		<mkdir dir="${wtk.res}" />
 		<copy todir="${wtk.res}" >
 			<fileset dir="${res}" includes="**/*.png" />
+			<fileset dir="${res}" includes="**/*.wav" />
 		</copy>
 		<copy todir="${wtk.res}" >
 			<filterset refid="midlet.info" />
@@ -535,6 +536,7 @@
 		<copy todir="${tmpres}/${res.todir}" >
 			<fileset dir="${icon.dir}" >
 				<include name="**/*.png" />
+				<include name="**/*.wav" />
 				<!-- Restrict
 				<exclude name="**/reversi*.png" />
 				-->
@@ -551,6 +553,7 @@
 		<copy todir="${tmpres}/en" >
 			<fileset dir="${icon.dir}" >
 				<include name="**/*.png" />
+				<include name="**/*.wav" />
 				<!-- UNDO 
 				<exclude name="**/reversi*.png" />
 				UNDO -->
