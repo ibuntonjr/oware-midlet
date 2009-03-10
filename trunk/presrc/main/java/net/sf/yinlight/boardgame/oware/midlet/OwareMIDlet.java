@@ -112,7 +112,7 @@ public class OwareMIDlet extends BoardGameApp {
   final static public int LEVEL_DIFFICULT = 1;
   final static public int LEVEL_HARD = 2;
 	/* Dept.  Number of moves that the AI tests. */
-  public static int gsInitSeedsInit = 4;
+  public static int gsInitSeedsInit = 1;
   public static int gsInitSeeds = 4;
   public static int gsInitSeedsLimit = 6;
   public static int gsInitSeedsIncr = 1;
