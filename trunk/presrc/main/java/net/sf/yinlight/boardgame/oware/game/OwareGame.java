@@ -373,19 +373,19 @@ public final class OwareGame extends BoardGame {
   public void eval(boolean lazyProcess, BoardGame bg, GameTable t,
 			final byte player, boolean endGame) {
 		try {
-			OwareTable rTable = (OwareTable)t;
-			int pointFirstPlayer = rTable.getPoint((byte)0);
-			int pointSecondPlayer = rTable.getPoint((byte)1);
+			OwareTable ctable = (OwareTable)t;
+			int pointFirstPlayer = ctable.getPoint((byte)0);
+			int pointSecondPlayer = ctable.getPoint((byte)1);
 			if (endGame) {
-				for (int i = 0; i < rTable.nbrRow; ++i) {
-					for (int j = 0; j < rTable.nbrCol; ++j) {
-						int ix = rTable.getItem(i, j) - 1;
-						int cseeds = rTable.getSeeds(i, j);
+				for (int i = 0; i < ctable.nbrRow; ++i) {
+					for (int j = 0; j < ctable.nbrCol; ++j) {
+						int ix = ctable.getItem(i, j) - 1;
+						int cseeds = ctable.getSeeds(i, j);
 						if (cseeds > 0) {
 							if (endGame) {
-								rTable.setPoint((byte)ix, (byte)(rTable.getPoint((byte)ix) +
+								ctable.setPoint((byte)ix, (byte)(ctable.getPoint((byte)ix) +
 										cseeds));
-								rTable.setSeeds(i, j, (byte)0);
+								ctable.setSeeds(i, j, (byte)0);
 							}
 						}
 						if (ix == 0) {
@@ -401,7 +401,7 @@ public final class OwareGame extends BoardGame {
 				point = -point;
 			}
 			//#ifdef DLOGGING
-			if (finestLoggable) {logger.finest("eval player,pointFirstPlayer,pointSecondPlayer,point,rTable.getPassNum()=" + player + "," + pointFirstPlayer + "," + pointSecondPlayer + "," +  point + "," + rTable.getPassNum());}
+			if (finestLoggable) {logger.finest("eval player,pointFirstPlayer,pointSecondPlayer,point,ctable.getPassNum()=" + player + "," + pointFirstPlayer + "," + pointSecondPlayer + "," +  point + "," + ctable.getPassNum());}
 			//#endif
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -419,6 +419,9 @@ public final class OwareGame extends BoardGame {
   public int getGameResult(final byte player) {
 		eval(false, true, player);
     int score = point;
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("getGameResult player,score=" + player + "," + score);}
+		//#endif
     if (score > 0) {
       return TwoPlayerGame.WIN;
     }
