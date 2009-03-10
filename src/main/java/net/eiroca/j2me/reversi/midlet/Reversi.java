@@ -58,6 +58,7 @@ public class Reversi extends BoardGameApp {
   final public static int MSG_NAME = OwareMIDlet.MSG_USERDEF + msgOffset++; // 0
   final public static int MSG_UPPER = OwareMIDlet.MSG_USERDEF + msgOffset++; // 0
   final public static int MSG_LOWER = OwareMIDlet.MSG_USERDEF + msgOffset++; // 0
+  final public static int MSG_USERDEF = OwareMIDlet.MSG_USERDEF + msgOffset++; // 0
 
 	//#ifdef DLOGGING
 //@  private boolean fineLoggable;
@@ -67,11 +68,11 @@ public class Reversi extends BoardGameApp {
 	//#endif
 
   public Reversi() {
-	//#ifdef DJMTEST
+		//#ifdef DJMTEST
 //@    super("Reversi Games Suite");
-	//#else
+		//#else
     super();
-	//#endif
+		//#endif
 		//#ifdef DLOGGING
 //@		logger = Logger.getLogger("Reversi");
 //@		fineLoggable = logger.isLoggable(Level.FINE);
