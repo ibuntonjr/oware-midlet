@@ -72,3 +72,19 @@ Opponent gets seeds
 Reversi
 Upper
 Lower
+Difficulty
+Beginner
+Intermediate
+Expert
+Custom
+MineSweeper
+Custom Level
+Field heigth
+Field width
+Numer of bombs
+Height
+Width
+Bombs
+ must be between 
+ and 
+Level 
