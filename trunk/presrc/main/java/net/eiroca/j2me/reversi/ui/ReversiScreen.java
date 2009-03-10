@@ -180,9 +180,16 @@ public final class ReversiScreen extends BoardGameScreen {
     // two pieces
 		drawPiece(0, BoardGameScreen.table.nbrCol, 1, false,
 				((BoardGameApp.gsFirst == 0) ? piece2Image : piece1Image), 0, 0); /* y, x */
+		if (BoardGameScreen.actPlayer == 0) {
+			drawSelectionBox(BoardGameScreen.table.nbrCol, 0, 0);
+		}
 		drawPiece(BoardGameScreen.table.nbrRow - 1, BoardGameScreen.table.nbrCol, 0,
 				false,
 				((BoardGameApp.gsFirst == 1) ? piece2Image : piece1Image), 0, 0); /* y, x */
+			if (BoardGameScreen.actPlayer == 1) {
+				drawSelectionBox(BoardGameScreen.table.nbrCol,
+						BoardGameScreen.table.nbrRow - 1, 0);
+			}
     // numbers
     screen.setColor(BaseApp.foreground);
     screen.drawString(infoLines[0], width + vertWidth, off_y + sizey + 2, Graphics.TOP | Graphics.RIGHT);
@@ -222,7 +229,7 @@ public final class ReversiScreen extends BoardGameScreen {
     updatePossibleMoves();
 		int numMoves = 0;
     while (!gameEnded && !isHuman[BoardGameScreen.actPlayer] &&
-				(numMoves++ > 2)) {
+				(numMoves++ < 2)) {
 			if (BoardGameApp.precalculate) {
 				mtt = new MinimaxTimerTask();
 			}
@@ -239,6 +246,10 @@ public final class ReversiScreen extends BoardGameScreen {
       updatePossibleMoves();
       gMiniMax.clearPrecalculatedMoves();
     }
+		//#ifdef DLOGGING
+		if (finerLoggable) {logger.finer("nextTurn end BoardGameScreen.actPlayer,isHuman[BoardGameScreen.actPlayer],numMoves,gameEnded=" + BoardGameScreen.actPlayer + "," + isHuman[BoardGameScreen.actPlayer] + "," + numMoves + "," + gameEnded);}
+		tableDraws = 2;
+		//#endif
   }
 
 	public void procEndGame(byte player) {
