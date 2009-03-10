@@ -371,7 +371,7 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 			screen.fillRect(0, 0, screenWidth, screenHeight);
 			drawBoard();
 			drawTable();
-			drawSelectionBox();
+			drawSelectionBox(selx, sely, 0);
 			drawPossibleMoves();
 			drawVertInfo();
 			drawMessage();
@@ -532,15 +532,17 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 		}
   }
 
-  protected void drawSelectionBox() {
+  protected void drawSelectionBox(int x, int y, int yadjust) {
     if (BoardGameScreen.getActPlayer() == 0) {
       screen.setColor(BoardGameScreen.COLOR_P1);
     }
     else {
       screen.setColor(BoardGameScreen.COLOR_P2);
     }
-    screen.drawRect(off_x + selx * sizex, off_y + sely * sizey, sizex, sizey);
-    screen.drawRect(off_x + selx * sizex + 1, off_y + sely * sizey + 1, sizex - 2, sizey - 2);
+    screen.drawRect(off_x + x * sizex, off_y + yadjust + y * sizey, sizex,
+				sizey);
+    screen.drawRect(off_x + x * sizex + 1, off_y + yadjust + y * sizey + 1,
+				sizex - 2, sizey - 2);
   }
 
   abstract protected void drawTable();
