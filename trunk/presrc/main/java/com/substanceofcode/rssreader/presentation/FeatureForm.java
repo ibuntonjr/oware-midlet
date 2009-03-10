@@ -50,7 +50,6 @@ import net.eiroca.j2me.rms.Settings;
 import net.sf.jlogmicro.util.logging.Logger;
 import net.sf.jlogmicro.util.logging.Level;
 //#endif
-
 /* Form with optional commands added with addPromptCommand which if
    used, will give prompt message with OK/Cancel.  */
 public class FeatureForm extends Form {
