@@ -23,7 +23,6 @@ package net.eiroca.j2me.game;
 
 import javax.microedition.lcdui.Choice;
 import javax.microedition.lcdui.ChoiceGroup;
-import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Gauge;
 import net.eiroca.j2me.app.BaseApp;
 import com.substanceofcode.rssreader.presentation.FeatureForm;
