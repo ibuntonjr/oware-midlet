@@ -94,14 +94,13 @@ public final class MineSweeperScreen extends BoardGameScreen {
 
   public MineSweeperScreen(final GameApp midlet) {
 		super(midlet, false, true, MineSweeper.MSG_NAME);
+		//#ifdef DMIDP20
     try {
 			//#ifdef DLOGGING
 //@			if (finestLoggable) {logger.finest("constructor ");}
 			//#endif
-			//#ifdef DMIDP20
       pBomb = Manager.createPlayer(getClass().getResourceAsStream(MineSweeper.RES_BOMB), "audio/x-wav");
       pTicTac = Manager.createPlayer(getClass().getResourceAsStream(MineSweeper.RES_CLOCK), "audio/x-wav");
-			//#endif
 			//#ifdef DLOGGING
 //@			if (finestLoggable) {logger.finest("constructor pBomb,pTicTac=" + pBomb + "," + pTicTac);}
 			//#endif
@@ -113,6 +112,7 @@ public final class MineSweeperScreen extends BoardGameScreen {
 //@			logger.severe("construction error", e1);
 			//#endif
     }
+		//#endif
 		iSmile = BaseApp.createImage(MineSweeper.RES_SMILE);
 		iSmileOK = BaseApp.createImage(MineSweeper.RES_SMILEOK);
 		iSmileKO = BaseApp.createImage(MineSweeper.RES_SMILEKO);
