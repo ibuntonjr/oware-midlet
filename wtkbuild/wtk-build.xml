@@ -124,7 +124,6 @@
 		<property file="${basedir}/${wtk.properties}" />
 		<property name="PERMISSIONS" value="" />
 		<property name="log.subdir" value="jlogmicro" />
-		<property name="Oware-concat.jad" value="Oware-concat.jad" />
 		<property name="GRAPHICS" value="true" />
 		<property name="PRECALCULATE" value="false" />
 		<!-- undo
@@ -629,6 +628,9 @@
 		</antcall>
 		<antcall target="cat.to.midlet" >
 			<param name="concat.jad" value="Reversi-concat.jad" />
+		</antcall>
+		<antcall target="cat.to.midlet" >
+			<param name="concat.jad" value="Minesweeper-concat.jad" />
 		</antcall>
 
 		<echo message="MIDLETVERS=${MIDLETVERS}" />
