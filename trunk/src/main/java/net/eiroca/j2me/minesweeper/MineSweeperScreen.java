@@ -34,8 +34,8 @@ import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
-import javax.microedition.lcdui.game.Sprite;
 //#ifdef DMIDP20
+import javax.microedition.lcdui.game.Sprite;
 import javax.microedition.media.Manager;
 import javax.microedition.media.Player;
 import javax.microedition.media.control.VolumeControl;
@@ -117,8 +117,11 @@ public final class MineSweeperScreen extends BoardGameScreen {
 		iSmileOK = BaseApp.createImage(MineSweeper.RES_SMILEOK);
 		iSmileKO = BaseApp.createImage(MineSweeper.RES_SMILEKO);
 		iAll = BaseApp.createImage(MineSweeper.RES_ICONS);
+		// UNDO MINE (Handle sprite with split
+		//#ifdef DMIDP20
 		icons = new Sprite(iAll, 15, 15);
 		icons.setFrame(11);
+		//#endif
 		rgame = new MineSweeperGame();
 		textFont = Font.getFont(Font.FACE_MONOSPACE, Font.STYLE_PLAIN, Font.SIZE_SMALL);
   }
@@ -171,10 +174,10 @@ public final class MineSweeperScreen extends BoardGameScreen {
 				vol = (VolumeControl) pTicTac.getControl("VolumeControl");
 				vol.setLevel(GameApp.usVolume * 20);
 			}
-			//#endif
 			catch (final Exception e) {
 				//
 			}
+			//#endif
 			sec = 0;
 			last = System.currentTimeMillis();
 			offX = 0;
@@ -251,24 +254,32 @@ public final class MineSweeperScreen extends BoardGameScreen {
 					drawSelectionBox();
 				}
         if (info[x][y] == MineSweeperGame.MINE_UNCHECKED) {
+					//#ifdef DMIDP20
           icons.setFrame(11);
           icons.setPosition(base_x + ((x - offX) * MineSweeperScreen.BLKSIZE), base_y + ((y - offY) * MineSweeperScreen.BLKSIZE));
           icons.paint(g);
+					//#endif
         }
         if (info[x][y] == MineSweeperGame.MINE_CHECKED) {
+					//#ifdef DMIDP20
           icons.setFrame(10);
           icons.setPosition(base_x + ((x - offX) * MineSweeperScreen.BLKSIZE), base_y + ((y - offY) * MineSweeperScreen.BLKSIZE));
           icons.paint(g);
+					//#endif
         }
         if (info[x][y] == MineSweeperGame.MINE_BOMB) {
+					//#ifdef DMIDP20
           icons.setFrame(9);
           icons.setPosition(base_x + ((x - offX) * MineSweeperScreen.BLKSIZE), base_y + ((y - offY) * MineSweeperScreen.BLKSIZE));
           icons.paint(g);
+					//#endif
         }
         if ((info[x][y] >= 0) && (info[x][y] <= 8)) {
+					//#ifdef DMIDP20
           icons.setFrame(info[x][y]);
           icons.setPosition(base_x + ((x - offX) * MineSweeperScreen.BLKSIZE), base_y + ((y - offY) * MineSweeperScreen.BLKSIZE));
           icons.paint(g);
+					//#endif
         }
       }
     }
@@ -374,10 +385,14 @@ public final class MineSweeperScreen extends BoardGameScreen {
     else if (action == Canvas.FIRE) {
       final Vector v = game.checkCell(selx, sely);
       if (game.status == MineSweeperGame.GE_EXPLODED) {
+				//#ifdef DMIDP20
         GameApp.play(pBomb);
+				//#endif
       }
       else {
+				//#ifdef DMIDP20
         GameApp.play(pTicTac);
+				//#endif
       }
       for (int i = 0; i < v.size(); i++) {
         final MineInfo m = (MineInfo) v.elementAt(i);
@@ -388,10 +403,14 @@ public final class MineSweeperScreen extends BoardGameScreen {
       if (game.canDoubleClick(selx, sely)) {
         final Vector v = game.doubleClick(selx, sely);
         if (game.status == MineSweeperGame.GE_EXPLODED) {
+					//#ifdef DMIDP20
           GameApp.play(pBomb);
+					//#endif
         }
         else {
+					//#ifdef DMIDP20
           GameApp.play(pTicTac);
+					//#endif
         }
         for (int i = 0; i < v.size(); i++) {
           final MineInfo m = (MineInfo) v.elementAt(i);
