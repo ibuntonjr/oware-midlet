@@ -1465,7 +1465,7 @@ implements CommandListener
   public static Image[] splitImages(final String res, final int count, final int width, final int height) {
 		//#ifdef DLOGGING
 //@		Logger logger = Logger.getLogger("BaseApp");
-//@		logger.finest("createImage res,count,width,height=" + res + "," + count + "," + width + "," + height);
+//@		logger.finest("splitImages res,count,width,height=" + res + "," + count + "," + width + "," + height);
 		//#endif
     final Image[] images = new Image[count];
     try {
