@@ -1,14 +1,13 @@
-MIDlet-1: Oware, @ICONDIR@owareicon32x32.png, net.sf.yinlight.boardgame.oware.midlet.OwareMIDlet
 MIDlet-Jar-Size: 26843
-MIDlet-Info-URL: http://code.google.com/p/oware
+MIDlet-Info-URL: http://code.google.com/p/oware-midlet
 MIDlet-Jar-URL: @MIDLETURL@
 MIDlet-Name: Oware
-MIDlet-Vendor: Irving Bunton
+MIDlet-Vendor: Irving Bunton Jr
 MIDlet-Version: @MIDLETVERS@
 MIDlet-Permissions-Opt: javax.microedition.io.HttpConnection@PERMISSIONS@
 MIDlet-Data-Size: 3000
 MIDlet-Icon: /owareicon32x32.png
-MIDlet-Description: Oware Game
+MIDlet-Description: Oware/Reversi Game
 MicroEdition-Configuration: @JCLDCVERS@
 MicroEdition-Profile: @JMIDPVERS@
 boardgame-graphics: @GRAPHICS@
