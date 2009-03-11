@@ -1489,7 +1489,7 @@ implements CommandListener
         g = images[i].getGraphics();
 				//#ifdef DMIDP20
         g.drawRegion(image, i * width, 0, width, width, Sprite.TRANS_NONE, 0, 0,
-						Graphics.LEFT | Graphics.TOP);
+						0);
 				//#else
 //@        g.drawImage(image, -i * width, 0, 0);
 				//#endif
