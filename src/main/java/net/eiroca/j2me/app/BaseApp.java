@@ -81,6 +81,7 @@ import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.Item;
 //#ifdef DMIDP20
 import javax.microedition.lcdui.ItemCommandListener;
+import javax.microedition.lcdui.game.Sprite;
 //#endif
 import javax.microedition.lcdui.List;
 //#ifdef DMIDP20
@@ -1479,11 +1480,19 @@ implements CommandListener
 			//#else
 //@      final Image image = BaseApp.createImage(res);
 			//#endif
+			//#ifdef DLOGGING
+//@			logger.finest("splitImages image.getWidth(),image.getHeight()=" + image.getWidth() + "," + image.getHeight());
+			//#endif
 			int widthCount = image.getWidth();
       for (int i = 0; i < count; i++) {
         images[i] = Image.createImage(width, height);
         g = images[i].getGraphics();
-        g.drawImage(image, -i * width, 0, 0);
+				//#ifdef DMIDP20
+        g.drawRegion(image, i * width, 0, width, width, Sprite.TRANS_NONE, 0, 0,
+						Graphics.LEFT | Graphics.TOP);
+				//#else
+//@        g.drawImage(image, -i * width, 0, 0);
+				//#endif
 				widthCount -= width;
 				//#ifdef DLOGGING
 //@				logger.trace("splitImages i,widthCount=" + i + "," + widthCount);
