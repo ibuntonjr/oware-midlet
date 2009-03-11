@@ -1,4 +1,3 @@
-MIDlet-1: Oware, /owareicon32x32.png, net.sf.yinlight.boardgame.oware.midlet.OwareMIDlet
 MIDlet-Vendor: Irving Bunton
 MIDlet-Info-URL: http://www.code.google.com/p/oware
 MIDlet-Name: Oware
