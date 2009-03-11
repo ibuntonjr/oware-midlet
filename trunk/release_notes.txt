@@ -123,4 +123,7 @@
 + Fix computer moves not working with Reversi.
 + Fix problem where icons were not appearing for Reversi if they need to be smaller than the icons in the JAR file.
 + More logging.
-+ 
++ Mark last Reversi pieces moves 
++ Allow creation of release file with different names.
++ Allow creation of JAR without Oware.
++ Use JAD for obfuscate.
