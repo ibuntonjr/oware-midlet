@@ -219,6 +219,8 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 				squareWidth = sizex * table.nbrRow;
 				piece1Image = getImageFit(BoardGameApp.gsPiece1Images, sizex);
 				piece2Image = getImageFit(BoardGameApp.gsPiece2Images, sizex);
+				pieceWidth = piece1Image.getWidth();
+				pieceHeight = piece1Image.getHeight();
 				//#ifdef DLOGGING
 //@				if (finestLoggable) {logger.finest("constructor piece1Image,piece1Image.getWidth(),piece1Image.getHeight()=" + ((piece1Image == null) ? "piece1Image is null" : piece1Image.getWidth() + "," + piece1Image.getHeight()));}
 //@				if (finestLoggable) {logger.finest("constructor piece2Image,piece2Image.getWidth(),piece2Image.getHeight()=" + ((piece2Image == null) ? "piece2Image is null" : piece2Image.getWidth() + "," + piece2Image.getHeight()));}
