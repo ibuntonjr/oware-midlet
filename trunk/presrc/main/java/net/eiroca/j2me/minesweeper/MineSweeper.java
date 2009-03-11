@@ -277,11 +277,18 @@ public class MineSweeper extends BoardGameApp {
 
   protected Displayable getHighScore() {
     final Form form = new FeatureForm(BaseApp.messages[GameApp.MSG_MENU_MAIN_HIGHSCORE]);
+		//#ifdef DMIDP20
     final Font f = Font.getFont(Font.STYLE_BOLD);
+		//#else
+    final Font df = Font.getDefaultFont();
+    final Font f = Font.getFont(df.getFace(), Font.STYLE_BOLD, df.getSize());
+		//#endif
     for (int l = 0; l < GameApp.hsMaxLevel; l++) {
       final Vector scores = GameApp.highscore.getList(l);
       final StringItem txt = new StringItem(BaseApp.messages[MineSweeper.MSG_HS_LEVEL] + BaseApp.messages[MineSweeper.MSG_TEXT_LEVEL_01 + l] + "\n", null);
+			//#ifdef DMIDP20
       txt.setFont(f);
+			//#endif
       form.append(txt);
       if (scores.size() == 0) {
         form.append(BaseApp.messages[GameApp.MSG_TEXT_HIGHSCORE_01]);
