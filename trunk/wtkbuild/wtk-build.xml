@@ -124,6 +124,7 @@
 		<property file="${basedir}/${wtk.properties}" />
 		<property name="PERMISSIONS" value="" />
 		<property name="log.subdir" value="jlogmicro" />
+		<property name="Oware-concat.jad" value="Oware-concat.jad" />
 		<property name="GRAPHICS" value="true" />
 		<property name="PRECALCULATE" value="false" />
 		<!-- undo
@@ -137,7 +138,9 @@
 		-->
 		<property name="stage" value="" />
 		<property name="build.prefix" value="${file.prefix}${stage}" />
-		<property name="build.file.root" value="${build.prefix}${project.name}-${FMIDLETVERSROOT}" />
+		<property name="release.name" value="${project.name}" />
+		<property name="build.file.root" value="${build.prefix}${release.name}-${FMIDLETVERSROOT}" />
+		<property name="alx.build.file.root" value="${build.prefix}${release.name}_${FMIDLETVERSROOT}" />
 		<property name="buildinfo" value="${SUFFIXVERS}-${stage}b${build.number}" />
 		<!-- changed -->
 		<mkdir dir="${target}" />
@@ -619,6 +622,9 @@
 			<param name="concat.jad" value="logging-concat.jad" />
 		</antcall>
 		<antcall target="cat.to.midlet" >
+			<param name="concat.jad" value="Oware-concat.jad" />
+		</antcall>
+		<antcall target="cat.to.midlet" >
 			<param name="concat.jad" value="jlogmicro.jad" />
 		</antcall>
 		<antcall target="cat.to.midlet" >
@@ -648,7 +654,7 @@
 
 		</wtkpackage>
 
-		<wtkobfuscate jarfile="${bin}/${project.name}.jar" obfuscator="proguard" if="keep.obfuscate" >
+		<wtkobfuscate jarfile="${bin}/${project.name}.jar" obfuscator="proguard" jadfile="${bin}/${project.name}.jad" if="keep.obfuscate" >
 			<argument value="-keep public class ${obfuscate.classes}" />
 		</wtkobfuscate>
 		<!-- Include version in the file so that they can be uploaded to -->
@@ -658,7 +664,7 @@
 		<copy file="${bin}/${project.name}.jar" tofile="${bin}/${build.file.root}.jar" />
 		<copy file="${bin}/${build.file.root}.jar" todir="${dist}" />
 		<copy file="${bin}/${build.file.root}.jad" todir="${dist}" />
-		<copy file="${bin}/${project.name}.alx" tofile="${dist}/${build.prefix}${project.name}_${FMIDLETVERSROOT}.alx" />
+		<copy file="${bin}/${project.name}.alx" tofile="${dist}/${alx.build.file.root}.alx" />
 		<copy file="${bin}/${project.name}.jar" tofile="${build}/${build.prefix}${build.jar}" />
 		<antcall target="create.prc" inheritAll="true" />
 		<!-- Manifest changes based on MIDP/JSR's so use prefixes to -->
