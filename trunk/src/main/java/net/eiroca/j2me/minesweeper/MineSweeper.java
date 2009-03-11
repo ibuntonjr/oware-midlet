@@ -364,7 +364,7 @@ public class MineSweeper extends BoardGameApp {
 		try {
 			super.loadBoardGameCustomization();
 			MineSweeper.usLevel = BaseApp.settings.getInt(
-					MineSweeper.MINE_SWEEPER_US_LEVEL, MineSweeper.usLevelInit);
+					MineSweeper.MINE_SWEEPER_US_LEVEL, MineSweeper.usLevel);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			//#ifdef DLOGGING
