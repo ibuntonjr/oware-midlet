@@ -170,7 +170,6 @@ abstract public class BoardGameApp extends GameApp {
 	/* How many human players. */
   public static int gsPlayer = 1;
   public static int gsFirst = 1;
-  //undo static public String[] pieceImage = new String[0];
   static public String[] gsSquareImages = new String[0];
   static public String[] gsPiece1Images = new String[0];
   static public String[] gsPiece2Images = new String[0];
