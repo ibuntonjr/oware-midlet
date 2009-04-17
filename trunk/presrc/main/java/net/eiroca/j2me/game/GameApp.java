@@ -393,7 +393,7 @@ public abstract class GameApp extends Application {
    */
   public void doGameStop() {
 		//#ifdef DLOGGING
-		if (finestLoggable) {logger.finest("doGameStop isActive()=" + isActive(), new Exception("UNDO"));}
+		if (finestLoggable) {logger.finest("doGameStop isActive()=" + isActive());}
 		//#endif
     if (isActive()) {
       GameApp.game.hide();
