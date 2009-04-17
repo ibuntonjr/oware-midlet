@@ -68,7 +68,8 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
   protected static final byte STORE_VERS = 2;
   protected static final byte SCREEN_STORE_BYTES = 6;
   protected static final char NL = '\n';
-  protected static final int HEIGHT_SEPARATERS = 4;
+  protected static final int WIDTH_SEPARATERS = 2;
+  protected static final int HEIGHT_SEPARATERS = 2;
   protected static final int COLOR_TEXT_BG = 0xEEEEEE;
   protected static final int COLOR_TEXT_FG = 0x000000;
   protected static final int COLOR_BG = 0xFFFFD0;
@@ -204,8 +205,10 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
     fontHeight = cscreen.getFont().getHeight();
     height = sizey * brow;
     width = sizex * bcol;
-		piece_offy = 5;
-		if (GameApp.graphics && (BoardGameApp.gsSquareImages.length > 0)) {
+		if (!GameApp.graphics) {
+				piece_offy = WIDTH_SEPARATERS;
+				piece_offx = HEIGHT_SEPARATERS;
+		} else if (GameApp.graphics && (BoardGameApp.gsSquareImages.length > 0)) {
 			sizex = Math.min(sizex, sizey);
 			sizey = sizex;
 			squareImage = getImageFit(BoardGameApp.gsSquareImages, sizex);
@@ -232,15 +235,18 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 		}
 		if (GameApp.graphics && ((BoardGameApp.gsSquareImages.length == 0) ||
 				(squareImage == null))) {
-			pieceWidth = sizex - fontHeight;
-			pieceHeight = Math.min(sizex, sizey - fontHeight);
-			pieceWidth = pieceHeight;
+			if (BoardGameApp.gsTextRow > 0) {
+				pieceHeight = sizey - fontHeight;
+			} else {
+				pieceHeight = sizey - 2 * HEIGHT_SEPARATERS;
+			}
+			pieceWidth = sizex - 2 * WIDTH_SEPARATERS;
 			// See if # text rows of text height plus the pieceWidth is < sizey
 			if ((BoardGameApp.gsTextRow > 0) &&
 				(sizey < ((BoardGameApp.gsTextRow * fontHeight + HEIGHT_SEPARATERS) +
 									pieceWidth + piece_offy + 1))) {
 				int newSizey = (BoardGameApp.gsTextRow * (fontHeight + HEIGHT_SEPARATERS)) +
-					pieceWidth  + 1;
+					pieceHeight  + 1;
 				if (newSizey < origSizey) {
 					sizey = newSizey;
 				}
@@ -249,20 +255,25 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 				//#endif
 			}
 			piece_offx = (sizex - pieceWidth) / 2;
+			piece_offy = (sizex - pieceHeight) / 2;
 			cupWidth = pieceWidth;
 			cupHeight = pieceHeight;
-			if (cupWidth > cupHeight) {
-				cupWidth = cupHeight;
-			} else {
-				cupHeight = cupWidth;
-			}
 			piece1Image = getImageFit(BoardGameApp.gsPiece1Images, cupWidth);
 			piece2Image = getImageFit(BoardGameApp.gsPiece2Images, cupWidth);
+			if ((piece1Image != null) && (piece2Image != null) &&
+					(piece1Image.getWidth() == piece1Image.getHeight()) &&
+			    (piece1Image.getWidth() == piece2Image.getHeight()) &&
+			    (piece2Image.getWidth() == piece2Image.getHeight())) {
+				if (cupWidth > cupHeight) {
+					cupWidth = cupHeight;
+				} else {
+					cupHeight = cupWidth;
+				}
+			}
 			//#ifdef DLOGGING
 //@			if (finestLoggable) {logger.finest("constructor piece1Image,piece1Image.getWidth(),piece1Image.getHeight()=" + ((piece1Image == null) ? "piece1Image is null" : piece1Image.getWidth() + "," + piece1Image.getHeight()));}
 //@			if (finestLoggable) {logger.finest("constructor piece2Image,piece2Image.getWidth(),piece2Image.getHeight()=" + ((piece2Image == null) ? "piece2Image is null" : piece2Image.getWidth() + "," + piece2Image.getHeight()));}
 			//#endif
-			//undo cup2Image = null; // undo BaseApp.createImage(CUP2);
 			turnImage = piece1Image;
 			if (piece1Image != null) {
 				int imageWidth = piece1Image.getWidth();
@@ -302,14 +313,14 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
   }
 
 	Image getImageFit(String[] imageNames, int width) {
-		Image cimage = null;
+		Image rimage = null;
 		for (int ix = imageNames.length - 1; ix >= 0; ix--) {
-			cimage = BaseApp.createImage(imageNames[ix]);
+			final Image cimage = BaseApp.createImage(imageNames[ix]);
 			if ((cimage != null) && (cimage.getWidth() < width)) {
-				break;
+				return cimage;
 			}
 		}
-		return cimage;
+		return null;
 	}
 
   /**
@@ -552,7 +563,6 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
   public void drawVertInfo() {
 		try {
 			// two pieces
-			//undo
 			drawPiece(0, table.nbrCol, 1, false,
 				((BoardGameApp.gsFirst == 0) ? piece2Image : piece1Image), 0, 0); /* y, x */
 			drawPiece(table.nbrRow - 1, table.nbrCol, 0, false,
