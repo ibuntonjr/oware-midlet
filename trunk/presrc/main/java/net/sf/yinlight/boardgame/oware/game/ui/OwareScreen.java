@@ -226,12 +226,12 @@ public final class OwareScreen extends BoardGameScreen {
   public void drawVertInfo() {
 		try {
 			// two pieces
-			//undo
 			drawPiece(0, BoardGameScreen.table.nbrCol, 1, false,
 					((BoardGameScreen.actPlayer == 0) ? piece2Image : piece1Image), 0, 0); /* y, x */
 			if (BoardGameScreen.actPlayer == 0) {
 				drawSelectionBox(BoardGameScreen.table.nbrCol, 0, 0);
 			}
+			// FIX
 			int cadjust = -pieceHeight - piece_offy;
 			drawPiece(BoardGameScreen.table.nbrRow, BoardGameScreen.table.nbrCol,
 					0, false,
