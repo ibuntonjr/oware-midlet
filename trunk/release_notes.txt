@@ -116,10 +116,12 @@
 + Remove logging entries from manifest/jad. 
 + Workedaround exceptions with pre calculate on for Reversi.  Pre calculcate needs to be disabled as it has bugs.
 
-1.0 2009-03-10 Beta 2 Version
+1.0 2009-04-17 Beta 2 Version
 + Highlight pieces in verticle bar.
 + Start of minesweeper app.  This is only available for test version.
 + Remove unneeded declaratoins.
++ Remove unneeded logging.
++ Remove unneeded space for Reversi.
 + Fix computer moves not working with Reversi.
 + Fix problem where icons were not appearing for Reversi if they need to be smaller than the icons in the JAR file.
 + More logging.
@@ -129,3 +131,8 @@
 + Use JAD for obfuscate.
 + Use drawRegion to split images for menu as this is documented to do so for MIDP 2.0.
 + Put in help text for Reversi.
+
+Issues:
+
+Highlighting of lower player is not the right place for Oware.
+
