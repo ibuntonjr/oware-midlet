@@ -47,6 +47,7 @@ import net.eiroca.j2me.game.GameScreen;
 import net.eiroca.j2me.game.GameUISettings;
 import net.eiroca.j2me.game.Score;
 import net.eiroca.j2me.minesweeper.CustomLevelForm;
+import net.sf.yinlight.boardgame.oware.midlet.AppConstants;
 import net.eiroca.j2me.minesweeper.MineSweeperScreen;
 import net.eiroca.j2me.minesweeper.game.MineSweeperGame;
 import net.eiroca.j2me.minesweeper.game.MineSweeperTable;
@@ -317,8 +318,8 @@ public class MineSweeper extends BoardGameApp {
 		try {
 			super.init();
 			BoardGameApp.playerNames = new String[] {
-					BaseApp.messages[net.eiroca.j2me.reversi.midlet.Reversi.MSG_UPPER],
-					BaseApp.messages[net.eiroca.j2me.reversi.midlet.Reversi.MSG_LOWER]};
+					BaseApp.messages[AppConstants.MSG_UPPER],
+					BaseApp.messages[AppConstants.MSG_LOWER]};
 		} catch (Throwable e) {
 			e.printStackTrace();
 			//#ifdef DLOGGING
