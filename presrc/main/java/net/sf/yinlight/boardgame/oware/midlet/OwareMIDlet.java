@@ -81,22 +81,6 @@ import net.sf.jlogmicro.util.presentation.RecStoreLoggerForm;
 	*/ 
 public class OwareMIDlet extends BoardGameApp {
 
-  public static short msgOffset = 0;
-  final public static int MSG_NAME = BoardGameApp.MSG_USERDEF + msgOffset++; // 0
-  final public static int MSG_INIT_SEEDS = BoardGameApp.MSG_USERDEF + msgOffset++;
-  final public static int MSG_MAX_HOUSES = BoardGameApp.MSG_USERDEF + msgOffset++;
-  final public static int MSG_GRAND_SLAM = BoardGameApp.MSG_USERDEF + msgOffset++;
-  final public static int MSG_GRAND_SLAM1 = BoardGameApp.MSG_USERDEF + msgOffset++;
-  final public static int MSG_GRAND_SLAM2 = BoardGameApp.MSG_USERDEF + msgOffset++;
-  final public static int MSG_GRAND_SLAM3 = BoardGameApp.MSG_USERDEF + msgOffset++;
-  final public static int MSG_GRAND_SLAM4 = BoardGameApp.MSG_USERDEF + msgOffset++;
-  final public static int MSG_GRAND_SLAM5 = BoardGameApp.MSG_USERDEF + msgOffset++;
-  final public static int MSG_GRAND_SLAM6 = BoardGameApp.MSG_USERDEF + msgOffset++;
-  final public static int MSG_OPPONENT_EMPTY = BoardGameApp.MSG_USERDEF + msgOffset++;
-  final public static int MSG_OPPONENT_EMPTY1 = BoardGameApp.MSG_USERDEF + msgOffset++;
-  final public static int MSG_OPPONENT_EMPTY2 = BoardGameApp.MSG_USERDEF + msgOffset++;
-  final public static int MSG_USERDEF = BoardGameApp.MSG_USERDEF + msgOffset;
-
   protected ChoiceGroup opInitSeeds;
   protected ChoiceGroup opMaxHouses;
   protected ChoiceGroup opGrandSlam;
@@ -227,24 +211,24 @@ public class OwareMIDlet extends BoardGameApp {
 		try {
 			final Form form = (Form)super.getOptions();
 			if (OwareMIDlet.gsInitSeedsLimit < 0) {
-				opInitSeeds = Application.createNumRange(OwareMIDlet.MSG_INIT_SEEDS,
+				opInitSeeds = Application.createNumRange(AppConstants.MSG_INIT_SEEDS,
 						OwareMIDlet.gsInitSeedsInit, OwareMIDlet.gsInitSeedsLimit,
 						OwareMIDlet.gsInitSeedsIncr);
 			}
-			opMaxHouses = Application.createNumRange(OwareMIDlet.MSG_MAX_HOUSES,
+			opMaxHouses = Application.createNumRange(AppConstants.MSG_MAX_HOUSES,
 					OwareMIDlet.gsMaxHousesInit, OwareMIDlet.gsMaxHousesLimit,
 					OwareMIDlet.gsMaxHousesIncr);
 			opGrandSlam = Application.createChoiceGroup(
-					OwareMIDlet.MSG_GRAND_SLAM,
+					AppConstants.MSG_GRAND_SLAM,
 					Choice.EXCLUSIVE,
-					new int[] { OwareMIDlet.MSG_GRAND_SLAM1,
-			OwareMIDlet.MSG_GRAND_SLAM2, OwareMIDlet.MSG_GRAND_SLAM3,
-			OwareMIDlet.MSG_GRAND_SLAM4, OwareMIDlet.MSG_GRAND_SLAM5});
+					new int[] { AppConstants.MSG_GRAND_SLAM1,
+			AppConstants.MSG_GRAND_SLAM2, AppConstants.MSG_GRAND_SLAM3,
+			AppConstants.MSG_GRAND_SLAM4, AppConstants.MSG_GRAND_SLAM5});
 			opOpponentEmpty = Application.createChoiceGroup(
-					OwareMIDlet.MSG_OPPONENT_EMPTY,
+					AppConstants.MSG_OPPONENT_EMPTY,
 					Choice.EXCLUSIVE,
-					new int[] { OwareMIDlet.MSG_OPPONENT_EMPTY1,
-			OwareMIDlet.MSG_OPPONENT_EMPTY2});
+					new int[] { AppConstants.MSG_OPPONENT_EMPTY1,
+			AppConstants.MSG_OPPONENT_EMPTY2});
 			if (OwareMIDlet.gsInitSeedsLimit < 0) {
 				form.append(opInitSeeds);
 			}
