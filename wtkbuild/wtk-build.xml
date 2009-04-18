@@ -81,6 +81,7 @@
 	    <echo message="no.release=${no.release}" />
 		<property file="${basedir}/test.properties${test.template}" />
 		<property name="jlogmicro.jad" value="${jlogmicro.jad}" />
+		<property name="jlogmicro.nbr" value="${jlogmicro.nbr}" />
 		<antcall target="test.buildno" />
 		<property file="${basedir}/test_buildinfo.properties${test.template}" />
 	    <echo message="build.number=${build.number}" />
@@ -127,8 +128,11 @@
 		<property name="GRAPHICS" value="true" />
 		<property name="PRECALCULATE" value="false" />
 		<property name="Oware-concat.jad" value="Oware-concat.jad" />
+		<property name="Oware-concat.nbr" value="1" />
 		<property name="Reversi-concat.jad" value="Reversi-concat.jad" />
+		<property name="Reversi-concat.nbr" value="2" />
 		<property name="Minesweeper-concat.jad" value="Minesweeper-concat.jad" />
+		<property name="Minesweeper-concat.nbr" value="3" />
 		<!-- undo
 		<property name="language.file" value="messages_en_US.xml" />
 		<xmlproperty file="${msg.dir}/${language.file}" collapseAttributes="true" />
@@ -611,19 +615,24 @@
 		</copy>
 
 		<antcall target="cat.to.midlet" >
-			<param name="concat.jad" value="logging-concat.jad" />
+			<param name="concat.jad" value="${logging-concat.jad}" />
+			<param name="concat.jad" value="${logging-concat.nbr}" />
 		</antcall>
 		<antcall target="cat.to.midlet" >
-			<param name="concat.jad" value="Oware-concat.jad" />
+			<param name="concat.jad" value="${Oware-concat.jad}" />
+			<param name="concat.nbr" value="${Oware-concat.nbr}" />
 		</antcall>
 		<antcall target="cat.to.midlet" >
-			<param name="concat.jad" value="jlogmicro.jad" />
+			<param name="concat.jad" value="${jlogmicro.jad}" />
+			<param name="concat.nbr" value="${jlogmicro.nbr}" />
 		</antcall>
 		<antcall target="cat.to.midlet" >
-			<param name="concat.jad" value="Reversi-concat.jad" />
+			<param name="concat.jad" value="${Reversi-concat.jad}" />
+			<param name="concat.nbr" value="${Reversi-concat.nbr}" />
 		</antcall>
 		<antcall target="cat.to.midlet" >
-			<param name="concat.jad" value="Minesweeper-concat.jad" />
+			<param name="concat.jad" value="${Minesweeper-concat.jad}" />
+			<param name="concat.nbr" value="${Minesweeper-concat.nbr}" />
 		</antcall>
 
 		<echo message="MIDLETVERS=${MIDLETVERS}" />
@@ -687,6 +696,9 @@
 		<mkdir dir="${tmpcat}" />
 		<copy file="${res}/${concat.jad}" todir="${tmpcat}" >
 			<filterset refid="midlet.info" />
+			<filterset >
+				<filter token="MIDLETNBR" value="${concat.nbr}" />
+			</filterset>
 		</copy>
 		<concat destfile="${bin}/${project.name}.jad" append="true" >
 			<fileset file="${tmpcat}/${concat.jad}" />
@@ -1268,12 +1280,13 @@
 	</target>
 
 	<target name="dist.reversi" >
-		<antcall target="dist" >
+		<antcall target="dist" inheritAll="true" >
 			<param name="release.name" value="Reversi" />
-			<param name="src.excludes" value="**/minesweeper/**,**/Oware*.java,**/Mine*.java" />
-			<param name="res.excludes" value="**/oware*,**/mine*" />
+			<param name="Reversi-concat.nbr" value="1" />
 			<param name="Oware-concat.jad" value="" />
 			<param name="Minesweeper-concat.jad" value="" />
+			<param name="src.excludes" value="**/minesweeper/**,**/Oware*.java,**/Mine*.java" />
+			<param name="res.excludes" value="**/oware*,**/mine*" />
 		</antcall>
 	</target>
 
