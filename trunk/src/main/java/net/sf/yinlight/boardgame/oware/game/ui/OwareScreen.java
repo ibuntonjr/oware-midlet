@@ -55,6 +55,7 @@ import net.sf.yinlight.boardgame.oware.game.OwareTable;
 import net.sf.yinlight.boardgame.oware.game.LimitedMinMax;
 import net.sf.yinlight.boardgame.oware.game.OwareMinMax;
 import net.sf.yinlight.boardgame.oware.game.BoardGameApp;
+import net.sf.yinlight.boardgame.oware.midlet.AppConstants;
 
 //#ifdef DLOGGING
 //@import net.sf.jlogmicro.util.logging.Logger;
@@ -82,7 +83,7 @@ public final class OwareScreen extends BoardGameScreen {
   public OwareScreen(final GameApp midlet, final boolean suppressKeys,
 			final boolean fullScreen) {
 		/* Do not suppress keys.  However, do full screen. */
-    super(midlet, false, true, OwareMIDlet.MSG_NAME);
+    super(midlet, false, true, AppConstants.MSG_OWARE_NAME);
     BoardGameScreen.rgame = new OwareGame();
 		// FIX for different AIs and skill
     switch (OwareMIDlet.gsLevel) {
@@ -231,6 +232,7 @@ public final class OwareScreen extends BoardGameScreen {
 			if (BoardGameScreen.actPlayer == 0) {
 				drawSelectionBox(BoardGameScreen.table.nbrCol, 0, 0);
 			}
+			// FIX
 			int cadjust = -pieceHeight - piece_offy;
 			drawPiece(BoardGameScreen.table.nbrRow, BoardGameScreen.table.nbrCol,
 					0, false,
@@ -344,7 +346,7 @@ public final class OwareScreen extends BoardGameScreen {
 			tables = BoardGameScreen.rgame.animatedTurn(BoardGameScreen.table, BoardGameScreen.actPlayer, move, newTable);
 			boolean goodMove = (tables != null);
 			if (!goodMove) {
-				setMessage(BaseApp.messages[OwareMIDlet.MSG_INVALIDMOVE], 2000);
+				setMessage(BaseApp.messages[BoardGameApp.MSG_INVALIDMOVE], 2000);
 				//#ifdef DLOGGING
 //@				if (finestLoggable) {logger.finest("No valid move BoardGameScreen.actPlayer,=isHuman[BoardGameScreen.actPlayer])" + BoardGameScreen.actPlayer + "," + isHuman[BoardGameScreen.actPlayer]);}
 				//#endif
@@ -406,13 +408,13 @@ public final class OwareScreen extends BoardGameScreen {
 									message = OwareMIDlet.playerNames[BoardGameScreen.actPlayer];
 								}
 								else {
-									message = BaseApp.messages[OwareMIDlet.MSG_HUMAN];
+									message = BaseApp.messages[BoardGameApp.MSG_HUMAN];
 								}
 							}
 							else {
-								message = BaseApp.messages[OwareMIDlet.MSG_COMPUTER];
+								message = BaseApp.messages[BoardGameApp.MSG_COMPUTER];
 							}
-							setMessage(message + OwareMIDlet.MSG_PASS, 3000);
+							setMessage(message + BoardGameApp.MSG_PASS, 3000);
 							BoardGameScreen.table.setPassNum(BoardGameScreen.table.getPassNum() + 1);
 							// just to be sure
 							gMiniMax.clearPrecalculatedMoves();
