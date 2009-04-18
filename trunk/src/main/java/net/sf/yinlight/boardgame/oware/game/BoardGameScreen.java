@@ -48,10 +48,7 @@ import net.eiroca.j2me.game.tpg.TwoPlayerGame;
 import net.sf.yinlight.boardgame.oware.game.BoardGame;
 import net.sf.yinlight.boardgame.oware.game.BoardGameMove;
 import net.sf.yinlight.boardgame.oware.game.ui.MinimaxTimerTask;
-import net.sf.yinlight.boardgame.oware.game.OwareMove;
-import net.sf.yinlight.boardgame.oware.game.OwareTable;
 import net.sf.yinlight.boardgame.oware.game.LimitedMinMax;
-import net.sf.yinlight.boardgame.oware.game.OwareMinMax;
 import net.sf.yinlight.boardgame.oware.game.BoardGameApp;
 import com.substanceofcode.rssreader.presentation.FeatureMgr;
 
