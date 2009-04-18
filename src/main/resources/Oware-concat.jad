@@ -1,1 +1,1 @@
-MIDlet-1: Oware, @ICONDIR@owareicon32x32.png, net.sf.yinlight.boardgame.oware.midlet.OwareMIDlet
+MIDlet-@MIDLETNBR@: Oware, @ICONDIR@owareicon32x32.png, net.sf.yinlight.boardgame.oware.midlet.OwareMIDlet
