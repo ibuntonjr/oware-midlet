@@ -131,6 +131,7 @@
 + Use JAD for obfuscate.
 + Use drawRegion to split images for menu as this is documented to do so for MIDP 2.0.
 + Put in help text for Reversi.
++ Allow creating a program with just one app.
 
 Issues:
 
