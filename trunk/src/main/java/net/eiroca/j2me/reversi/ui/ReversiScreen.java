@@ -49,6 +49,7 @@ import net.sf.yinlight.boardgame.oware.game.BoardGameTable;
 import net.sf.yinlight.boardgame.oware.game.LimitedMinMax;
 import net.sf.yinlight.boardgame.oware.game.BoardGameApp;
 import net.sf.yinlight.boardgame.oware.game.BoardGameMove;
+import net.sf.yinlight.boardgame.oware.midlet.AppConstants;
 
 //#ifdef DLOGGING
 //@import net.sf.jlogmicro.util.logging.Logger;
@@ -86,7 +87,7 @@ public final class ReversiScreen extends BoardGameScreen {
   //#endif
 
   public ReversiScreen(final GameApp midlet) {
-    super(midlet, false, true, Reversi.MSG_NAME);
+    super(midlet, false, true, AppConstants.MSG_REVERSI_NAME);
     BoardGameScreen.rgame = new ReversiGame(ReversiScreen.heurMatrix, 10, 18, true);
 		gMiniMax = new LimitedMinMax(); // FIX
   }
@@ -274,7 +275,7 @@ public final class ReversiScreen extends BoardGameScreen {
 			tables = BoardGameScreen.rgame.animatedTurn(BoardGameScreen.table, BoardGameScreen.actPlayer, move, newTable);
 			boolean goodMove = (tables != null);
 			if (!goodMove) {
-				setMessage(BaseApp.messages[Reversi.MSG_INVALIDMOVE], 2000);
+				setMessage(BaseApp.messages[BoardGameApp.MSG_INVALIDMOVE], 2000);
 				return false;
 			}
 			else {
@@ -317,13 +318,13 @@ public final class ReversiScreen extends BoardGameScreen {
 									message = Reversi.playerNames[BoardGameScreen.actPlayer];
 								}
 								else {
-									message = BaseApp.messages[Reversi.MSG_HUMAN];
+									message = BaseApp.messages[BoardGameApp.MSG_HUMAN];
 								}
 							}
 							else {
-								message = BaseApp.messages[Reversi.MSG_COMPUTER];
+								message = BaseApp.messages[BoardGameApp.MSG_COMPUTER];
 							}
-							setMessage(message + Reversi.MSG_PASS, 3000);
+							setMessage(message + BoardGameApp.MSG_PASS, 3000);
 							BoardGameScreen.table.setPassNum(BoardGameScreen.table.getPassNum() + 1);
 							// just to be sure
 							gMiniMax.clearPrecalculatedMoves();
