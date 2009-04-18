@@ -110,7 +110,7 @@ public class OwareTest {
 		try {
 			super.init();
 			OwareMIDlet.playerNames = new String[] {
-					BaseApp.messages[OwareMIDlet.MSG_NAMEPLAYER1], BaseApp.messages[OwareMIDlet.MSG_NAMEPLAYER2]};
+					BaseApp.messages[AppConstants.MSG_NAMEPLAYER1], BaseApp.messages[AppConstants.MSG_NAMEPLAYER2]};
 			if (first) {
 				first = false;
 				bsavedRec = ((OwareScreen)game).getSavedGameRecord();
@@ -127,7 +127,7 @@ public class OwareTest {
 	//#ifdef DTEST
   protected Displayable getTesting() {
 		try {
-			final Form form = new FeatureForm(BaseApp.messages[OwareMIDlet.MSG_MENU_MAIN_TEST]);
+			final Form form = new FeatureForm(BaseApp.messages[AppConstants.MSG_MENU_MAIN_TEST]);
 			tstName = new TextField("Test name",
 							"", 80, TextField.ANY);
 			tstRow0 = new TextField("Input row 0 cups/total",
