@@ -1,4 +1,4 @@
-MIDlet-Vendor: Irving Bunton
+MIDlet-Vendor: Irving Bunton Jr
 MIDlet-Info-URL: http://www.code.google.com/p/oware
 MIDlet-Name: Oware
 MIDlet-Icon: /owareicon32x32.png
