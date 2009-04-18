@@ -58,9 +58,9 @@ import net.eiroca.j2me.app.BaseApp;
 import net.eiroca.j2me.game.GameApp;
 import net.eiroca.j2me.game.GameScreen;
 import net.eiroca.j2me.game.tpg.GameMinMax;
-import net.sf.yinlight.boardgame.oware.game.OwareGame;
-import net.sf.yinlight.boardgame.oware.game.OwareTable;
-import net.sf.yinlight.boardgame.oware.game.OwareMove;
+//#ifdef DTEST
+//@import net.sf.yinlight.boardgame.oware.game.OwareTable;
+//#endif
 import net.sf.yinlight.boardgame.oware.game.BoardGameScreen;
 import com.substanceofcode.rssreader.presentation.FeatureForm;
 import com.substanceofcode.rssreader.presentation.FeatureMgr;
