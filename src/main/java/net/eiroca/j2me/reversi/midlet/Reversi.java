@@ -42,7 +42,7 @@ import net.eiroca.j2me.game.tpg.GameMinMax;
 import net.eiroca.j2me.reversi.ui.ReversiScreen;
 import net.sf.yinlight.boardgame.oware.game.BoardGameScreen;
 import net.sf.yinlight.boardgame.oware.game.BoardGameApp;
-import net.sf.yinlight.boardgame.oware.midlet.OwareMIDlet;
+import net.sf.yinlight.boardgame.oware.midlet.AppConstants;
 
 //#ifdef DLOGGING
 //@import net.sf.jlogmicro.util.logging.Logger;
@@ -54,11 +54,6 @@ import net.sf.yinlight.boardgame.oware.midlet.OwareMIDlet;
 
 public class Reversi extends BoardGameApp {
 
-  public static short msgOffset = 0;
-  final public static int MSG_NAME = OwareMIDlet.MSG_USERDEF + msgOffset++; // 0
-  final public static int MSG_UPPER = OwareMIDlet.MSG_USERDEF + msgOffset++; // 0
-  final public static int MSG_LOWER = OwareMIDlet.MSG_USERDEF + msgOffset++; // 0
-  final public static int MSG_USERDEF = OwareMIDlet.MSG_USERDEF + msgOffset++; // 0
 
 	//#ifdef DLOGGING
 //@  private boolean fineLoggable;
@@ -123,8 +118,8 @@ public class Reversi extends BoardGameApp {
 		try {
 			super.init();
 			BoardGameApp.playerNames = new String[] {
-					BaseApp.messages[Reversi.MSG_UPPER],
-					BaseApp.messages[Reversi.MSG_LOWER]};
+					BaseApp.messages[AppConstants.MSG_UPPER],
+					BaseApp.messages[AppConstants.MSG_LOWER]};
 		} catch (Throwable e) {
 			e.printStackTrace();
 			//#ifdef DLOGGING
