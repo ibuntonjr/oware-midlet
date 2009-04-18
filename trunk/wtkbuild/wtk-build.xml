@@ -126,6 +126,9 @@
 		<property name="log.subdir" value="jlogmicro" />
 		<property name="GRAPHICS" value="true" />
 		<property name="PRECALCULATE" value="false" />
+		<property name="Oware-concat.jad" value="Oware-concat.jad" />
+		<property name="Reversi-concat.jad" value="Reversi-concat.jad" />
+		<property name="Minesweeper-concat.jad" value="Minesweeper-concat.jad" />
 		<!-- undo
 		<property name="language.file" value="messages_en_US.xml" />
 		<xmlproperty file="${msg.dir}/${language.file}" collapseAttributes="true" />
@@ -279,8 +282,10 @@
 		<wtkpreprocess srcdir="${compat.presrc}" destdir="${tmppreprocess}" encoding="${wtk.encoding}" symbols="${preprocess.defines}" if="compat.presrc" />
 		<echo message="Preprocess jar src if set ${jar.presrc}." />
 		<wtkpreprocess srcdir="${jar.presrc}" destdir="${tmppreprocess}" encoding="${wtk.encoding}" symbols="${preprocess.defines}" if="jar.presrc" />
+		<property name="src.excludes" value="" />
+		<echo message="src.excludes=${src.excludes}" />
 		<copy todir="${comp.src}" overwrite="true" >
-			<fileset dir="${tmppreprocess}" includes="**/*.java" />
+			<fileset dir="${tmppreprocess}" includes="**/*.java" excludes="${src.excludes}" />
 			<filterset refid="defile.filter" />
 		</copy>
 		<antcall target="util.comp.copy" />
@@ -288,7 +293,9 @@
 			<param name="dsrc" value="${comp.src}" />
 		</antcall>
 		<antcall target="wtk.src.copy" />
-		<antcall target="wtk.res.copy" />
+		<antcall target="copy.res" >
+			<param name="to.res.dir" value="${wtk.res}" />
+		</antcall>
 		<antcall target="ecj.compile" />
 		<antcall target="findbugs" />
 		<antcall target="pmd" />
@@ -396,9 +403,9 @@
 	</target>
 
 	<target name="copy.unproc.comp" depends="prepare" if="unproc.src" >
+		<echo message="src.excludes=${src.excludes}" />
 		<copy todir="${comp.src}" overwrite="true" >
-		<!-- UNDO -->
-			<fileset dir="${unproc.src}" includes="**/*.java" excludes="**/Rever*.java" />
+			<fileset dir="${unproc.src}" includes="**/*.java" excludes="${src.excludes}" />
 		</copy>
 	</target>
 
@@ -420,24 +427,6 @@
 		</delete>
 		<copy todir="${wtk.src}" >
 			<fileset dir="${comp.src}" includes="**/*.java" />
-		</copy>
-	</target>
-
-	<target name="wtk.res.copy" depends="prepare" if="wtk.res" >
-		<delete dir="${wtk.res}" />
-		<mkdir dir="${wtk.res}" />
-		<copy todir="${wtk.res}" >
-			<fileset dir="${res}" includes="**/*.png" />
-			<fileset dir="${res}" includes="**/*.wav" />
-		</copy>
-		<copy todir="${wtk.res}" >
-			<filterset refid="midlet.info" />
-			<fileset dir="${res}" includes="**/*.txt" />
-		</copy>
-		<!-- UNDO -->
-		<copy todir="${wtk.res}" flatten="true" >
-			<filterset refid="midlet.info" />
-			<fileset dir="${res}" includes="**/*.txt" />
 		</copy>
 	</target>
 
@@ -535,13 +524,15 @@
 	</target>
 
 	<target name="copy.res" if="need.res" depends="prepare" >
-		<copy todir="${tmpres}/${res.todir}" >
+		<property name="res.excludes" value="" />
+		<echo message="res.excludes=${res.excludes}" />
+		<delete dir="${to.res.dir}" />
+		<mkdir dir="${to.res.dir}" />
+		<copy todir="${to.res.dir}" >
 			<fileset dir="${icon.dir}" >
 				<include name="**/*.png" />
 				<include name="**/*.wav" />
-				<!-- Restrict
-				<exclude name="**/reversi*.png" />
-				-->
+				<exclude name="${res.excludes}" />
 			</fileset>
 		</copy>
 		<!-- undo remove?
@@ -552,26 +543,26 @@
 		</copy>
 		undo? -->
 		<!-- UNDO -->
-		<copy todir="${tmpres}/en" >
+		<copy todir="${to.res.dir}/en" >
 			<fileset dir="${icon.dir}" >
 				<include name="**/*.png" />
 				<include name="**/*.wav" />
-				<!-- UNDO 
-				<exclude name="**/reversi*.png" />
-				UNDO -->
+				<exclude name="${res.excludes}" />
 			</fileset>
 		</copy>
-		<copy todir="${tmpres}/${msg.todir}" >
+		<copy todir="${to.res.dir}/${msg.todir}" >
 			<filterset refid="midlet.info" />
 			<fileset dir="${msg.dir}" >
 				<include name="**/*.txt" />
+				<exclude name="${res.excludes}" />
 			</fileset>
 		</copy>
 		<!-- UNDO -->
-		<copy todir="${tmpres}/${msg.base.todir}" flatten="true" >
+		<copy todir="${to.res.dir}/${msg.base.todir}" flatten="true" >
 			<filterset refid="midlet.info" />
 			<fileset dir="${msg.dir}" >
 				<include name="**/*.txt" />
+				<exclude name="${res.excludes}" />
 			</fileset>
 		</copy>
 		<!-- undo
@@ -600,7 +591,9 @@
 		<delete dir="${tmpres}" />
 		<mkdir dir="${tmpres}" />
 
-		<antcall target="copy.res" />
+		<antcall target="copy.res" >
+			<param name="to.res.dir" value="${tmpres}/${res.todir}" />
+		</antcall>
 		<antcall target="copy.test.res" />
 
 		<copy file="${res}/${project.name}.jad" todir="${bin}" overwrite="true" >
@@ -1271,6 +1264,16 @@
 		<antcall target="dist.dev.status" inheritAll="true" >
 			<param name="no.test" value="true" />
 			<param name="no.staging" value="true" />
+		</antcall>
+	</target>
+
+	<target name="dist.reversi" >
+		<antcall target="dist" >
+			<param name="release.name" value="Reversi" />
+			<param name="src.excludes" value="**/minesweeper/**,**/Oware*.java,**/Mine*.java" />
+			<param name="res.excludes" value="**/oware*,**/mine*" />
+			<param name="Oware-concat.jad" value="" />
+			<param name="Minesweeper-concat.jad" value="" />
 		</antcall>
 	</target>
 
