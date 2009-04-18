@@ -726,9 +726,9 @@
 			<arg value="jad=${dist}/${build.file.root}_cod.jad" />
 			<arg value="${dist}/${build.file.root}.jar" />
 		</exec>
-		<move file="${project.name}.cso" tofile="${dist}/${build.prefix}${project.name}_${FMIDLETVERSROOT}.cso" />
-		<move file="${project.name}.cod" tofile="${dist}/${build.prefix}${project.name}_${FMIDLETVERSROOT}.cod" />
-		<move file="${project.name}.debug" tofile="${dist}/${build.prefix}${project.name}_${FMIDLETVERSROOT}.debug" />
+		<move file="${project.name}.cso" tofile="${dist}/${build.file.root}.cso" />
+		<move file="${project.name}.cod" tofile="${dist}/${build.file.root}.cod" />
+		<move file="${project.name}.debug" tofile="${dist}/${build.file.root}.debug" />
 	</target>
 
 	<target name="svn.op.dist" unless="skip.svn.op" >
