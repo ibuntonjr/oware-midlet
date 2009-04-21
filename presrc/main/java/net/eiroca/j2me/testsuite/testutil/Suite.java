@@ -16,25 +16,31 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package test;
+/**
+ * This was modified no later than 2009-04-20 by Irving Bunton, Jr
+ */
+// Expand to define memory size define
+@DMEMSIZEDEF@
+//#ifdef DLARGEMEM
+package net.eiroca.j2me.testsuite.testutil;
 
 import java.util.Hashtable;
 import java.util.Vector;
 import javax.microedition.lcdui.Form;
 import net.eiroca.j2me.app.BaseApp;
 import net.eiroca.j2me.util.HTTPAttach;
-import test.benchmark.MathSuite;
-import test.benchmark.PrecisionSuite;
-import test.benchmark.SuiteAbstract;
-import test.inspector.APIsInspector;
-import test.inspector.CanvasInspector;
-import test.inspector.Graphic3DInspector;
-import test.inspector.LocalDeviceInspector;
-import test.inspector.MIDletInspector;
-import test.inspector.MultimediaInspector;
-import test.inspector.PrivacyPropertyInspector;
-import test.inspector.PropertyInspector;
-import test.inspector.SystemInspector;
+import net.eiroca.j2me.testsuite.testutil.benchmark.MathSuite;
+import net.eiroca.j2me.testsuite.testutil.benchmark.PrecisionSuite;
+import net.eiroca.j2me.testsuite.testutil.benchmark.SuiteAbstract;
+import net.eiroca.j2me.testsuite.testutil.inspector.APIsInspector;
+import net.eiroca.j2me.testsuite.testutil.inspector.CanvasInspector;
+import net.eiroca.j2me.testsuite.testutil.inspector.Graphic3DInspector;
+import net.eiroca.j2me.testsuite.testutil.inspector.LocalDeviceInspector;
+import net.eiroca.j2me.testsuite.testutil.inspector.MIDletInspector;
+import net.eiroca.j2me.testsuite.testutil.inspector.MultimediaInspector;
+import net.eiroca.j2me.testsuite.testutil.inspector.PrivacyPropertyInspector;
+import net.eiroca.j2me.testsuite.testutil.inspector.PropertyInspector;
+import net.eiroca.j2me.testsuite.testutil.inspector.SystemInspector;
 
 public class Suite implements HTTPAttach {
 
@@ -159,3 +165,4 @@ public class Suite implements HTTPAttach {
   }
 
 }
+//#endif
