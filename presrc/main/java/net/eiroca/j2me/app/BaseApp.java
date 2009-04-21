@@ -1955,8 +1955,10 @@ implements CommandListener
   public static String resPrefix = null;
 
 	//#ifdef DLARGEMEM
+	//#ifdef DJMTEST
   public BaseApp() {
 	}
+	//#endif
 	//#endif
 
   /**
