@@ -461,6 +461,10 @@ implements CommandListener
    * @return
    */
   public static String removeHtml(final String text) {
+		//#ifdef DLOGGING
+		Logger logger = Logger.getLogger("BaseApp");
+		boolean finerLoggable = logger.isLoggable(Level.FINER);
+		//#endif
     int htmlStartIndex;
     int htmlEndIndex;
     if (text == null) { return null; }
@@ -478,8 +482,8 @@ implements CommandListener
 			// get into infinate loop.
 			if (htmlEndIndex < 0) {
 				//#ifdef DLOGGING
-				if (finerLoggable) {logger.finer("No end > for htmlStartIndex,htmlText=" + htmlStartIndex + "," + htmlText);}
-				if (finerLoggable) {logger.finer("plainText=" + plainText);}
+				if (finerLoggable) {logger.finer("removeHtml No end > for htmlStartIndex,htmlText=" + htmlStartIndex + "," + htmlText);}
+				if (finerLoggable) {logger.finer("removeHtml plainText=" + plainText);}
 				//#endif
 				break;
 			}
@@ -1949,6 +1953,11 @@ implements CommandListener
   public static BaseApp midlet;
   public static Display display;
   public static String resPrefix = null;
+
+	//#ifdef DLARGEMEM
+  public BaseApp() {
+	}
+	//#endif
 
   /**
    * Setup midlet and display references
