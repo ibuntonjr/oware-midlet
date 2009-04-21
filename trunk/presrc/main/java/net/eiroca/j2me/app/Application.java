@@ -45,6 +45,8 @@
  */
 // Expand to define MIDP define
 @DMIDPVERS@
+// Expand to define memory size define
+@DMEMSIZEDEF@
 // Expand to define JMUnit test define
 @DJMTESTDEF@
 // Expand to define logging define
@@ -92,6 +94,11 @@ public abstract class Application extends BaseApp implements CommandListener
 	//#ifdef DJMTEST
   public Application(String name) {
     super(name);
+	}
+	//#endif
+
+	//#ifdef DLARGEMEM
+  public Application() {
 	}
 	//#endif
 
