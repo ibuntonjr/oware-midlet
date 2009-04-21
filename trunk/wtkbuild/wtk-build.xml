@@ -124,6 +124,8 @@
 		<property name="propdir" value="${basedir}" />
 		<property file="${basedir}/${wtk.properties}" />
 		<property name="PERMISSIONS" value="" />
+		<property name="DJSR82" value="DNOJSR82" />
+		<property name="DJSR184" value="DNOJSR184" />
 		<property name="log.subdir" value="jlogmicro" />
 		<property name="GRAPHICS" value="true" />
 		<property name="PRECALCULATE" value="false" />
@@ -166,6 +168,8 @@
 			<filter token="DMEMSIZEDEF" value="//#define ${DMEMSIZEDEF}" />
 			<filter token="DITUNESDEF" value="//#define ${DITUNESDEF}" />
 			<filter token="DJSR75" value="//#define ${DJSR75}" />
+			<filter token="DJSR82" value="//#define ${DJSR82}" />
+			<filter token="DJSR184" value="//#define ${DJSR184}" />
 			<filter token="DJSR238" value="//#define ${DJSR238}" />
 			<filter token="DTESTDEF" value="//#define ${DTESTDEF}" />
 			<filter token="DJMTESTDEF" value="//#define ${DJMTESTDEF}" />
@@ -246,6 +250,8 @@
 	    <echo message="DFEATUREFORMDEF=${DFEATUREFORMDEF}" />
 	    <echo message="DFEATUREFORMIMPORTDEF=${DFEATUREFORMIMPORTDEF}" />
 	    <echo message="DJSR75=${DJSR75}" />
+	    <echo message="DJSR82=${DJSR82}" />
+	    <echo message="DJSR184=${DJSR184}" />
 	    <echo message="DJSR238=${DJSR238}" />
 	    <echo message="DTESTDEF=${DTESTDEF}" />
 	    <echo message="DJMTESTDEF=${DJMTESTDEF}" />
@@ -273,7 +279,7 @@
 		<!-- Copy unpreprocessed source to compiled src dir -->
 		<delete dir="${tmppreprocess}" />
 		<mkdir dir="${tmppreprocess}" />
-		<property name="preprocess.defines" value="DEBUG=WARN,${DMIDPVERS},${DCLDCVERS},${DITUNESDEF},${DMEMSIZEDEF},${DJSR75},${DJSR238},${DTESTDEF},${DJMTESTDEF},${DLOGDEF},${DTESTUIDEF},${DCOMPATDEF},${DFEATUREFORMDEF}" />
+		<property name="preprocess.defines" value="DEBUG=WARN,${DMIDPVERS},${DCLDCVERS},${DITUNESDEF},${DMEMSIZEDEF},${DJSR75},${DJSR82},${DJSR184},${DJSR238},${DTESTDEF},${DJMTESTDEF},${DLOGDEF},${DTESTUIDEF},${DCOMPATDEF},${DFEATUREFORMDEF}" />
 		<echo message="preprocess.defines=${preprocess.defines}." />
 		<wtkpreprocess srcdir="${presrc}" destdir="${tmppreprocess}" encoding="${wtk.encoding}" symbols="${preprocess.defines}" if="presrc" />
 		<echo message="Preprocess util pre src if set ${presrc.util.src}." />
@@ -911,10 +917,28 @@
 		</antcall>
 	</target>
 
-	<!-- Compile using WTK with MIDP-2.0 and JSR-75 and test -->
+	<!-- Compile using WTK with MIDP-2.0, CLDC 1.1 and JSR-75 and test -->
 	<target name="compile.2.0.cldc1.1.jsr75" >
 		<antcall target="compile" >
 			<param name="wtk.properties" value="wtk2.0cldc1.1.jsr75.properties${wtk.template}" />
+			<param name="no.staging" value="true" />
+			<param name="no.release" value="true" />
+		</antcall>
+	</target>
+
+	<!-- Compile using WTK with Large memory, MIDP-2.0 and JSR-75 and test -->
+	<target name="compile.2.0.large.jsr75" >
+		<antcall target="compile" >
+			<param name="wtk.properties" value="wtk2.0large.jsr75.properties${wtk.template}" />
+			<param name="no.staging" value="true" />
+			<param name="no.release" value="true" />
+		</antcall>
+	</target>
+
+	<!-- Compile using WTK with Large memory, MIDP-2.0 and JSR-75 and test -->
+	<target name="compile.2.0.large.jsr75.jsr82.jsr184" >
+		<antcall target="compile" >
+			<param name="wtk.properties" value="wtk2.0large.jsr75.jsr82.jsr184.properties${wtk.template}" />
 			<param name="no.staging" value="true" />
 			<param name="no.release" value="true" />
 		</antcall>
@@ -1285,8 +1309,15 @@
 			<param name="Reversi-concat.nbr" value="1" />
 			<param name="Oware-concat.jad" value="" />
 			<param name="Minesweeper-concat.jad" value="" />
-			<param name="src.excludes" value="**/minesweeper/**,**/Oware*.java,**/Mine*.java" />
-			<param name="res.excludes" value="**/oware*,**/mine*" />
+			<param name="src.excludes" value="**/testsuite/**,**/minesweeper/**,**/Oware*.java,**/Mine*.java" />
+			<param name="res.excludes" value="**/oware*,**/mine*,**/test*" />
+		</antcall>
+	</target>
+
+	<target name="dist.games" >
+		<antcall target="dist" inheritAll="true" >
+			<param name="src.excludes" value="**/testsuite/**" />
+			<param name="res.excludes" value="**/oware*,**/mine*,**/test*" />
 		</antcall>
 	</target>
 
