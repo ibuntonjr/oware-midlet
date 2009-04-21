@@ -133,6 +133,12 @@
 + Put in help text for Reversi.
 + Allow creating a program with just one app.
 
+1.0 2009-04-21 Beta 3 Version
++ Check in missing classes.
++ Set up for test suite.
++ Use large memory define for test classes.
++ Fix copyrights.
+
 Issues:
 
 Highlighting of lower player is not the right place for Oware.
