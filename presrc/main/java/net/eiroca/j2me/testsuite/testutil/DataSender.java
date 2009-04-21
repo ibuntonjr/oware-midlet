@@ -1,4 +1,10 @@
-package test;
+/**
+ * This was modified no later than 2009-04-20 by Irving Bunton, Jr
+ */
+// Expand to define memory size define
+@DMEMSIZEDEF@
+//#ifdef DLARGEMEM
+package net.eiroca.j2me.testsuite.testutil;
 
 import java.util.Vector;
 import net.eiroca.j2me.observable.Observable;
@@ -98,3 +104,4 @@ public class DataSender implements Observable, Observer, Runnable {
   }
 
 }
+//#endif
