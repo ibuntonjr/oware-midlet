@@ -31,7 +31,8 @@
 	<property name="dist.midp20.cldc11" value="${target}/dist/midp20_cldc11" />
 	<property name="dist.midp20.jsr75" value="${target}/dist/midp20_jsr75" />
 	<property name="dist.midp20.cldc11.jsr75" value="${target}/dist/midp20_cldc11_jsr75" />
-	<property name="dist.midp20.cldc11.jsr75.largemem" value="${target}/dist/midp20_cldc11_jsr75.largemem" />
+	<property name="dist.midp20.cldc11.jsr75.largemem" value="${target}/dist/midp20_cldc11_jsr75_largemem" />
+	<property name="dist.midp20.jsr75.jsr82.jsr184.largemem" value="${target}/dist/midp20_jsr75_jsr82_jsr184_largemem" />
 	<property name="dist.midp20.cldc11.largemem" value="${target}/dist/midp20_cldc11_largemem" />
 	<property name="dist.midp20.jsr75_jsr238" value="${target}/dist/midp20_jsr75_jsr238" />
 	<property name="build" value="${target}/build" />
@@ -42,6 +43,7 @@
 	<property name="build.midp20.cldc11.jsr75" value="${target}/build/midp20_cldc11_jsr75" />
 	<property name="build.midp20.cldc11.jsr75.largemem" value="${target}/build/midp20_cldc11_jsr75.largemem" />
 	<property name="build.midp20.cldc11.largemem" value="${target}/build/midp20_cldc11_largemem" />
+	<property name="build.midp20.jsr75.jsr82.jsr184.largemem" value="${target}/build/midp20_cldc11_jsr75_jsr82_jsr84.largemem" />
 	<property name="build.midp20.jsr75.jsr238" value="${target}/build/midp20_jsr75.jsr238" />
 	<property name="classes" value="${target}/classes" />
 	<property name="tmppreprocess" value="${target}/tmppreprocess" />
@@ -407,7 +409,7 @@
 		<echo message="Deleting test src ${dsrc}." />
 		<delete includeemptydirs="true" failonerror="false" >
 			<!-- remove testui classes as these are kept in testui -->
-			<fileset dir="${dsrc}" includes="**/Compatibility*,**/testutil/**,**/testlcdui/*.java,**/jmunit/**" />
+			<fileset dir="${dsrc}" includes="**/Compatibility*,**/substanceofcode/testutil/**,**/testlcdui/*.java,**/jmunit/**" />
 			<fileset dir="${dsrc}/net/sf/${log.subdir}" />
 		</delete>
 	</target>
@@ -1105,6 +1107,15 @@
 		</antcall>
 	</target>
 
+	<!-- Compile for MIDP 2.0, JSR-75, JSR-82, and JSR-184 for release -->
+	<target name="dist.compile.2.0.large.jsr75.jsr82.jsr184" >
+		<antcall target="compile" >
+			<param name="wtk.properties" value="wtk2.0large.jsr75.jsr82.jsr184.properties${wtk.template}" />
+			<param name="no.test" value="true" />
+			<param name="no.staging" value="true" />
+		</antcall>
+	</target>
+
 	<!-- Future.  No code for JSR-238 now. -->
 	<!-- Compile for MIDP 1.0 as a release (no test) -->
 	<target name="compile.2.0.jsr238" >
@@ -1183,6 +1194,16 @@
 			<param name="wtk.properties" value="wtk2.0large.cldc1.1.properties${wtk.template}" />
 			<param name="dist.vers" value="${dist.midp20.cldc11.largemem}" />
 			<param name="build.vers" value="${build.midp20.cldc11.largemem}" />
+			<param name="no.test" value="true" />
+			<param name="no.staging" value="true" />
+		</antcall>
+	</target>
+
+	<target name="dist.midp.2.0.jsr75.jsr82.jsr184.largemem" unless="no.2.0.cldc.1.1.jsr75.jsr82.jsr184.largemem" >
+		<antcall target="dist.version" inheritAll="true" >
+			<param name="wtk.properties" value="wtk2.0large.jsr75.jsr82.jsr184.properties${wtk.template}" />
+			<param name="dist.vers" value="${dist.midp20.jsr75.jsr82.jsr184.largemem}" />
+			<param name="build.vers" value="${build.midp20.jsr75.jsr82.jsr184.largemem}" />
 			<param name="no.test" value="true" />
 			<param name="no.staging" value="true" />
 		</antcall>
@@ -1277,12 +1298,18 @@
 			<param name="build.number" value="${build.number}" />
 			<param name="release.buildno" value="true" />
 		</antcall>
+		<antcall target="dist.midp.2.0.cldc.1.1" >
+			<param name="build.number" value="${build.number}" />
+			<param name="release.buildno" value="true" />
+		</antcall>
 		<!-- Don't need JSR-75 -->
+		<!--
 		<antcall target="dist.midp.2.0.cldc.1.1.largemem" >
 			<param name="build.number" value="${build.number}" />
 			<param name="release.buildno" value="true" />
 		</antcall>
-		<antcall target="dist.midp.2.0.cldc.1.1" >
+		-->
+		<antcall target="dist.midp.2.0.jsr75.jsr82.jsr184.largemem" >
 			<param name="build.number" value="${build.number}" />
 			<param name="release.buildno" value="true" />
 		</antcall>
