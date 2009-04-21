@@ -16,7 +16,13 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package test;
+/**
+ * This was modified no later than 2009-04-20 by Irving Bunton, Jr
+ */
+// Expand to define memory size define
+@DMEMSIZEDEF@
+//#ifdef DLARGEMEM
+package net.eiroca.j2me.testsuite.testutil;
 
 abstract public class AbstractProcessor {
 
@@ -46,3 +52,4 @@ abstract public class AbstractProcessor {
   abstract public void execute();
 
 }
+//#endif
