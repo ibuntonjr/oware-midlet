@@ -1,8 +1,8 @@
 MIDlet-Vendor: Irving Bunton Jr
 MIDlet-Info-URL: http://www.code.google.com/p/oware
-MIDlet-Name: Oware
-MIDlet-Icon: /owareicon32x32.png
-MIDlet-Description: Oware Game
+MIDlet-Name: @MIDLETNAME@
+MIDlet-Icon: @MIDLETICON@
+MIDlet-Description: @MIDLETDESC@
 MIDlet-Version: @MIDLETVERS@
 MIDlet-Permissions-Opt: javax.microedition.io.HttpConnection@PERMISSIONS@
 MIDlet-Data-Size: 3000
