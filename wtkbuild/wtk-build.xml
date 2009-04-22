@@ -186,9 +186,10 @@
 			<filter token="CLDCVERS" value="${wtk.cldc.version}" />
 			<filter token="MIDLETVERS" value="${MIDLETVERS}" />
 			<filter token="PERMISSIONS" value="${PERMISSIONS}" />
+			<filter token="MIDLETDESC" value="${MIDLETDESC}" />
 			<filter token="GRAPHICS" value="${GRAPHICS}" />
 			<filter token="MIDLETNAME" value="${release.name}" />
-			<filter token="MIDLETICON" value="${release.icon}" />
+			<filter token="MIDLETICON" value="${MIDLETICON}" />
 			<filter token="PRECALCULATE" value="${PRECALCULATE}" />
 			<filter token="PROGVERS" value="${buildinfo}" />
 			<filter token="ICONDIR" value="${res.todir}" />
