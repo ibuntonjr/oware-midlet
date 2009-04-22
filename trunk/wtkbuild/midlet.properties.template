@@ -1,0 +1,4 @@
+#Set properties used for midlets with selected apps.
+MIDLETNAME = ${release.name}
+MIDLETICON =  /owareicon32x32.png
+MIDLETDESC =  Oware/Reversi Game
