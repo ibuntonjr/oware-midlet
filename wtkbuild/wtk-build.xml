@@ -876,6 +876,7 @@
 		<unjar src="${build}/${build.prefix}obfuscated.jar" dest="${obfuscated}" />
 		<delete dir="${obfuscated}/MANIFEST.MF" />
 		<delete file="${project.name}.jar" />
+		<delete dir="${dist.vers}" />
 	</target>
 
 	<!-- Compile using WTK with MIDP-1.0 and test -->
