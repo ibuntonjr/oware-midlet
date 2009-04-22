@@ -120,6 +120,8 @@
 
 	<!-- prepare the target folder -->
 	<target name="prepare" depends="test.prepare,release.prepare" >
+		<property name="release.name" value="${project.name}" />
+		<property file="${basedir}/midlet.properties${optional.template}" />
 		<!-- Define the Wireless Toolkit home directory. Needed by the tasks. -->
 		<!-- Define some additional properties for this project. Not required. -->
 		<property file="${basedir}/optional.properties${optional.template}" />
@@ -148,7 +150,6 @@
 		-->
 		<property name="stage" value="" />
 		<property name="build.prefix" value="${file.prefix}${stage}" />
-		<property name="release.name" value="${project.name}" />
 		<property name="build.file.root" value="${build.prefix}${release.name}-${FMIDLETVERSROOT}" />
 		<property name="alx.build.file.root" value="${build.prefix}${release.name}_${FMIDLETVERSROOT}" />
 		<property name="buildinfo" value="${SUFFIXVERS}-${stage}b${build.number}" />
@@ -186,6 +187,8 @@
 			<filter token="MIDLETVERS" value="${MIDLETVERS}" />
 			<filter token="PERMISSIONS" value="${PERMISSIONS}" />
 			<filter token="GRAPHICS" value="${GRAPHICS}" />
+			<filter token="MIDLETNAME" value="${release.name}" />
+			<filter token="MIDLETICON" value="${release.icon}" />
 			<filter token="PRECALCULATE" value="${PRECALCULATE}" />
 			<filter token="PROGVERS" value="${buildinfo}" />
 			<filter token="ICONDIR" value="${res.todir}" />
@@ -695,8 +698,10 @@
 
 	<target name="create.prc" depends="prepare" if="wtk.wme.home" >
 		<wtkmakeprc jarfile="${bin}/${project.name}.jar" name="${project.name}"  highres="true" creator="${prc.creater}" longname="${prc.longname}" />
-		<mkdir dir="${dist}/${build.prefix}prc" />
-		<move file="${bin}/${project.name}.prc" todir="${dist}/${build.prefix}prc" />
+		<delete dir="${dist}/${build.file.root}_prc" />
+		<mkdir dir="${dist}/${build.file.root}_prc" />
+		<move file="${bin}/${project.name}.prc" todir="${dist}/${build.file.root}_prc" />
+		<jar destfile="${dist}/${build.file.root}_prc.zip" basedir="${dist}/${build.file.root}_prc" manifest="${bin}/manifest.mf" />
 	</target>
 
 	<target name="cat.to.midlet" depends="prepare" if="${concat.jad}" >
@@ -1333,6 +1338,8 @@
 	<target name="dist.reversi" >
 		<antcall target="dist" inheritAll="true" >
 			<param name="release.name" value="Reversi" />
+			<param name="MIDLETICON" value="/reversi_icon.png" />
+			<param name="MIDLETDESC" value="Reversi Game" />
 			<param name="Reversi-concat.nbr" value="1" />
 			<param name="Oware-concat.jad" value="" />
 			<param name="Minesweeper-concat.jad" value="" />
