@@ -174,8 +174,8 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 		//#endif
 		// FIX turnImage = BaseApp.createImage(TURN_ICON);
 		/* Leave space to the right of the board for putting other info. */
-		int bcol = BoardGameApp.gsCol;
-		int brow = BoardGameApp.gsRow;
+		int bcol = BoardGameApp.gsCol[BoardGameApp.PD_CURR];
+		int brow = BoardGameApp.gsRow[BoardGameApp.PD_CURR];
     width = screenWidth * bcol / (bcol + 1);
     vertWidth = screenWidth - width;
     height = screenHeight;
@@ -328,9 +328,9 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
     super.init();
 		try {
 			//#ifdef DLOGGING
-//@			if (finestLoggable) {logger.finest("init BoardGameApp.gsRow,BoardGameApp.gsCol,BoardGameApp.gsNbrPlayers=" + BoardGameApp.gsRow + "," + BoardGameApp.gsCol + "," + BoardGameApp.gsNbrPlayers);}
+//@			if (finestLoggable) {logger.finest("init BoardGameApp.gsRow,BoardGameApp.gsCol,BoardGameApp.gsNbrPlayers[BoardGameApp.PD_CURR]=" + BoardGameApp.gsRow + "," + BoardGameApp.gsCol + "," + BoardGameApp.gsNbrPlayers[BoardGameApp.PD_CURR]);}
 			//#endif
-			infoLines = new String[BoardGameApp.gsNbrPlayers + 1];
+			infoLines = new String[BoardGameApp.gsNbrPlayers[BoardGameApp.PD_CURR] + 1];
 			BaseApp.background = 0x00FFFFFF;
 			BaseApp.foreground = 0x00000000;
 			score.beginGame(1, 0, 0);
@@ -794,7 +794,7 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 
   public void updateSkillInfo() {
     if (!BoardGameScreen.twoplayer) {
-      infoLines[BoardGameScreen.table.nbrPlayers] = BaseApp.messages[BoardGameApp.MSG_LEVELPREFIX + BoardGameApp.gsLevel] + BoardGameApp.gsDept;
+      infoLines[BoardGameScreen.table.nbrPlayers] = BaseApp.messages[BoardGameApp.MSG_LEVELPREFIX + BoardGameApp.gsLevel] + BoardGameApp.gsDepth[BoardGameApp.PD_CURR];
     }
     else {
       infoLines[BoardGameScreen.table.nbrPlayers] = null;
@@ -824,7 +824,7 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
   }
 
   public static int getActSkill() {
-    int actSkill = BoardGameApp.gsDept;
+    int actSkill = BoardGameApp.gsDepth[BoardGameApp.PD_CURR];
     if (BoardGameScreen.turnNum > 50) {
       actSkill++;
     }
@@ -973,9 +973,9 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 		//#ifdef DLOGGING
 //@		if (finestLoggable) {logger.finest("BoardGameApp.gsLevel,offset=" + BoardGameApp.gsLevel + "," + offset);}
 		//#endif
-		b[index++] = (byte) BoardGameApp.gsDept;
+		b[index++] = (byte) BoardGameApp.gsDepth[BoardGameApp.PD_CURR];
 		//#ifdef DLOGGING
-//@		if (finestLoggable) {logger.finest("BoardGameApp.gsDept,offset=" + BoardGameApp.gsDept + "," + offset);}
+//@		if (finestLoggable) {logger.finest("BoardGameApp.gsDepth[BoardGameApp.PD_CURR],offset=" + BoardGameApp.gsDepth[BoardGameApp.PD_CURR] + "," + offset);}
 		//#endif
     return index - offset;
   }
@@ -985,6 +985,9 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
    */
   public byte[] saveRecordStore()
 	throws Exception {
+		//#ifdef DLOGGING
+//@		if (finestLoggable) {logger.finest("saveRecordStore BoardGameScreen.table=" + BoardGameScreen.table);}
+		//#endif
 		try {
 			if (BoardGameScreen.table == null) {
 				return null;
