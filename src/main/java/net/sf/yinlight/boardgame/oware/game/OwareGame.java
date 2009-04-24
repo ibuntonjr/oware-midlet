@@ -57,6 +57,12 @@ public final class OwareGame extends BoardGame {
   public static final int GRAND_SLAM_LEGAL_FIRST = 4;
   public static final int GRAND_SLAM_LEGAL_24 = 5;
   public static final int GRAND_SLAM_LEGAL_MAX = 24;
+  public static final int MULTI_LAP_ONE = 0;
+  public static final int MULTI_LAP_1ST = 1;
+  public static final int MULTI_LAP_2ND = 2;
+  public static final int CAPTURE_EMPTY = 0;
+  public static final int CAPTURE_23 = 1;
+  public static final int CAPTURE_4 = 2;
 
 	//#ifdef DLOGGING
 //@	private Logger logger = Logger.getLogger("OwareGame");
@@ -116,6 +122,8 @@ public final class OwareGame extends BoardGame {
 			newTable.setPassNum(0);
 			boolean changed = false;
 			int seeds = newTable.getSeeds(row, col);
+			boolean capture4 = (OwareMIDlet.gsCapture[BoardGameApp.PD_CURR] ==
+					OwareGame.CAPTURE_4);
 			newTable.setSeeds(row, col, (byte)0);
 			move.setPoint((byte)seeds);
 			newTable.setLastMove(player, move);
@@ -124,6 +132,7 @@ public final class OwareGame extends BoardGame {
 			boolean first = true;
 			int lastRow = crow;
 			int lastCol = ccol;
+			int lastSeeds = -1;
 			while (seeds > 0) {
 				if (first) {
 					first = false;
@@ -132,18 +141,47 @@ public final class OwareGame extends BoardGame {
 					ccol = (crow == 1) ? 0 : (table.nbrCol - 1);
 				}
 				int dir = (crow == 0) ? -1 : 1;
+				boolean oneLap = (OwareMIDlet.gsMultiLap[BoardGameApp.PD_CURR] !=
+							OwareGame.MULTI_LAP_ONE);
+				int nseeds = 0;
 				for (; (ccol >= 0) && (ccol < table.nbrCol); ccol += dir) {
-					if ((crow != row) || (ccol != col)) {
-						int cseeds = newTable.getSeeds(crow, ccol);
-						newTable.setSeeds(crow, ccol, (byte)(cseeds + 1));
+					if (oneLap || ((crow != row) || (ccol != col))) {
+						nseeds = newTable.getSeeds(crow, ccol) + 1;
+						if (capture4 && (nseeds == 4) && (seeds > 1)) {
+							newTable.incrPoint((byte)crow, (byte)nseeds);
+							newTable.setSeeds(crow, ccol, (byte)0);
+						} else {
+							newTable.setSeeds(crow, ccol, (byte)nseeds);
+						}
 						//#ifdef DLOGGING
-//@						logger.finest("_turn crow,ccol,dir,(cseeds + 1),seeds=" + crow + "," + ccol + "," + dir + "," + (cseeds + 1) + "," + seeds);
+//@						logger.finest("_turn crow,ccol,dir,(nseeds - 1),seeds=" + crow + "," + ccol + "," + dir + "," + (nseeds - 1) + "," + seeds);
 						//#endif
 						changed = true;
 						lastRow = crow;
 						lastCol = ccol;
 						if (--seeds <= 0) {
-							break;
+							switch (OwareMIDlet.gsMultiLap[BoardGameApp.PD_CURR]) {
+								default:
+								case OwareGame.MULTI_LAP_ONE:
+									lastSeeds = 0;
+									break;
+								case OwareGame.MULTI_LAP_1ST:
+									if (nseeds == 1) {
+										lastSeeds = 0;
+										break;
+									} else if (capture4 && (nseeds == 4)) {
+										seeds = 0;
+										lastSeeds = nseeds;
+										break;
+									} else {
+										seeds = nseeds;
+										newTable.setSeeds(crow, ccol, (byte)0);
+									}
+									break;
+							}
+							if (--seeds <= 0) {
+								break;
+							}
 						}
 					//#ifdef DLOGGING
 //@					} else {
@@ -159,32 +197,53 @@ public final class OwareGame extends BoardGame {
 			/* Score points/capture. */
 			int holesCaptured = 0;
 			int lastCaptureCol = lastCol;
-			if ((captureAll || (captureIx >= 0)) && (lastRow != row)) {
-				// Move in the opposite direction this time
-				crow = lastRow;
-				ccol = lastCol;
-				int dir = (crow == 0) ? 1 : -1;
-				for (; (ccol >= 0) && (ccol < table.nbrCol); ccol += dir) {
-					final int cseeds = newTable.getSeeds(crow, ccol);
-					if ((cseeds == 2) || (cseeds == 3)) {
-						if ((captureIx >= 0) && (captureIx == ccol)) {
-							continue;
+			if (captureAll || (captureIx >= 0)) {
+				if (lastRow == row) {
+					if ((lastSeeds == 0) &&
+						(OwareMIDlet.gsCapture[BoardGameApp.PD_CURR] ==
+						 OwareGame.CAPTURE_EMPTY)) {
+						// Get points on opposite side of the board from the opponent if
+						// we end up in an empty cup on our side.
+						byte opponent = (byte)(1 - lastRow);
+						newTable.incrPoint((byte)row,
+									(byte)(newTable.getSeeds(opponent, lastCol) + 1));
+						newTable.setSeeds(opponent, lastCol, (byte)0);
+						holesCaptured = 1;
+					} else if ((lastSeeds == 4) && capture4) {
+						newTable.incrPoint((byte)row, (byte)lastSeeds);
+						newTable.setSeeds((byte)lastRow, lastCol, (byte)0);
+						holesCaptured = 1;
+					}
+				} else if (lastRow != row) {
+					boolean capture2or3 = (OwareMIDlet.gsCapture[BoardGameApp.PD_CURR] ==
+							OwareGame.CAPTURE_23);
+					if (capture2or3) {
+						// Move in the opposite direction this time
+						crow = lastRow;
+						ccol = lastCol;
+						int dir = (crow == 0) ? 1 : -1;
+						for (; (ccol >= 0) && (ccol < table.nbrCol); ccol += dir) {
+							final int cseeds = newTable.getSeeds(crow, ccol);
+							if ((cseeds == 2) || (cseeds == 3)) {
+								if ((captureIx >= 0) && (captureIx == ccol)) {
+									continue;
+								}
+								newTable.incrPoint(player, newTable.getSeeds(crow, ccol));
+								//#ifdef DLOGGING
+//@								logger.finest("_turn capturing crow,ccol,dir,newTable.getSeeds(crow, ccol=" + crow + "," + ccol + "," + dir + "," + newTable.getSeeds(crow, ccol));
+								//#endif
+								newTable.setSeeds(crow, ccol, (byte)0);
+								lastCaptureCol = ccol;
+								if (++holesCaptured > maxHouses) {
+									//#ifdef DLOGGING
+//@									logger.finest("_turn capturing over max crow,ccol,holesCaptured=" + crow + "," + ccol + "," + holesCaptured);
+									//#endif
+									break;
+								}
+							} else {
+								break;
+							}
 						}
-						newTable.setPoint(player, (byte)(newTable.getPoint(player) +
-								newTable.getSeeds(crow, ccol)));
-						//#ifdef DLOGGING
-//@						logger.finest("_turn capturing crow,ccol,dir,newTable.getSeeds(crow, ccol=" + crow + "," + ccol + "," + dir + "," + newTable.getSeeds(crow, ccol));
-						//#endif
-						newTable.setSeeds(crow, ccol, (byte)0);
-						lastCaptureCol = ccol;
-						if (++holesCaptured > maxHouses) {
-							//#ifdef DLOGGING
-//@							logger.finest("_turn capturing over max crow,ccol,holesCaptured=" + crow + "," + ccol + "," + holesCaptured);
-							//#endif
-							break;
-						}
-					} else {
-						break;
 					}
 				}
 			}
@@ -192,7 +251,7 @@ public final class OwareGame extends BoardGame {
 			boolean emptyHoles = allEmptyHoles(newTable, (1 - player));
 
 			if (captureAll && changed && (holesCaptured > 0) && emptyHoles) {
-					switch (OwareMIDlet.gsGrandSlam) {
+					switch (OwareMIDlet.gsGrandSlam[BoardGameApp.PD_CURR]) {
 					case GRAND_SLAM_ILLEGAL:
 					default:
 						//#ifdef DLOGGING
