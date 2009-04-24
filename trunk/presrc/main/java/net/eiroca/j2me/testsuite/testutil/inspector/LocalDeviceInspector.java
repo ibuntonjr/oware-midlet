@@ -34,7 +34,7 @@ public class LocalDeviceInspector extends AbstractProcessor {
 
   public static final String PREFIX = "L.";
   public static final String CATEGORY = "Bluetooth";
-  public static final String PROP_DATA = "data_bluetooth.txt";
+  public static final String PROP_DATA = "testsuite_data_bluetooth.txt";
 
   Hashtable test;
 
