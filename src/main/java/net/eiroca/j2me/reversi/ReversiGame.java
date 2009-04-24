@@ -71,14 +71,10 @@ public final class ReversiGame extends BoardGame {
   }
 
   public ReversiGame(final ReversiGame rg) {
-		super(rg);
-		this.heurMatrix = new int[rg.rTable.nbrRow][rg.rTable.nbrCol]; 
+		this(new int[rg.rTable.nbrRow][rg.rTable.nbrCol], rg.libertyPenalty, rg.sBonus, rg.squareErase);
 		for (int i = 0; i < rg.rTable.nbrRow; i++) {
-			System.arraycopy(heurMatrix[i], 0, rg.heurMatrix[i], 0, rg.rTable.nbrCol);
+			System.arraycopy(rg.heurMatrix[i], 0, heurMatrix[i], 0, rg.rTable.nbrCol);
 		}
-    this.libertyPenalty = libertyPenalty;
-    this.sBonus = sBonus;
-    this.squareErase = squareErase;
   }
 
   private GameTable[] _turn(final ReversiTable table, final byte player, final ReversiMove move, final ReversiTable newTable, final boolean animated) {
@@ -152,8 +148,7 @@ public final class ReversiGame extends BoardGame {
   }
 
   protected void eraseSquareHeuristic(final int[][] heurMatrix,
-			final int[] savedCells, final int i, final int j, final int id,
-			final int jd) {
+			final int[] savedCells, final int i, final int j, final int id, final int jd) {
     savedCells[S01_IX] = heurMatrix[i][j + jd];
     savedCells[S11_IX] = heurMatrix[i + id][j + jd];
     heurMatrix[i][j + jd] = 0;
@@ -174,22 +169,29 @@ public final class ReversiGame extends BoardGame {
 		int numFirstFreeNeighbours = 0;
 		int numSecondFreeNeighbours = 0;
 		int[] savedCells = new int[2];
-    if (!lazyProcess && squareErase) {
+		boolean saved = false;
+    if (!lazyProcess && rg.squareErase) {
+			int lastRowIx = bgt.nbrRow - 1;
+			int lastColIx = bgt.nbrCol - 1;
       if (tableIntArray[0][0] != 0) {
         rg.eraseSquareHeuristic(rg.heurMatrix, savedCells, 0, 0, 1, 1);
+				saved = true;
       }
-      if (tableIntArray[0][7] != 0) {
-        rg.eraseSquareHeuristic(rg.heurMatrix, savedCells, 0, 7, 1, -1);
+      if (tableIntArray[0][lastColIx] != 0) {
+        rg.eraseSquareHeuristic(rg.heurMatrix, savedCells, 0, ReversiTable.MAX_NBR_COL - 1, 1, -1);
+				saved = true;
       }
-      if (tableIntArray[7][7] != 0) {
-        rg.eraseSquareHeuristic(rg.heurMatrix, savedCells, 7, 7, -1, -1);
+      if (tableIntArray[lastRowIx][lastColIx] != 0) {
+        rg.eraseSquareHeuristic(rg.heurMatrix, savedCells, ReversiTable.MAX_NBR_ROW - 1, ReversiTable.MAX_NBR_COL - 1, -1, -1);
+				saved = true;
       }
-      if (tableIntArray[7][0] != 0) {
-        rg.eraseSquareHeuristic(rg.heurMatrix, savedCells, 7, 0, -1, 1);
+      if (tableIntArray[lastRowIx][0] != 0) {
+        rg.eraseSquareHeuristic(rg.heurMatrix, savedCells, ReversiTable.MAX_NBR_ROW - 1, 0, -1, 1);
+				saved = true;
       }
     }
     for (int i = 0; i < bgt.nbrRow; ++i) {
-      for (int j = 0; j < 8; ++j) {
+      for (int j = 0; j < bgt.nbrCol; ++j) {
         final int item = tableIntArray[i][j];
         switch (item) {
           case 1:
@@ -213,14 +215,14 @@ public final class ReversiGame extends BoardGame {
         }
       }
     }
-    if (!lazyProcess && squareErase) {
+    if (!lazyProcess && rg.squareErase && saved) {
       rg.restoreSquareHeuristic(rg.heurMatrix, savedCells, 0, 0, 1, 1);
-      rg.restoreSquareHeuristic(rg.heurMatrix, savedCells, 0, 7, 1, -1);
-      rg.restoreSquareHeuristic(rg.heurMatrix, savedCells, 7, 7, -1, -1);
-      rg.restoreSquareHeuristic(rg.heurMatrix, savedCells, 7, 0, -1, 1);
+      rg.restoreSquareHeuristic(rg.heurMatrix, savedCells, 0, ReversiTable.MAX_NBR_COL - 1, 1, -1);
+      rg.restoreSquareHeuristic(rg.heurMatrix, savedCells, ReversiTable.MAX_NBR_ROW - 1, ReversiTable.MAX_NBR_COL - 1, -1, -1);
+      rg.restoreSquareHeuristic(rg.heurMatrix, savedCells, ReversiTable.MAX_NBR_ROW - 1, 0, -1, 1);
     }
     int squareBonusPoint = 0;
-    if (!lazyProcess && (sBonus != 0)) {
+    if (!lazyProcess && (rg.sBonus != 0)) {
       squareBonusPoint = rg.squareBonus(tableIntArray);
     }
     if (lazyProcess) {
@@ -235,7 +237,7 @@ public final class ReversiGame extends BoardGame {
       }
     }
     else {
-      point = pointFirstPlayer - pointSecondPlayer + libertyPenalty * (numSecondFreeNeighbours - numFirstFreeNeighbours) + sBonus * squareBonusPoint;
+      point = pointFirstPlayer - pointSecondPlayer + libertyPenalty * (numSecondFreeNeighbours - numFirstFreeNeighbours) + rg.sBonus * squareBonusPoint;
     }
     if (player == 1) {
       point = -point;
@@ -249,7 +251,7 @@ public final class ReversiGame extends BoardGame {
 	protected int freeNeighbours(int[][] tableIntArray, final int i, final int j) { int freeNeighbours = 0;
 			for (int id = -1; id <= 1; ++id) {
       for (int jd = -1; jd <= 1; ++jd) {
-        if ((i + id >= 0) && (i + id < rTable.nbrRow) && (j + jd >= 0) && (j + jd < 8) && (tableIntArray[i + id][j + jd] == 0)) {
+        if ((i + id >= 0) && (i + id < rTable.nbrRow) && (j + jd >= 0) && (j + jd < rTable.nbrCol) && (tableIntArray[i + id][j + jd] == 0)) {
           ++freeNeighbours;
         }
       }
@@ -313,10 +315,11 @@ public final class ReversiGame extends BoardGame {
       // two passes: end of the game
       return null;
     }
-    final ReversiTable newTable = new ReversiTable();
+		BoardGameTable bgt = (BoardGameTable)table;
+    final ReversiTable newTable = (ReversiTable)bgt.getEmptyTable();
     final ReversiMove move = new ReversiMove(0, 0);
     boolean hasMove = false;
-    for (int row = 0; row < ((BoardGameTable)table).nbrRow; ++row) {
+    for (int row = 0; row < bgt.nbrRow; ++row) {
       for (int col = 0; col < ((BoardGameTable)table).nbrCol; ++col) {
         move.setCoordinates(row, col);
         if (!hasMove && (((ReversiTable) table).getItem(row, col) == 0)) {
@@ -331,7 +334,7 @@ public final class ReversiGame extends BoardGame {
     if (!hasMove) { return null; }
     if (moves.size() == 0) {
       // need to pass
-      moves.addElement(new ReversiMove(8, 8));
+      moves.addElement(new ReversiMove(bgt.nbrRow, bgt.nbrCol));
     }
     final GameMove[] retMoves = new ReversiMove[moves.size()];
 		moves.copyInto(retMoves);
@@ -343,8 +346,8 @@ public final class ReversiGame extends BoardGame {
   }
 
   protected void restoreSquareHeuristic(final int[][] heurMatrix,
-			final int[]savedCells, final int i,
-			final int j, final int id, final int jd) {
+			final int[] savedCells, final int i, final int j, final int id,
+			final int jd) {
     heurMatrix[i][j + jd] = savedCells[S01_IX];
     heurMatrix[i + id][j] = savedCells[S01_IX];
     heurMatrix[i + id][j + jd] = savedCells[S11_IX];
@@ -373,88 +376,97 @@ public final class ReversiGame extends BoardGame {
 	}
 
   protected int squareBonus(int[][] tableIntArray) {
-    boolean c1 = true;
-    boolean c2 = true;
-    boolean c3 = true;
-    boolean c4 = true;
-    final int bonus[] = new int[3];
-    bonus[1] = 0;
-    bonus[2] = 0;
-    final int corner1 = tableIntArray[0][0];
-    if (corner1 != 0) {
-      int c1r = 1;
-      while ((c1r < 8) && (tableIntArray[0][c1r] == corner1)) {
-        ++c1r;
-      }
-      bonus[corner1] += c1r - 1;
-      if (c1r == 8) {
-        c2 = false;
-      }
-    }
-    final int corner2 = tableIntArray[0][7];
-    if (corner2 != 0) {
-      if (c2) {
-        int c2l = 1;
-        while ((c2l < 8) && (tableIntArray[0][7 - c2l] == corner2)) {
-          ++c2l;
-        }
-        bonus[corner2] += c2l - 1;
-        if (c2l == 8) {
-          c1 = false;
-        }
-      }
-      int c2r = 1;
-      while ((c2r < 8) && (tableIntArray[c2r][7] == corner2)) {
-        ++c2r;
-      }
-      bonus[corner2] += c2r - 1;
-      if (c2r == 8) {
-        c3 = false;
-      }
-    }
-    final int corner3 = tableIntArray[7][7];
-    if (corner3 != 0) {
-      if (c3) {
-        int c3l = 1;
-        while ((c3l < 8) && (tableIntArray[7 - c3l][7] == corner3)) {
-          ++c3l;
-        }
-        bonus[corner3] += c3l - 1;
-      }
-      int c3r = 1;
-      while ((c3r < 8) && (tableIntArray[7][7 - c3r] == corner3)) {
-        ++c3r;
-      }
-      bonus[corner3] += c3r - 1;
-      if (c3r == 8) {
-        c4 = false;
-      }
-    }
-    final int corner4 = tableIntArray[7][0];
-    if (corner4 != 0) {
-      if (c4) {
-        int c4l = 1;
-        while ((c4l < 8) && (tableIntArray[7][c4l] == corner4)) {
-          ++c4l;
-        }
-        bonus[corner4] += c4l - 1;
-      }
-      int c4r = 1;
-      while ((c4r < 8) && (tableIntArray[7 - c4r][0] == corner4)) {
-        ++c4r;
-      }
-      bonus[corner4] += c4r - 1;
-      if (c4r == 8) {
-        c1 = false;
-      }
-    }
-    if ((corner1 != 0) && c1) {
-      int c1l = 1;
-      while ((c1l < 8) && (tableIntArray[c1l][0] == corner1)) {
-        ++c1l;
-      }
-      bonus[corner1] += c1l - 1;
-    }
+		final int bonus[] = new int[3];
+		bonus[1] = 0;
+		bonus[2] = 0;
+		try {
+			boolean c1 = true;
+			boolean c2 = true;
+			boolean c3 = true;
+			boolean c4 = true;
+			final int corner1 = tableIntArray[0][0];
+			if (corner1 != 0) {
+				int c1r = 1;
+				while ((c1r < rTable.nbrCol) && (tableIntArray[0][c1r] == corner1)) {
+					++c1r;
+				}
+				bonus[corner1] += c1r - 1;
+				if (c1r == rTable.nbrCol) {
+					c2 = false;
+				}
+			}
+			int lastRowIx = rTable.nbrRow - 1;
+			int lastColIx = rTable.nbrCol - 1;
+			final int corner2 = tableIntArray[0][lastColIx];
+			if (corner2 != 0) {
+				if (c2) {
+					int c2l = 1;
+					while ((c2l < rTable.nbrCol) && (tableIntArray[0][lastColIx - c2l] == corner2)) {
+						++c2l;
+					}
+					bonus[corner2] += c2l - 1;
+					if (c2l == rTable.nbrCol) {
+						c1 = false;
+					}
+				}
+				int c2r = 1;
+				while ((c2r < rTable.nbrRow) && (tableIntArray[c2r][lastColIx] == corner2)) {
+					++c2r;
+				}
+				bonus[corner2] += c2r - 1;
+				if (c2r == rTable.nbrRow) {
+					c3 = false;
+				}
+			}
+			final int corner3 = tableIntArray[rTable.nbrRow][rTable.nbrCol];
+			if (corner3 != 0) {
+				if (c3) {
+					int c3l = 1;
+					while ((c3l < rTable.nbrRow) && (tableIntArray[lastRowIx - c3l][lastColIx] == corner3)) {
+						++c3l;
+					}
+					bonus[corner3] += c3l - 1;
+				}
+				int c3r = 1;
+				while ((c3r < rTable.nbrRow) && (tableIntArray[lastRowIx][lastColIx - c3r] == corner3)) {
+					++c3r;
+				}
+				bonus[corner3] += c3r - 1;
+				if (c3r == rTable.nbrRow) {
+					c4 = false;
+				}
+			}
+			final int corner4 = tableIntArray[lastRowIx][0];
+			if (corner4 != 0) {
+				if (c4) {
+					int c4l = 1;
+					while ((c4l < rTable.nbrCol) && (tableIntArray[lastRowIx][c4l] == corner4)) {
+						++c4l;
+					}
+					bonus[corner4] += c4l - 1;
+				}
+				int c4r = 1;
+				while ((c4r < rTable.nbrRow) && (tableIntArray[lastRowIx - c4r][0] == corner4)) {
+					++c4r;
+				}
+				bonus[corner4] += c4r - 1;
+				if (c4r == rTable.nbrRow) {
+					c1 = false;
+				}
+			}
+			if ((corner1 != 0) && c1) {
+				int c1l = 1;
+				while ((c1l < rTable.nbrRow) && (tableIntArray[c1l][0] == corner1)) {
+					++c1l;
+				}
+				bonus[corner1] += c1l - 1;
+			}
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+//@			logger.severe("squareBonus error", e);
+			//#endif
+		}
     return bonus[1] - bonus[2];
   }
 
