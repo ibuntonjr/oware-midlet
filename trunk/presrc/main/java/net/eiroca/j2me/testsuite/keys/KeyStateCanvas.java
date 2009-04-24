@@ -144,39 +144,39 @@ public class KeyStateCanvas extends Canvas {
     }
     // Add the game name, if any, to the string
     switch (gameCode) {
-      case UP: {
+      case Canvas.UP: {
         gameName = "UP";
         break;
       }
-      case DOWN: {
+      case Canvas.DOWN: {
         gameName = "DOWN";
         break;
       }
-      case LEFT: {
+      case Canvas.LEFT: {
         gameName = "LEFT";
         break;
       }
-      case RIGHT: {
+      case Canvas.RIGHT: {
         gameName = "RIGHT";
         break;
       }
-      case FIRE: {
+      case Canvas.FIRE: {
         gameName = "FIRE";
         break;
       }
-      case GAME_A: {
+      case Canvas.GAME_A: {
         gameName = "GAME-A";
         break;
       }
-      case GAME_B: {
+      case Canvas.GAME_B: {
         gameName = "GAME-B";
         break;
       }
-      case GAME_C: {
+      case Canvas.GAME_C: {
         gameName = "GAME-C";
         break;
       }
-      case GAME_D: {
+      case Canvas.GAME_D: {
         gameName = "GAME-D";
         break;
       }
@@ -184,13 +184,15 @@ public class KeyStateCanvas extends Canvas {
         break;
       }
     }
+		// Some keys may not have a keypad number such as joy stick, but have a
+		// game name.
+		if (gameName != null) {
+			name.append('(');
+			name.append(gameName);
+			name.append(')');
+			name.append(' ');
+		}
     if (recognised) {
-      if (gameName != null) {
-        name.append('(');
-        name.append(gameName);
-        name.append(')');
-        name.append(' ');
-      }
       name.append(keyChar);
     }
     else {
