@@ -352,7 +352,7 @@ public class MineSweeperGame extends BoardGame {
   private void init() {
     // buat kotak kosong
     BoardGameScreen.table = new MineSweeperTable(size_width, size_height,
-			BoardGameApp.gsNbrPlayers, bomb);
+			BoardGameApp.gsNbrPlayers[BoardGameApp.PD_CURR], bomb);
   }
 
   public boolean isGameEnded(BoardGame bg, BoardGameTable t,
