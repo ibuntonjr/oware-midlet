@@ -361,6 +361,22 @@ public final class OwareTable extends BoardGameTable {
   }
 
   /**
+   * Increment the number of point for the player
+   * @param player
+   * @author Irv Bunton
+   */
+  public void incrPoint(final byte player, byte score) {
+		try {
+			point[player] += score;
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+//@			logger.severe("setPoint error player,score=" + player + "," + score, e);
+			//#endif
+		}
+  }
+
+  /**
    * Set the number of reserve for the player
    * @param player
    * @author Irv Bunton
