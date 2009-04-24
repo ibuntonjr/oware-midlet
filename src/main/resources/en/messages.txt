@@ -59,6 +59,14 @@ H
 Oware
 Initial seeds
 Max holes eaten(captured from)
+Multi-Lap
+One lap
+Land lap
+Next lap
+Capture rules
+Empty
+2-3 seeds
+4 seeds
 Grand Slam variations
 Illegal
 No capture
