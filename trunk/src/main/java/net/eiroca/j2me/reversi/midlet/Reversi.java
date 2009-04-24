@@ -91,25 +91,12 @@ public class Reversi extends BoardGameApp {
 		BoardGameApp.gsLevelMsg = new int[0];
     GameApp.hsName = "Reversi";
 		GameApp.resSplash = "reversi_splash.png";
+		BoardGameApp.gsDepth = new int[] {3, 3, 1, -14, 2};
+		BoardGameApp.gsRow =  new int[] {8, 8, 4, 8, 1};
+		BoardGameApp.gsCol =  new int[] {8, 8, 4, 8, 1};
+		BoardGameApp.gsNbrPlayers =  new int[] {2, 2, 2, 2, 1};
 		setGameDefaults();
   }
-
-	public void setGameDefaults() {
-		BoardGameApp.gsDeptInit = 1;
-		BoardGameApp.gsDeptLimit = -14;
-		BoardGameApp.gsDept = 3;
-		BoardGameApp.gsDeptIncr = 1;
-		BoardGameApp.gsRowInit = 8;
-		BoardGameApp.gsRowLimit = -8;
-		BoardGameApp.gsRow = 8;
-		BoardGameApp.gsRowIncr = 1;
-		BoardGameApp.gsColInit = 8;
-		BoardGameApp.gsCol = 8;
-		BoardGameApp.gsColLimit = -8;
-		BoardGameApp.gsColIncr = 1;
-		BoardGameApp.gsNbrPlayers = 2;
-		BoardGameApp.gsNbrPlayersLimit = 2;
-	}
 
   public void init() {
 		//#ifdef DLOGGING
