@@ -140,6 +140,21 @@
 + Fix copyrights.
 + Remove empty directories.
 
+1.0 2009-04-21 Beta 4 Version
++ Fix image references in Oware.
++ Change Reversi applet icon.
++ Fix testsuite bug where if joy stick or 4 way navigation used, the key code and game action will be shown.
++ Change txt/image names to have testsuite_ as a prefix.
++ Fix problem for testsuite where txt files were not put into the jar.
++ Make changes to have changes in rows/columns for Reversi/MineSweeper, but needs work before release.
++ Better handling of game parameters.
++ Use readAppProperty instead of getAppProperty for defaults handling.
++ Fix creation of Reversi game copy for heurMatrix.
++ Have separate about for test suite.
++ Change test suite classes and templates to use CLDC 1.1 as this must be used for 3D.
++ Support multi-lap the first place that last seed lands.  This needs testing.
++ Support capture of empty, 2 or 3 or 4 in house.  This needs testing.
+
 Issues:
 
 Highlighting of lower player is not the right place for Oware.
