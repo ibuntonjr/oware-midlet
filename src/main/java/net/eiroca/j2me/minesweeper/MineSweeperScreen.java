@@ -131,7 +131,7 @@ public final class MineSweeperScreen extends BoardGameScreen {
 			MineSweeperGame game = (MineSweeperGame)rgame;
 			// This (newGame) also creates a new BoardGameScreen.table. 
 			if (MineSweeper.usLevel == 3) {
-				game.newGame(BoardGameApp.gsCol, BoardGameApp.gsRow, MineSweeper.bomb);
+				game.newGame(BoardGameApp.gsCol[BoardGameApp.PD_CURR], BoardGameApp.gsRow[BoardGameApp.PD_CURR], MineSweeper.bomb);
 			}
 			else {
 				if (MineSweeper.usLevel == 0) {
