@@ -94,7 +94,9 @@ public final class ReversiScreen extends BoardGameScreen {
 
   public void init() {
 		try {
-			BoardGameScreen.table = new ReversiTable();
+			BoardGameScreen.table = new ReversiTable(
+					BoardGameApp.gsRow[BoardGameApp.PD_CURR],
+					BoardGameApp.gsCol[BoardGameApp.PD_CURR]);
 			super.init();
 			//#ifdef DLOGGING
 //@			if (finestLoggable) {tableDraws = 2;}
@@ -127,7 +129,8 @@ public final class ReversiScreen extends BoardGameScreen {
 		}
 		if (lastMovePoint > 0) {
       screen.setColor(BoardGameScreen.COLOR_FG);
-			screen.fillRect(x, y + (pieceHeight / 2) + (pieceHeight / 8),
+			screen.fillRect(x, y + (pieceHeight / 2) +
+					(pieceHeight / ((ReversiTable)BoardGameScreen.table).nbrRow),
 											pieceWidth, (pieceHeight / 4));
 			//#ifdef DLOGGING
 //@			if ((drawItems || (tableDraws-- > 0)) && finestLoggable) {logger.finest("drawPiece line row,col=" + row + "," + col);}
@@ -271,7 +274,7 @@ public final class ReversiScreen extends BoardGameScreen {
   boolean processMove(final BoardGameMove pmove, final boolean startForeThinking) {
 		final ReversiMove move = (ReversiMove)pmove;
 		try {
-			final ReversiTable newTable = new ReversiTable();
+			final ReversiTable newTable = (ReversiTable)((BoardGameTable)BoardGameScreen.table).getEmptyTable();
 			tables = BoardGameScreen.rgame.animatedTurn(BoardGameScreen.table, BoardGameScreen.actPlayer, move, newTable);
 			boolean goodMove = (tables != null);
 			if (!goodMove) {
