@@ -32,7 +32,7 @@
 	<property name="dist.midp20.jsr75" value="${target}/dist/midp20_jsr75" />
 	<property name="dist.midp20.cldc11.jsr75" value="${target}/dist/midp20_cldc11_jsr75" />
 	<property name="dist.midp20.cldc11.jsr75.largemem" value="${target}/dist/midp20_cldc11_jsr75_largemem" />
-	<property name="dist.midp20.jsr75.jsr82.jsr184.largemem" value="${target}/dist/midp20_jsr75_jsr82_jsr184_largemem" />
+	<property name="dist.midp20.cldc11.jsr75.jsr82.jsr184.largemem" value="${target}/dist/midp20_cldc11_jsr75_jsr82_jsr184_largemem" />
 	<property name="dist.midp20.cldc11.largemem" value="${target}/dist/midp20_cldc11_largemem" />
 	<property name="dist.midp20.jsr75_jsr238" value="${target}/dist/midp20_jsr75_jsr238" />
 	<property name="build" value="${target}/build" />
@@ -43,7 +43,7 @@
 	<property name="build.midp20.cldc11.jsr75" value="${target}/build/midp20_cldc11_jsr75" />
 	<property name="build.midp20.cldc11.jsr75.largemem" value="${target}/build/midp20_cldc11_jsr75.largemem" />
 	<property name="build.midp20.cldc11.largemem" value="${target}/build/midp20_cldc11_largemem" />
-	<property name="build.midp20.jsr75.jsr82.jsr184.largemem" value="${target}/build/midp20_cldc11_jsr75_jsr82_jsr84.largemem" />
+	<property name="build.midp20.cldc11.jsr75.jsr82.jsr184.largemem" value="${target}/build/midp20_cldc11_jsr75_jsr82_jsr184.largemem" />
 	<property name="build.midp20.jsr75.jsr238" value="${target}/build/midp20_jsr75.jsr238" />
 	<property name="classes" value="${target}/classes" />
 	<property name="tmppreprocess" value="${target}/tmppreprocess" />
@@ -548,6 +548,7 @@
 			<fileset dir="${icon.dir}" >
 				<include name="**/*.png" />
 				<include name="**/*.wav" />
+				<include name="**/*.txt" />
 				<exclude name="${res.excludes}" />
 			</fileset>
 		</copy>
@@ -945,9 +946,9 @@
 	</target>
 
 	<!-- Compile using WTK with Large memory, MIDP-2.0 and JSR-75 and test -->
-	<target name="compile.2.0.large.jsr75.jsr82.jsr184" >
+	<target name="compile.2.0.cldc1.1.large.jsr75.jsr82.jsr184" >
 		<antcall target="compile" >
-			<param name="wtk.properties" value="wtk2.0large.jsr75.jsr82.jsr184.properties${wtk.template}" />
+			<param name="wtk.properties" value="wtk2.0large.cldc1.1.jsr75.jsr82.jsr184.properties${wtk.template}" />
 			<param name="no.staging" value="true" />
 			<param name="no.release" value="true" />
 		</antcall>
@@ -1115,9 +1116,9 @@
 	</target>
 
 	<!-- Compile for MIDP 2.0, JSR-75, JSR-82, and JSR-184 for release -->
-	<target name="dist.compile.2.0.large.jsr75.jsr82.jsr184" >
+	<target name="dist.compile.2.0.cldc1.1.large.jsr75.jsr82.jsr184" >
 		<antcall target="compile" >
-			<param name="wtk.properties" value="wtk2.0large.jsr75.jsr82.jsr184.properties${wtk.template}" />
+			<param name="wtk.properties" value="wtk2.0large.cldc1.1.jsr75.jsr82.jsr184.properties${wtk.template}" />
 			<param name="no.test" value="true" />
 			<param name="no.staging" value="true" />
 		</antcall>
@@ -1208,9 +1209,9 @@
 
 	<target name="dist.midp.2.0.jsr75.jsr82.jsr184.largemem" unless="no.2.0.cldc.1.1.jsr75.jsr82.jsr184.largemem" >
 		<antcall target="dist.version" inheritAll="true" >
-			<param name="wtk.properties" value="wtk2.0large.jsr75.jsr82.jsr184.properties${wtk.template}" />
-			<param name="dist.vers" value="${dist.midp20.jsr75.jsr82.jsr184.largemem}" />
-			<param name="build.vers" value="${build.midp20.jsr75.jsr82.jsr184.largemem}" />
+			<param name="wtk.properties" value="wtk2.0large.cldc1.1.jsr75.jsr82.jsr184.properties${wtk.template}" />
+			<param name="dist.vers" value="${dist.midp20.cldc11.jsr75.jsr82.jsr184.largemem}" />
+			<param name="build.vers" value="${build.midp20.cldc11.jsr75.jsr82.jsr184.largemem}" />
 			<param name="no.test" value="true" />
 			<param name="no.staging" value="true" />
 		</antcall>
