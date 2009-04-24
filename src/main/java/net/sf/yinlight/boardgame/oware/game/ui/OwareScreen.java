@@ -102,9 +102,10 @@ public final class OwareScreen extends BoardGameScreen {
 
   public void init() {
 		try {
-			BoardGameScreen.table = new OwareTable(BoardGameApp.gsRow,
-					BoardGameApp.gsCol, BoardGameApp.gsNbrPlayers,
-					OwareMIDlet.gsInitSeeds);
+			BoardGameScreen.table = new OwareTable(BoardGameApp.gsRow[BoardGameApp.PD_CURR],
+					BoardGameApp.gsCol[BoardGameApp.PD_CURR],
+					BoardGameApp.gsNbrPlayers[BoardGameApp.PD_CURR],
+					OwareMIDlet.gsInitSeeds[BoardGameApp.PD_CURR]);
 			super.init();
 			//#ifdef DLOGGING
 //@			if (finestLoggable) {tableDraws = 2;}
@@ -259,7 +260,7 @@ public final class OwareScreen extends BoardGameScreen {
 			cadjust -= (2 * fontHeight) - 2;
 			// skill
 			// Put at middle of height.
-			if (infoLines[BoardGameApp.gsNbrPlayers] != null) { screen.drawString(infoLines[BoardGameApp.gsNbrPlayers], width + vertWidth, cadjust, Graphics.BASELINE | Graphics.RIGHT); }
+			if (infoLines[BoardGameApp.gsNbrPlayers[BoardGameApp.PD_CURR]] != null) { screen.drawString(infoLines[BoardGameApp.gsNbrPlayers[BoardGameApp.PD_CURR]], width + vertWidth, cadjust, Graphics.BASELINE | Graphics.RIGHT); }
 		} catch (Throwable e) {
 			e.printStackTrace();
 			//#ifdef DLOGGING
