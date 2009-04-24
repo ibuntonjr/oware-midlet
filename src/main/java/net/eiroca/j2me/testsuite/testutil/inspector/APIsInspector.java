@@ -33,7 +33,7 @@
 //@
 //@  public static final String CATEGORY = "APIs";
 //@  public static final String PREFIX = "A.";
-//@  public static final String PROP_DATA = "data_class.txt";
+//@  public static final String PROP_DATA = "testsuite_data_class.txt";
 //@
 //@  Hashtable test;
 //@
