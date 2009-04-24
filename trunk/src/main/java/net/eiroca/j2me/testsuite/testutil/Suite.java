@@ -21,6 +21,8 @@
  */
 // Expand to define memory size define
 //#define DREGULARMEM
+// Expand to define logging define
+//#define DNOLOGGING
 //#ifdef DLARGEMEM
 //@package net.eiroca.j2me.testsuite.testutil;
 //@
@@ -42,9 +44,14 @@
 //@import net.eiroca.j2me.testsuite.testutil.inspector.PropertyInspector;
 //@import net.eiroca.j2me.testsuite.testutil.inspector.SystemInspector;
 //@
+//#ifdef DLOGGING
+//@import net.sf.jlogmicro.util.logging.Logger;
+//@import net.sf.jlogmicro.util.logging.Level;
+//#endif
+//@
 //@public class Suite implements HTTPAttach {
 //@
-//@  public static final String MAPPING = "/mapping.txt";
+//@  public static final String MAPPING = "/testsuite_mapping.txt";
 //@  public static final String VERSION = "1.0.0";
 //@
 //@  private boolean finished = false;
@@ -53,30 +60,45 @@
 //@  private final AbstractProcessor[] inspectors;
 //@  private final SuiteAbstract[] benchmarks;
 //@
+	//#ifdef DLOGGING
+//@	private Logger logger = Logger.getLogger("Suite");
+//@	private boolean fineLoggable = logger.isLoggable(Level.FINE);
+//@  private boolean finerLoggable = logger.isLoggable(Level.FINER);
+//@	private boolean finestLoggable = logger.isLoggable(Level.FINEST);
+//@	private boolean traceLoggable = logger.isLoggable(Level.TRACE);
+	//#endif
+//@
 //@  public Suite() {
 //@    inspectors = new AbstractProcessor[9];
 //@    benchmarks = new SuiteAbstract[2];
-//@    inspectors[0] = new MIDletInspector();
-//@    inspectors[1] = new CanvasInspector();
-//@    inspectors[2] = new PropertyInspector();
-//@    inspectors[3] = new APIsInspector();
-//@    inspectors[4] = new SystemInspector();
-//@    inspectors[5] = new MultimediaInspector();
-//@    inspectors[6] = new PrivacyPropertyInspector();
-//@    inspectors[7] = new LocalDeviceInspector();
-//@    inspectors[8] = new Graphic3DInspector();
-//@    benchmarks[0] = new PrecisionSuite();
-//@    benchmarks[1] = new MathSuite();
-//@    for (int i = 0; i < inspectors.length; i++) {
-//@      if (inspectors[i] != null) {
-//@        inspectors[i].setSuite(this);
-//@      }
-//@    }
-//@    for (int i = 0; i < benchmarks.length; i++) {
-//@      if (benchmarks[i] != null) {
-//@        benchmarks[i].setSuite(this);
-//@      }
-//@    }
+//@		try {
+//@			inspectors[0] = new MIDletInspector();
+//@			inspectors[1] = new CanvasInspector();
+//@			inspectors[2] = new PropertyInspector();
+//@			inspectors[3] = new APIsInspector();
+//@			inspectors[4] = new SystemInspector();
+//@			inspectors[5] = new MultimediaInspector();
+//@			inspectors[6] = new PrivacyPropertyInspector();
+//@			inspectors[7] = new LocalDeviceInspector();
+//@			inspectors[8] = new Graphic3DInspector();
+//@			benchmarks[0] = new PrecisionSuite();
+//@			benchmarks[1] = new MathSuite();
+//@			for (int i = 0; i < inspectors.length; i++) {
+//@				if (inspectors[i] != null) {
+//@					inspectors[i].setSuite(this);
+//@				}
+//@			}
+//@			for (int i = 0; i < benchmarks.length; i++) {
+//@				if (benchmarks[i] != null) {
+//@					benchmarks[i].setSuite(this);
+//@				}
+//@			}
+//@		} catch (Throwable e) {
+//@			e.printStackTrace();
+			//#ifdef DLOGGING
+//@			logger.severe("constructor error", e);
+			//#endif
+//@		}
 //@  }
 //@
 //@  public void run() {
