@@ -1161,35 +1161,44 @@ implements CommandListener
   public static InputStream getInputStream(final String res) {
 		//#ifdef DLOGGING
 		Logger logger = Logger.getLogger("BaseApp");
+		logger.finest("getInputStream res=" + res);
 		//#endif
-    StringBuffer sb = new StringBuffer(BaseApp.BUF_SIZE);
-    String basepath;
-    final Class me = res.getClass();
-    sb.append(BaseApp.DIR_SEP);
-    if (BaseApp.resPrefix != null) {
-      sb.append(BaseApp.resPrefix).append(BaseApp.DIR_SEP);
-    }
-    basepath = sb.toString();
-    final String locale = Device.getLocale();
-    if (locale != null) {
-      sb.append(locale).append(BaseApp.DIR_SEP);
-    }
-    sb.append(res);
-    InputStream in = me.getResourceAsStream(sb.toString());
-    if (in == null) {
-			//#ifdef DLOGGING
-      if (in == null) {
-				logger.warning("getInputStream missing error for res,sb=" + res + "," + sb.toString());
+    InputStream in = null;
+		try {
+			StringBuffer sb = new StringBuffer(BaseApp.BUF_SIZE);
+			String basepath;
+			final Class me = res.getClass();
+			sb.append(BaseApp.DIR_SEP);
+			if (BaseApp.resPrefix != null) {
+				sb.append(BaseApp.resPrefix).append(BaseApp.DIR_SEP);
 			}
-			//#endif
-      sb = new StringBuffer(basepath).append(res);
-      in = me.getResourceAsStream(sb.toString());
-			//#ifdef DLOGGING
-      if (in == null) {
-				logger.severe("getInputStream missing error for res,locale,sb" + res + "," + locale + "," + sb.toString(), new IOException("Cannot find resource " + res));
+			basepath = sb.toString();
+			final String locale = Device.getLocale();
+			if (locale != null) {
+				sb.append(locale).append(BaseApp.DIR_SEP);
 			}
+			sb.append(res);
+			in = me.getResourceAsStream(sb.toString());
+			if (in == null) {
+				//#ifdef DLOGGING
+				if (in == null) {
+					logger.warning("getInputStream missing error for res,sb=" + res + "," + sb.toString());
+				}
+				//#endif
+				sb = new StringBuffer(basepath).append(res);
+				in = me.getResourceAsStream(sb.toString());
+				//#ifdef DLOGGING
+				if (in == null) {
+					logger.severe("getInputStream missing error for res,locale,sb" + res + "," + locale + "," + sb.toString(), new IOException("Cannot find resource " + res));
+				}
+				//#endif
+			}
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("getInputStream error res=" + res, e);
 			//#endif
-    }
+		}
     return in;
   }
 
@@ -2108,14 +2117,24 @@ implements CommandListener
     return (sValue == null ? def : sValue);
   }
 
-  public String readAppProperty(final String sName, final String def) {
+	public String readAppProperty(final String sName, final String def) {
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("readAppProperty sName,def=" + sName + "," + def);}
+		//#endif
+	
     String sValue = null;
     try {
-      sValue = getAppProperty(sName);
+      sValue = super.getAppProperty(sName);
     }
     catch (final Exception e) {
+		//#ifdef DLOGGING
+		logger.severe("readAppProperty ", e);
+		//#endif
 			e.printStackTrace();
     }
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("readAppProperty sValue=" + sValue);}
+		//#endif
     return (sValue == null ? def : sValue);
   }
 
