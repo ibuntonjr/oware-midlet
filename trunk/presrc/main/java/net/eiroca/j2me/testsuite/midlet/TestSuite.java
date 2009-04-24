@@ -28,8 +28,12 @@
  */
 // Expand to define memory size define
 @DMEMSIZEDEF@
+// Expand to define MIDP define
+@DMIDPVERS@
 // Expand to define JMUnit test define
 @DJMTESTDEF@
+// Expand to define logging define
+@DLOGDEF@
 //#ifdef DLARGEMEM
 package net.eiroca.j2me.testsuite.midlet;
 
@@ -58,6 +62,14 @@ import net.eiroca.j2me.testsuite.testutil.inspector.PrivacyPropertyInspector;
 import net.eiroca.j2me.testsuite.testutil.inspector.PropertyInspector;
 import net.eiroca.j2me.testsuite.testutil.inspector.SystemInspector;
 import net.eiroca.j2me.testsuite.classbrowser.ClassBrowserHelper;
+
+//#ifdef DLOGGING
+import net.sf.jlogmicro.util.logging.Logger;
+import net.sf.jlogmicro.util.logging.Level;
+import net.sf.jlogmicro.util.logging.FormHandler;
+import net.sf.jlogmicro.util.logging.RecStoreHandler;
+import net.sf.jlogmicro.util.presentation.RecStoreLoggerForm;
+//#endif
 
 public final class TestSuite extends Application implements Observer {
 
@@ -101,8 +113,25 @@ public final class TestSuite extends Application implements Observer {
   private String url;
   private String[] menuDesc;
 
+	//#ifdef DLOGGING
+  private boolean fineLoggable;
+  private boolean finestLoggable;
+  private boolean traceLoggable;
+	private Logger logger;
+	//#endif
+
   public TestSuite() {
+		//#ifdef DJMTEST
+    super("TestSuite Test Suite");
+		//#else
     super();
+		//#endif
+		//#ifdef DLOGGING
+		logger = Logger.getLogger("TestSuite");
+		fineLoggable = logger.isLoggable(Level.FINE);
+		finestLoggable = logger.isLoggable(Level.FINEST);
+		traceLoggable = logger.isLoggable(Level.TRACE);
+		//#endif
   }
 
   private Displayable fAbout;
@@ -114,117 +143,124 @@ public final class TestSuite extends Application implements Observer {
 
   public boolean handleAction(final int action, final Displayable d, final Command cmd) {
     boolean processed = true;
-    int i;
-    Form fSpec;
-    switch (action) {
-      case AC_OK:
-        processed = false;
-        if (d == fPostData) {
-          processed = true;
-          final DataSender ds = new DataSender(suite);
-          ds.addObserver(this);
-          ds.submit(url, 400);
-          BaseApp.back(null);
-        }
-        break;
-      case AC_SHOWINSPECTOR:
-        if (fMenuInspector == null) {
-          fMenuInspector = new List("Inspectors", Choice.IMPLICIT, INSPECTOR_CAT, null);
-          BaseApp.setup(fMenuInspector, BaseApp.cBACK, null);
-          BaseApp.registerList(fMenuInspector, TestSuite.AC_DOINSPECTOR);
-        }
-        BaseApp.show(null, fMenuInspector, true);
-        break;
-      case AC_SHOWBENCHMARK:
-        if (fMenuBenchmark == null) {
-          fMenuBenchmark = new List("Benchmark", Choice.IMPLICIT, BENCHMARK_CAT, null);
-          BaseApp.setup(fMenuBenchmark, BaseApp.cBACK, null);
-          BaseApp.registerList(fMenuBenchmark, TestSuite.AC_DOBENCHMARK);
-        }
-        BaseApp.show(null, fMenuBenchmark, true);
-        break;
-      case AC_SHOWCLASSBROWSER:
-        if (fClassBrowser == null) {
-          ClassBrowserHelper.imPlus = BaseApp.createImage("Plus.png");
-          ClassBrowserHelper.imDash = BaseApp.createImage("Dash.png");
-          classes = BaseApp.readStrings("classes.txt");
-          fClassBrowser = new List("", Choice.IMPLICIT);
-          cbPackagePath = "";
-          loadClasses();
-          BaseApp.setup(fClassBrowser, cPREV, BaseApp.cBACK);
-          BaseApp.registerList(fClassBrowser, TestSuite.AC_OPENCLASS);
-        }
-        BaseApp.show(null, fClassBrowser, true);
-        break;
-      case AC_SHOWKEYSTATE:
-        if (fKeyState == null) {
-          fKeyState = new KeyStateCanvas();
-          BaseApp.setup(fKeyState, BaseApp.cBACK, null);
-        }
-        BaseApp.show(null, fKeyState, true);
-        break;
-      case AC_SHOWPOSTDATA:
-        if (fPostData == null) {
-          fPostData = getPostDataForm();
-        }
-        BaseApp.show(null, fPostData, true);
-        break;
-      case AC_DOABOUT:
-        if (fAbout == null) {
-          fAbout = BaseApp.getTextForm(TestSuite.MSG_ABOUT, "about.txt");
-        }
-        BaseApp.show(null, fAbout, true);
-        break;
-      case AC_DOINSPECTOR:
-        i = fMenuInspector.getSelectedIndex();
-        fSpec = new Form("Inspector: " + INSPECTOR_CAT[i]);
-        BaseApp.setup(fSpec, BaseApp.cBACK, null);
-        if (suite != null) {
-          suite.export(fSpec, INSPECTOR_CAT[i]);
-        }
-        BaseApp.show(null, fSpec, true);
-        break;
-      case AC_DOBENCHMARK:
-        i = fMenuBenchmark.getSelectedIndex();
-        fSpec = new Form("Benchmark: " + BENCHMARK_CAT[i]);
-        BaseApp.setup(fSpec, BaseApp.cBACK, null);
-        if (suite != null) {
-          suite.benchmark(fSpec, BENCHMARK_CAT[i]);
-        }
-        BaseApp.show(null, fSpec, true);
-        break;
-      case AC_OPENCLASS:
-        final int iIdx = fClassBrowser.getSelectedIndex();
-        final String sPackageElement = fClassBrowser.getString(iIdx);
-        // package elements always begin with a lower-case letter..
-        if ((sPackageElement != null) && Character.isLowerCase(sPackageElement.charAt(0))) {
-          // set the new package path
-          if ((cbPackagePath == null) || (cbPackagePath.length() == 0)) {
-            cbPackagePath = sPackageElement;
-          }
-          else {
-            cbPackagePath = cbPackagePath + "." + sPackageElement;
-          }
-          // redraw the screen object
-          loadClasses();
-        }
-        break;
-      case AC_PREV:
-        // strip off the last bit of the package path
-        final int iPos = cbPackagePath.lastIndexOf('.');
-        if (iPos == -1) {
-          cbPackagePath = ""; // back at the top level
-        }
-        else {
-          cbPackagePath = cbPackagePath.substring(0, iPos);
-        }
-        // redraw the screen object
-        loadClasses();
-        break;
-      default:
-        processed = false;
-        break;
-    }
+		try {
+			int i;
+			Form fSpec;
+			switch (action) {
+				case AC_OK:
+					processed = false;
+					if (d == fPostData) {
+						processed = true;
+						final DataSender ds = new DataSender(suite);
+						ds.addObserver(this);
+						ds.submit(url, 400);
+						BaseApp.back(null);
+					}
+					break;
+				case AC_SHOWINSPECTOR:
+					if (fMenuInspector == null) {
+						fMenuInspector = new List("Inspectors", Choice.IMPLICIT, INSPECTOR_CAT, null);
+						BaseApp.setup(fMenuInspector, BaseApp.cBACK, null);
+						BaseApp.registerList(fMenuInspector, TestSuite.AC_DOINSPECTOR);
+					}
+					BaseApp.show(null, fMenuInspector, true);
+					break;
+				case AC_SHOWBENCHMARK:
+					if (fMenuBenchmark == null) {
+						fMenuBenchmark = new List("Benchmark", Choice.IMPLICIT, BENCHMARK_CAT, null);
+						BaseApp.setup(fMenuBenchmark, BaseApp.cBACK, null);
+						BaseApp.registerList(fMenuBenchmark, TestSuite.AC_DOBENCHMARK);
+					}
+					BaseApp.show(null, fMenuBenchmark, true);
+					break;
+				case AC_SHOWCLASSBROWSER:
+					if (fClassBrowser == null) {
+						ClassBrowserHelper.imPlus = BaseApp.createImage("testsuite_Plus.png");
+						ClassBrowserHelper.imDash = BaseApp.createImage("testsuite_Dash.png");
+						classes = BaseApp.readStrings("testsuite_classes.txt");
+						fClassBrowser = new List("", Choice.IMPLICIT);
+						cbPackagePath = "";
+						loadClasses();
+						BaseApp.setup(fClassBrowser, cPREV, BaseApp.cBACK);
+						BaseApp.registerList(fClassBrowser, TestSuite.AC_OPENCLASS);
+					}
+					BaseApp.show(null, fClassBrowser, true);
+					break;
+				case AC_SHOWKEYSTATE:
+					if (fKeyState == null) {
+						fKeyState = new KeyStateCanvas();
+						BaseApp.setup(fKeyState, BaseApp.cBACK, null);
+					}
+					BaseApp.show(null, fKeyState, true);
+					break;
+				case AC_SHOWPOSTDATA:
+					if (fPostData == null) {
+						fPostData = getPostDataForm();
+					}
+					BaseApp.show(null, fPostData, true);
+					break;
+				case AC_DOABOUT:
+					if (fAbout == null) {
+						fAbout = BaseApp.getTextForm(TestSuite.MSG_ABOUT, "testsuite_about.txt");
+					}
+					BaseApp.show(null, fAbout, true);
+					break;
+				case AC_DOINSPECTOR:
+					i = fMenuInspector.getSelectedIndex();
+					fSpec = new Form("Inspector: " + INSPECTOR_CAT[i]);
+					BaseApp.setup(fSpec, BaseApp.cBACK, null);
+					if (suite != null) {
+						suite.export(fSpec, INSPECTOR_CAT[i]);
+					}
+					BaseApp.show(null, fSpec, true);
+					break;
+				case AC_DOBENCHMARK:
+					i = fMenuBenchmark.getSelectedIndex();
+					fSpec = new Form("Benchmark: " + BENCHMARK_CAT[i]);
+					BaseApp.setup(fSpec, BaseApp.cBACK, null);
+					if (suite != null) {
+						suite.benchmark(fSpec, BENCHMARK_CAT[i]);
+					}
+					BaseApp.show(null, fSpec, true);
+					break;
+				case AC_OPENCLASS:
+					final int iIdx = fClassBrowser.getSelectedIndex();
+					final String sPackageElement = fClassBrowser.getString(iIdx);
+					// package elements always begin with a lower-case letter..
+					if ((sPackageElement != null) && Character.isLowerCase(sPackageElement.charAt(0))) {
+						// set the new package path
+						if ((cbPackagePath == null) || (cbPackagePath.length() == 0)) {
+							cbPackagePath = sPackageElement;
+						}
+						else {
+							cbPackagePath = cbPackagePath + "." + sPackageElement;
+						}
+						// redraw the screen object
+						loadClasses();
+					}
+					break;
+				case AC_PREV:
+					// strip off the last bit of the package path
+					final int iPos = cbPackagePath.lastIndexOf('.');
+					if (iPos == -1) {
+						cbPackagePath = ""; // back at the top level
+					}
+					else {
+						cbPackagePath = cbPackagePath.substring(0, iPos);
+					}
+					// redraw the screen object
+					loadClasses();
+					break;
+				default:
+					processed = false;
+					break;
+			}
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("handleAction error", e);
+			//#endif
+		}
     return processed;
   }
 
@@ -232,17 +268,20 @@ public final class TestSuite extends Application implements Observer {
    * init
    */
   protected void init() {
-    super.init();
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("init");}
+		//#endif
     try {
+			super.init();
       url = readAppProperty("POSTURL", "http://www.eiroca.net/services/testsuite/store.php");
       BaseApp.messages = BaseApp.readStrings("messages.txt");
       final Image[] icons = new Image[6];
-      icons[0] = BaseApp.createImage("Specs.png");
-      icons[1] = BaseApp.createImage("Specs.png");
-      icons[2] = BaseApp.createImage("ClassBrowser.png");
-      icons[3] = BaseApp.createImage("Keys.png");
-      icons[4] = BaseApp.createImage("Dash.png");
-      icons[5] = BaseApp.createImage("icon.png");
+      icons[0] = BaseApp.createImage("testsuite_Specs.png");
+      icons[1] = BaseApp.createImage("testsuite_Specs.png");
+      icons[2] = BaseApp.createImage("testsuite_ClassBrowser.png");
+      icons[3] = BaseApp.createImage("testsuite_Keys.png");
+      icons[4] = BaseApp.createImage("testsuite_Dash.png");
+      icons[5] = BaseApp.createImage("testsuite_icon.png");
       suite = new Suite();
       suite.run();
       menuDesc = new String[] {
@@ -268,29 +307,51 @@ public final class TestSuite extends Application implements Observer {
   }
 
   private Form getPostDataForm() {
-    final Form f = new Form("Post Data");
-    f.append("Post data to server " + url);
-    BaseApp.setup(f, BaseApp.cBACK, BaseApp.cOK);
-    return f;
+		try {
+			final Form f = new Form("Post Data");
+			f.append("Post data to server " + url);
+			BaseApp.setup(f, BaseApp.cBACK, BaseApp.cOK);
+			return f;
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("getPostDataForm error", e);
+			//#endif
+			return null;
+		}
   }
 
   public void loadClasses() {
-    ClassBrowserHelper.generateList(fClassBrowser, cbPackagePath, classes);
-    fClassBrowser.setCommandListener(this);
-    if ((cbPackagePath == null) || (cbPackagePath.length() == 0)) {
-      fClassBrowser.setTitle("Top Level");
-      fClassBrowser.removeCommand(cPREV);
-    }
-    else {
-      fClassBrowser.setTitle(cbPackagePath);
-      fClassBrowser.addCommand(cPREV);
-    }
+		try {
+			ClassBrowserHelper.generateList(fClassBrowser, cbPackagePath, classes);
+			fClassBrowser.setCommandListener(this);
+			if ((cbPackagePath == null) || (cbPackagePath.length() == 0)) {
+				fClassBrowser.setTitle("Top Level");
+				fClassBrowser.removeCommand(cPREV);
+			}
+			else {
+				fClassBrowser.setTitle(cbPackagePath);
+				fClassBrowser.addCommand(cPREV);
+			}
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("loadClasses error", e);
+			//#endif
+		}
   }
 
   public void changed(final Observable observable) {
-    final DataSender ds = (DataSender) observable;
-    System.out.println(" " + ds.getStatus());
-    fMenu.set(4, menuDesc[4] + " (" + ds.getStatus() + ")", ClassBrowserHelper.imPlus);
+		try {
+			final DataSender ds = (DataSender) observable;
+			System.out.println(" " + ds.getStatus());
+			fMenu.set(4, menuDesc[4] + " (" + ds.getStatus() + ")", ClassBrowserHelper.imPlus);
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("changed error", e);
+			//#endif
+		}
   }
 
 }
