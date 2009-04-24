@@ -48,6 +48,14 @@ public class AppConstants {
   final public static int MSG_OWARE_NAME = BoardGameApp.MSG_USERDEF + msgOffset++; // 0
   final public static int MSG_INIT_SEEDS = BoardGameApp.MSG_USERDEF + msgOffset++;
   final public static int MSG_MAX_HOUSES = BoardGameApp.MSG_USERDEF + msgOffset++;
+  final public static int MSG_MULTI_LAP = BoardGameApp.MSG_USERDEF + msgOffset++;
+  final public static int MSG_ONE_LAP = BoardGameApp.MSG_USERDEF + msgOffset++;
+  final public static int MSG_1ST_LAP = BoardGameApp.MSG_USERDEF + msgOffset++;
+  final public static int MSG_2ND_LAP = BoardGameApp.MSG_USERDEF + msgOffset++;
+  final public static int MSG_CAPTURE_RULES = BoardGameApp.MSG_USERDEF + msgOffset++;
+  final public static int MSG_CAPTURE_EMPTY = BoardGameApp.MSG_USERDEF + msgOffset++;
+  final public static int MSG_CAPTURE_2_3 = BoardGameApp.MSG_USERDEF + msgOffset++;
+  final public static int MSG_CAPTURE_4 = BoardGameApp.MSG_USERDEF + msgOffset++;
   final public static int MSG_GRAND_SLAM = BoardGameApp.MSG_USERDEF + msgOffset++;
   final public static int MSG_GRAND_SLAM1 = BoardGameApp.MSG_USERDEF + msgOffset++;
   final public static int MSG_GRAND_SLAM2 = BoardGameApp.MSG_USERDEF + msgOffset++;
