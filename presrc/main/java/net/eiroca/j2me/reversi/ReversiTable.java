@@ -42,10 +42,8 @@ public final class ReversiTable extends BoardGameTable {
   /**
    * Two bits for every place: 00: nothing 01: 1 10: 2 11: oops
    */
-  protected static final int NBR_ROW = 8;
-  protected static final int NBR_COL = 8;
-  protected static final int TABLE_SIZE = NBR_ROW * NBR_COL;
-  protected static final int TABLE_STORE_SIZE = TABLE_SIZE + 1;
+  protected static final int MAX_NBR_ROW = 8;
+  protected static final int MAX_NBR_COL = 8;
   protected byte[] board;
 
   //#ifdef DLOGGING
@@ -59,35 +57,49 @@ public final class ReversiTable extends BoardGameTable {
     return (byte) (player + 1);
   }
 
+  public ReversiTable(int nbrRow, int nbrCol) {
+		super(nbrRow, nbrCol, 2);
+    board = new byte[nbrRow * nbrCol];
+		int itemRow = nbrRow / 2;
+		int itemCol = nbrCol / 2;
+    setItem(itemRow - 1, itemCol - 1, (byte) 2);
+    setItem(itemRow, itemCol, (byte) 2);
+    setItem(itemRow - 1, itemCol, (byte) 1);
+    setItem(itemRow, itemCol - 1, (byte) 1);
+  }
+
   public ReversiTable() {
-		super(NBR_ROW, NBR_COL, 2);
-    board = new byte[TABLE_SIZE];
-    setItem(3, 3, (byte) 2);
-    setItem(4, 4, (byte) 2);
-    setItem(3, 4, (byte) 1);
-    setItem(4, 3, (byte) 1);
+		this(MAX_NBR_ROW, MAX_NBR_COL);
   }
 
   public ReversiTable(final byte[] byteArray, final int offset) {
 		super(byteArray, offset);
 		try {
+			//#ifdef DLOGGING
+			if (finestLoggable) {logger.finest("constructor byteArray.length,offset=" + byteArray.length + "," + offset);}
+			//#endif
 			int coffset = offset + BoardGameTable.BOARD_TABLE_STORE_SIZE;
 			for (int i = 0; i < nbrPlayers; i++) {
-				if (lastMove[i] != null) {
-					byteArray[coffset++] = (byte)lastMove[i].row;
-					byteArray[coffset++] = (byte)lastMove[i].col;
-					byteArray[coffset++] = (byte)lastMove[i].getPoint();
+				if (byteArray[coffset] == 255) {
+					lastMove[i] = null;
+					coffset+= 3;
+					//#ifdef DLOGGING
+					if (finestLoggable) {logger.finest("constructor i,lastMove[i] null,coffset=" + i + ",null," + coffset);}
+					//#endif
 				} else {
-					byteArray[coffset++] = (byte)255;
-					byteArray[coffset++] = (byte)255;
-					byteArray[coffset++] = (byte)255;
+					lastMove[i] = new ReversiMove(byteArray[coffset++],
+							byteArray[coffset++]);
+					lastMove[i].setPoint(byteArray[coffset++]);
+					//#ifdef DLOGGING
+					if (finestLoggable) {logger.finest("constructor i,lastMove[i].getPoint(),coffset=" + i + "," + lastMove[i].getPoint() + "," + coffset);}
+					//#endif
 				}
 			}
 			//#ifdef DLOGGING
 			if (finestLoggable) {logger.finest("coffset=" + coffset);}
 			//#endif
-			board = new byte[TABLE_SIZE];
-			System.arraycopy(byteArray, coffset, board, 0, TABLE_SIZE);
+			board = new byte[nbrRow * nbrCol];
+			System.arraycopy(byteArray, coffset, board, 0, nbrRow * nbrCol);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			//#ifdef DLOGGING
@@ -98,12 +110,12 @@ public final class ReversiTable extends BoardGameTable {
 
   public ReversiTable(final ReversiTable table) {
 		super(table);
-    board = new byte[TABLE_SIZE];
-    System.arraycopy(table.board, 0, board, 0, TABLE_SIZE);
+    board = new byte[nbrRow * nbrCol];
+    System.arraycopy(table.board, 0, board, 0, nbrRow * nbrCol);
   }
 
   public BoardGameTable getEmptyTable() {
-		return new ReversiTable();
+		return new ReversiTable(nbrRow, nbrCol);
 	}
 
 	public BoardGameMove getBoardGameMove(int row, int col) {
@@ -123,8 +135,8 @@ public final class ReversiTable extends BoardGameTable {
 	}
 
   public void convertToIntArray(final int[][] array) {
-    for (int i = 0; i < NBR_ROW; ++i) {
-      for (int j = 0; j < NBR_COL; ++j) {
+    for (int i = 0; i < nbrRow; ++i) {
+      for (int j = 0; j < nbrCol; ++j) {
         array[i][j] = getItem(i, j);
       }
     }
@@ -133,7 +145,7 @@ public final class ReversiTable extends BoardGameTable {
   public void copyDataFrom(final GameTable table) {
     final ReversiTable rtable = (ReversiTable) table;
 		super.copyDataFrom(rtable);
-    System.arraycopy(rtable.board, 0, board, 0, TABLE_SIZE);
+    System.arraycopy(rtable.board, 0, board, 0, nbrRow * nbrCol);
   }
 
   public GameTable copyFrom() {
@@ -150,11 +162,11 @@ public final class ReversiTable extends BoardGameTable {
   }
 
   public byte getItem(final int row, final int col) {
-    return board[row * NBR_COL + col];
+    return board[row * nbrCol + col];
   }
 
   public void setItem(final int row, final int col, final byte value) {
-    board[row * NBR_COL + col] = value;
+    board[row * nbrCol + col] = value;
   }
 
   public byte[] toByteArray() {
@@ -165,6 +177,9 @@ public final class ReversiTable extends BoardGameTable {
 
   public void toByteArray(final byte[] byteArray, final int offset) {
 		try {
+			//#ifdef DLOGGING
+			if (finestLoggable) {logger.finest("toByteArray nbrRow,nbrCol,board,byteArray.length,offset=" + nbrRow + "," + nbrCol + "," + board.length + "," + byteArray.length + "," + offset);}
+			//#endif
 			super.toByteArray(byteArray, offset);
 			int coffset = offset + BoardGameTable.BOARD_TABLE_STORE_SIZE;
 			for (int i = 0; i < nbrPlayers; i++) {
@@ -177,6 +192,9 @@ public final class ReversiTable extends BoardGameTable {
 					byteArray[coffset++] = (byte)255;
 					byteArray[coffset++] = (byte)255;
 				}
+				//#ifdef DLOGGING
+				if (finestLoggable) {logger.finest("toByteArray i,coffset,lastMove=" + i + "," + coffset + "," + ((lastMove[i] == null) ? "null" : (lastMove[i].row + "x" + lastMove[i].col)));}
+				//#endif
 			}
 			System.arraycopy(board, 0, byteArray, coffset, board.length);
 			//#ifdef DLOGGING
@@ -185,7 +203,7 @@ public final class ReversiTable extends BoardGameTable {
 		} catch (Throwable e) {
 			e.printStackTrace();
 			//#ifdef DLOGGING
-			logger.severe("toByteArray error TABLE_STORE_SIZE,byteArray.length,offset=" + TABLE_STORE_SIZE + "," + byteArray.length + "," + offset, e);
+			logger.severe("toByteArray error byteArray.length,offset=" + byteArray.length + "," + offset, e);
 			//#endif
 		}
   }
@@ -195,8 +213,8 @@ public final class ReversiTable extends BoardGameTable {
    */
   public String toString() {
     final StringBuffer ret = new StringBuffer(80);
-    for (int i = 0; i < NBR_ROW; ++i) {
-      for (int j = 0; j < NBR_COL; ++j) {
+    for (int i = 0; i < nbrRow; ++i) {
+      for (int j = 0; j < nbrCol; ++j) {
         ret.append(getItem(j, i));
       }
       ret.append('\n');
