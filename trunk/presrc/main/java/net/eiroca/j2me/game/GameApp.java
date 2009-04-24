@@ -164,8 +164,8 @@ public abstract class GameApp extends Application {
 		//#endif
     super.init();
 		try {
-			final String gval = super.getAppProperty(GRAPHICS_PROPERY);
-			GameApp.graphics = ((gval == null) || gval.equals("true"));
+			final String gval = super.readAppProperty(GRAPHICS_PROPERY, "true");
+			GameApp.graphics = gval.equals("true");
 			BaseApp.messages = BaseApp.readStrings(GameApp.RES_MSGS);
 			if (GameApp.graphics) {
 				BaseApp.icons = BaseApp.splitImages(GameApp.RES_MENUICON, 9, 12, 12);
