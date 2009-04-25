@@ -1354,7 +1354,7 @@
 	<target name="dist.games" >
 		<antcall target="dist" inheritAll="true" >
 			<param name="src.excludes" value="**/testsuite/**" />
-			<param name="res.excludes" value="**/oware*,**/mine*,**/test*" />
+			<param name="res.excludes" value="**/test*" />
 		</antcall>
 	</target>
 
