@@ -298,12 +298,15 @@
 		<wtkpreprocess srcdir="${compat.presrc}" destdir="${tmppreprocess}" encoding="${wtk.encoding}" symbols="${preprocess.defines}" if="compat.presrc" />
 		<echo message="Preprocess jar src if set ${jar.presrc}." />
 		<wtkpreprocess srcdir="${jar.presrc}" destdir="${tmppreprocess}" encoding="${wtk.encoding}" symbols="${preprocess.defines}" if="jar.presrc" />
-		<property name="src.excludes" value="" />
+		<property name="src.excludes" value="bogus" />
 		<echo message="src.excludes=${src.excludes}" />
 		<copy todir="${comp.src}" overwrite="true" >
 			<fileset dir="${tmppreprocess}" includes="**/*.java" excludes="${src.excludes}" />
 			<filterset refid="defile.filter" />
 		</copy>
+		<delete>
+			<fileset dir="${comp.src}" includes="${src.excludes}" />
+		</delete>
 		<antcall target="util.comp.copy" />
 		<antcall target="delete.test.src" >
 			<param name="dsrc" value="${comp.src}" />
@@ -540,7 +543,7 @@
 	</target>
 
 	<target name="copy.res" if="need.res" depends="prepare" >
-		<property name="res.excludes" value="" />
+		<property name="res.excludes" value="bogus" />
 		<echo message="res.excludes=${res.excludes}" />
 		<delete dir="${to.res.dir}" />
 		<mkdir dir="${to.res.dir}" />
@@ -582,6 +585,9 @@
 				<exclude name="${res.excludes}" />
 			</fileset>
 		</copy>
+		<delete >
+			<fileset dir="${to.res.dir}" includes="${res.excludes}" />
+		</delete>
 		<!-- undo
 		<mkdir dir="${tmpres}/data" />
 		<xslt style="${msg.dir}/props.xsl" in="${msg.dir}/${language.file}" out="${tmpres}/data/lang.txt" />
@@ -1346,8 +1352,8 @@
 			<param name="Reversi-concat.nbr" value="1" />
 			<param name="Oware-concat.jad" value="" />
 			<param name="Minesweeper-concat.jad" value="" />
-			<param name="src.excludes" value="**/testsuite/**,**/minesweeper/**,**/Oware*.java,**/Mine*.java" />
-			<param name="res.excludes" value="**/oware*,**/mine*,**/test*" />
+			<param name="src.excludes" value="**/testsuite/**,**/minesweeper/**,**/Oware*,**/Mine*,testsuite/**,minesweeper/**,Oware*,Mine*" />
+			<param name="res.excludes" value="**/oware*,**/mine*,**/testsuite*,oware*,mine*,testsuite*" />
 		</antcall>
 	</target>
 
