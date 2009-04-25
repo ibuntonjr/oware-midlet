@@ -140,8 +140,9 @@
 + Fix copyrights.
 + Remove empty directories.
 
-1.0 2009-04-21 Beta 4 Version
+1.1.1 2009-04-24 Beta 1 Version
 + Fix image references in Oware.
++ Fix creation of games only release to allow Oware and Minsweeper.
 + Change Reversi applet icon.
 + Fix testsuite bug where if joy stick or 4 way navigation used, the key code and game action will be shown.
 + Change txt/image names to have testsuite_ as a prefix.
@@ -158,4 +159,6 @@
 Issues:
 
 Highlighting of lower player is not the right place for Oware.
+Oware images/text in the wrong places.
+Minesweeper does not work at all.
 
