@@ -348,9 +348,16 @@ public final class ReversiGame extends BoardGame {
   protected void restoreSquareHeuristic(final int[][] heurMatrix,
 			final int[] savedCells, final int i, final int j, final int id,
 			final int jd) {
-    heurMatrix[i][j + jd] = savedCells[S01_IX];
-    heurMatrix[i + id][j] = savedCells[S01_IX];
-    heurMatrix[i + id][j + jd] = savedCells[S11_IX];
+	  try {
+		heurMatrix[i][j + jd] = savedCells[S01_IX];
+		heurMatrix[i + id][j] = savedCells[S01_IX];
+		heurMatrix[i + id][j + jd] = savedCells[S11_IX];
+	} catch (Throwable e) {
+		e.printStackTrace();
+		//#ifdef DLOGGING
+		logger.severe("restoreSquareHeuristic error", e);
+		//#endif
+	}
   }
 
   protected void setTable(final GameTable table, final byte player, final boolean fullProcess) {
