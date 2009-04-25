@@ -1,0 +1,23 @@
+wtk.midp.version = 2.0
+wtk.cldc.version = 1.1
+wtk.optionalpda.enabled = true
+wtk.java3d.enabled = true
+wtk.bluetooth.enabled = true
+wtk.miapi.enabled  = false
+debug = debug
+DMIDPVERS = DMIDP20
+#Don't allow Itunes to save performance and memory
+DITUNESDEF = DNOITUNES
+DJSR75 = DJSR75
+DJSR82 = DJSR82
+DJSR184 = DJSR184
+DJSR238 = DNOJSR238
+DMEMSIZEDEF = DLARGEMEM
+#1.1 kills us.
+DCLDCVERS = DCLDCV11
+JMIDPVERS = MIDP-2.0 
+JCLDCVERS = CLDC-1.1
+file.prefix = midp20_jsr75_jsr82_jsr184_
+bin = ${target}/bin20jsr75jsr82jsr184
+MIDLETVERS = ${MIDLETVERSROOT}
+SUFFIXVERS = 2.0-cldc1.1-large-jsr75-jsr82-jsr184
