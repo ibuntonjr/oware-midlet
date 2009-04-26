@@ -25,14 +25,25 @@
 /**
  * This was modified no later than 2009-04-20 by Irving Bunton, Jr
  */
+// Expand to define MIDP define
+@DMIDPVERS@
 // Expand to define memory size define
 @DMEMSIZEDEF@
+// Expand to define logging define
+@DLOGDEF@
 //#ifdef DLARGEMEM
 package net.eiroca.j2me.testsuite.keys;
 
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
+
+import com.substanceofcode.rssreader.presentation.FeatureMgr;
+
+//#ifdef DLOGGING
+import net.sf.jlogmicro.util.logging.Logger;
+import net.sf.jlogmicro.util.logging.Level;
+//#endif
 
 /**
  * A screen GUI that prints a representation of the state of the standard phone
@@ -56,15 +67,22 @@ public class KeyStateCanvas extends Canvas {
   /** The maximum number of entries in the list. */
   private final int listSize;
 
+  //#ifdef DLOGGING
+  protected Logger logger = Logger.getLogger("KeyStateCanvas");
+  protected boolean fineLoggable = logger.isLoggable(Level.FINE);
+  protected boolean finerLoggable = logger.isLoggable(Level.FINER);
+  protected boolean finestLoggable = logger.isLoggable(Level.FINEST);
+  //#endif
+
   /**
    * Constructs an instance of the KeyStateCanvas class.
    */
   public KeyStateCanvas() {
     super();
-    fonText = Font.getFont(Font.FACE_PROPORTIONAL, Font.STYLE_PLAIN, Font.SIZE_SMALL);
-    list = new KeyStateList(this, fonText);
-    listSize = list.getSize();
-    fontHeight = fonText.getHeight() + 1;
+		fonText = Font.getFont(Font.FACE_PROPORTIONAL, Font.STYLE_PLAIN, Font.SIZE_SMALL);
+		list = new KeyStateList(this, fonText);
+		listSize = list.getSize();
+		fontHeight = fonText.getHeight() + 1;
   }
 
   /**
@@ -270,10 +288,17 @@ public class KeyStateCanvas extends Canvas {
    * @param keyCode the code of the key in question
    */
   protected void keyPressed(final int keyCode) {
-    synchronized (list) {
-      list.addEntry(keyCode, KeyState.PRESSED);
-    }
-    repaint();
+		try {
+			synchronized (list) {
+				list.addEntry(keyCode, KeyState.PRESSED);
+			}
+			repaint();
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("keyPressed error", e);
+			//#endif
+		}
   }
 
   /**
@@ -281,10 +306,17 @@ public class KeyStateCanvas extends Canvas {
    * @param keyCode the code of the key in question
    */
   protected void keyRepeated(final int keyCode) {
-    synchronized (list) {
-      list.addEntry(keyCode, KeyState.REPEATED);
-    }
-    repaint();
+		try {
+			synchronized (list) {
+				list.addEntry(keyCode, KeyState.REPEATED);
+			}
+			repaint();
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("keyRepeated error", e);
+			//#endif
+		}
   }
 
   /**
@@ -292,10 +324,17 @@ public class KeyStateCanvas extends Canvas {
    * @param keyCode the code of the key in question
    */
   protected void keyReleased(final int keyCode) {
-    synchronized (list) {
-      list.addEntry(keyCode, KeyState.RELEASED);
-    }
-    repaint();
+		try {
+			synchronized (list) {
+				list.addEntry(keyCode, KeyState.RELEASED);
+			}
+			repaint();
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("keyReleased error", e);
+			//#endif
+		}
   }
 
 }
