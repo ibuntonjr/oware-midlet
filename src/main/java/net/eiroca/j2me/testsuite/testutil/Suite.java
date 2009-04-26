@@ -19,6 +19,8 @@
 /**
  * This was modified no later than 2009-04-20 by Irving Bunton, Jr
  */
+// Expand to define DJSR184 define
+//#define DNOJSR184
 // Expand to define memory size define
 //#define DREGULARMEM
 // Expand to define logging define
