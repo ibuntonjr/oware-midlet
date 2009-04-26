@@ -19,12 +19,16 @@
 /**
  * This was modified no later than 2009-04-20 by Irving Bunton, Jr
  */
+// Expand to define DJSR135 define
+//#define DNOJSR135
 // Expand to define memory size define
 //#define DREGULARMEM
 //#ifdef DLARGEMEM
 //@package net.eiroca.j2me.testsuite.testutil.inspector;
 //@
+//#ifdef DJSR135
 //@import javax.microedition.media.Manager;
+//#endif
 //@import net.eiroca.j2me.testsuite.testutil.AbstractProcessor;
 //@
 //@public class MultimediaInspector extends AbstractProcessor {
@@ -37,11 +41,19 @@
 //@  }
 //@
 //@  public void execute() {
+	//#ifdef DJSR135
 //@    final String[] supportedProtocols = Manager.getSupportedProtocols(null);
+	//#else
+//@    final String[] supportedProtocols = new String[0];
+	//#endif
 //@    if (supportedProtocols != null) {
 //@      for (int i = 0; i < supportedProtocols.length; i++) {
 //@        final String protocol = supportedProtocols[i];
+		//#ifdef DJSR135
 //@        final String[] supportedContentTypes = Manager.getSupportedContentTypes(protocol);
+		//#else
+//@        final String[] supportedContentTypes = new String[0];
+		//#endif
 //@        for (int j = 0; j < supportedContentTypes.length; j++) {
 //@          addResult(protocol + "." + j, supportedContentTypes[j]);
 //@        }
