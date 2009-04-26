@@ -10,5 +10,7 @@ MIDlet-Icon: @MIDLETICON@
 MIDlet-Description: @MIDLETDESC@
 MicroEdition-Configuration: @JCLDCVERS@
 MicroEdition-Profile: @JMIDPVERS@
+Program-Version: @PROGVERS@
 boardgame-graphics: @GRAPHICS@
 boardgame-precalulate: @PRECALCULATE@
+boardgame-ignore-keycodes: @IGNOREKEYS@
