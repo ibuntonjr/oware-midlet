@@ -1549,6 +1549,7 @@
 		<antcall target="dist" inheritAll="true" >
 			<param name="src.excludes" value="**/testsuite/**,testsuite/**" />
 			<param name="res.excludes" value="**/testsuite*,testsuite*" />
+			<param name="Testsuite-concat.jad" value="" />
 		</antcall>
 	</target>
 
