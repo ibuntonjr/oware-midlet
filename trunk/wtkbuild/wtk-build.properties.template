@@ -85,11 +85,11 @@ midlet.home = ${wtk.workspace.proj}/apps/${project.name}
 prc.creater = OURI
 prc.longname = Oware/Reversi
 MIDLETURL_ROOT = http://oware-midlet.googlecode.com/files
-MIDLETVERSROOT = 0.1.1
+MIDLETVERSROOT = 0.1.2
 separator = /
 #Need vers with '_' to allow uploading to sites that get confused by to
 #many '.'
-FMIDLETVERSROOT = 0_1_1
+FMIDLETVERSROOT = 0_1_2
 #Location of manifest source
 manifestsrc = ../manifestsrc
 #? src = src
