@@ -27,23 +27,35 @@
 	<property name="analyze" value="${target}/analyze" />
 	<property name="dist" value="${target}/dist" />
 	<property name="dist.midp10" value="${target}/dist/midp10" />
+	<property name="dist.midp10.large" value="${target}/dist/midp10_large" />
 	<property name="dist.midp20" value="${target}/dist/midp20" />
+	<property name="dist.midp20.large" value="${target}/dist/midp20_large" />
 	<property name="dist.midp20.cldc11" value="${target}/dist/midp20_cldc11" />
 	<property name="dist.midp20.jsr75" value="${target}/dist/midp20_jsr75" />
+	<property name="dist.midp20.jsr135" value="${target}/dist/midp20_jsr135" />
+	<property name="dist.midp20.cldc11.jsr135" value="${target}/dist/midp20_cldc11_jsr135" />
+	<property name="dist.midp20.large.jsr135" value="${target}/dist/midp20_large_jsr135" />
 	<property name="dist.midp20.cldc11.jsr75" value="${target}/dist/midp20_cldc11_jsr75" />
 	<property name="dist.midp20.cldc11.jsr75.largemem" value="${target}/dist/midp20_cldc11_jsr75_largemem" />
 	<property name="dist.midp20.cldc11.jsr75.jsr82.jsr184.largemem" value="${target}/dist/midp20_cldc11_jsr75_jsr82_jsr184_largemem" />
+	<property name="dist.midp20.cldc11.jsr75.jsr82.jsr135.jsr184.largemem" value="${target}/dist/midp20_cldc11_jsr75_jsr82_jsr135_jsr184_largemem" />
 	<property name="dist.midp20.cldc11.largemem" value="${target}/dist/midp20_cldc11_largemem" />
 	<property name="dist.midp20.jsr75_jsr238" value="${target}/dist/midp20_jsr75_jsr238" />
 	<property name="build" value="${target}/build" />
 	<property name="build.midp10" value="${target}/build/midp10" />
+	<property name="build.midp10.large" value="${target}/build/midp10_large" />
 	<property name="build.midp20" value="${target}/build/midp20" />
+	<property name="build.midp20.large" value="${target}/build/midp20_large" />
 	<property name="build.midp20.cldc11" value="${target}/build/midp20_cldc11" />
 	<property name="build.midp20.jsr75" value="${target}/build/midp20_jsr75" />
+	<property name="build.midp20.jsr135" value="${target}/build/midp20_jsr135" />
+	<property name="build.midp20.cldc11.jsr135" value="${target}/build/midp20_cldc11_jsr135" />
+	<property name="build.midp20.large.jsr135" value="${target}/build/midp20_large_jsr135" />
 	<property name="build.midp20.cldc11.jsr75" value="${target}/build/midp20_cldc11_jsr75" />
 	<property name="build.midp20.cldc11.jsr75.largemem" value="${target}/build/midp20_cldc11_jsr75.largemem" />
 	<property name="build.midp20.cldc11.largemem" value="${target}/build/midp20_cldc11_largemem" />
 	<property name="build.midp20.cldc11.jsr75.jsr82.jsr184.largemem" value="${target}/build/midp20_cldc11_jsr75_jsr82_jsr184.largemem" />
+	<property name="build.midp20.cldc11.jsr75.jsr82.jsr135.jsr184.largemem" value="${target}/build/midp20_cldc11_jsr75_jsr82_jsr135_jsr184.largemem" />
 	<property name="build.midp20.jsr75.jsr238" value="${target}/build/midp20_jsr75.jsr238" />
 	<property name="classes" value="${target}/classes" />
 	<property name="tmppreprocess" value="${target}/tmppreprocess" />
@@ -128,7 +140,11 @@
 		<property name="propdir" value="${basedir}" />
 		<property file="${basedir}/${wtk.properties}" />
 		<property name="PERMISSIONS" value="" />
+		<!-- Use an invalid value.  The extra 0's mean that it will not match -->
+		<!-- anything in the code. -->
+		<property name="IGNOREKEYS" value="0000" />
 		<property name="DJSR82" value="DNOJSR82" />
+		<property name="DJSR135" value="DNOJSR135" />
 		<property name="DJSR184" value="DNOJSR184" />
 		<property name="log.subdir" value="jlogmicro" />
 		<property name="GRAPHICS" value="true" />
@@ -139,6 +155,8 @@
 		<property name="Reversi-concat.nbr" value="2" />
 		<property name="Minesweeper-concat.jad" value="Minesweeper-concat.jad" />
 		<property name="Minesweeper-concat.nbr" value="3" />
+		<property name="Testsuite-concat.jad" value="Testsuite-concat.jad" />
+		<property name="Testsuite-concat.nbr" value="4" />
 		<!-- undo
 		<property name="language.file" value="messages_en_US.xml" />
 		<xmlproperty file="${msg.dir}/${language.file}" collapseAttributes="true" />
@@ -172,6 +190,7 @@
 			<filter token="DITUNESDEF" value="//#define ${DITUNESDEF}" />
 			<filter token="DJSR75" value="//#define ${DJSR75}" />
 			<filter token="DJSR82" value="//#define ${DJSR82}" />
+			<filter token="DJSR135" value="//#define ${DJSR135}" />
 			<filter token="DJSR184" value="//#define ${DJSR184}" />
 			<filter token="DJSR238" value="//#define ${DJSR238}" />
 			<filter token="DTESTDEF" value="//#define ${DTESTDEF}" />
@@ -186,6 +205,7 @@
 			<filter token="CLDCVERS" value="${wtk.cldc.version}" />
 			<filter token="MIDLETVERS" value="${MIDLETVERS}" />
 			<filter token="PERMISSIONS" value="${PERMISSIONS}" />
+			<filter token="IGNOREKEYS" value="${IGNOREKEYS}" />
 			<filter token="MIDLETDESC" value="${MIDLETDESC}" />
 			<filter token="GRAPHICS" value="${GRAPHICS}" />
 			<filter token="MIDLETNAME" value="${release.name}" />
@@ -257,8 +277,10 @@
 	    <echo message="DFEATUREFORMIMPORTDEF=${DFEATUREFORMIMPORTDEF}" />
 	    <echo message="DJSR75=${DJSR75}" />
 	    <echo message="DJSR82=${DJSR82}" />
+	    <echo message="DJSR135=${DJSR135}" />
 	    <echo message="DJSR184=${DJSR184}" />
 	    <echo message="DJSR238=${DJSR238}" />
+	    <echo message="IGNOREKEYS=${IGNOREKEYS}" />
 	    <echo message="DTESTDEF=${DTESTDEF}" />
 	    <echo message="DJMTESTDEF=${DJMTESTDEF}" />
 	    <echo message="DTESTUIDEF=${DTESTUIDEF}" />
@@ -285,7 +307,7 @@
 		<!-- Copy unpreprocessed source to compiled src dir -->
 		<delete dir="${tmppreprocess}" />
 		<mkdir dir="${tmppreprocess}" />
-		<property name="preprocess.defines" value="DEBUG=WARN,${DMIDPVERS},${DCLDCVERS},${DITUNESDEF},${DMEMSIZEDEF},${DJSR75},${DJSR82},${DJSR184},${DJSR238},${DTESTDEF},${DJMTESTDEF},${DLOGDEF},${DTESTUIDEF},${DCOMPATDEF},${DFEATUREFORMDEF}" />
+		<property name="preprocess.defines" value="DEBUG=WARN,${DMIDPVERS},${DCLDCVERS},${DITUNESDEF},${DMEMSIZEDEF},${DJSR75},${DJSR82},${DJSR135},${DJSR184},${DJSR238},${DTESTDEF},${DJMTESTDEF},${DLOGDEF},${DTESTUIDEF},${DCOMPATDEF},${DFEATUREFORMDEF}" />
 		<echo message="preprocess.defines=${preprocess.defines}." />
 		<wtkpreprocess srcdir="${presrc}" destdir="${tmppreprocess}" encoding="${wtk.encoding}" symbols="${preprocess.defines}" if="presrc" />
 		<echo message="Preprocess util pre src if set ${presrc.util.src}." />
@@ -653,6 +675,10 @@
 			<param name="concat.jad" value="${Minesweeper-concat.jad}" />
 			<param name="concat.nbr" value="${Minesweeper-concat.nbr}" />
 		</antcall>
+		<antcall target="cat.to.midlet" >
+			<param name="concat.jad" value="${Testsuite-concat.jad}" />
+			<param name="concat.nbr" value="${Testsuite-concat.nbr}" />
+		</antcall>
 
 		<echo message="MIDLETVERS=${MIDLETVERS}" />
 
@@ -896,6 +922,15 @@
 		</antcall>
 	</target>
 
+	<!-- Compile using WTK with MIDP-1.0 and test -->
+	<target name="compile.1.0.large">
+		<antcall target="compile" >
+			<param name="wtk.properties" value="wtk1.0large.properties${wtk.template}" />
+			<param name="no.staging" value="true" />
+			<param name="no.release" value="true" />
+		</antcall>
+	</target>
+
 	<!-- Compile using WTK with MIDP-2.0 and test -->
 	<target name="compile.2.0">
 		<antcall target="compile" >
@@ -933,10 +968,28 @@
 		</antcall>
 	</target>
 
+	<!-- Compile using WTK with MIDP-2.0 and JSR-135 and test -->
+	<target name="compile.2.0.jsr135" >
+		<antcall target="compile" >
+			<param name="wtk.properties" value="wtk2.0jsr135.properties${wtk.template}" />
+			<param name="no.staging" value="true" />
+			<param name="no.release" value="true" />
+		</antcall>
+	</target>
+
 	<!-- Compile using WTK with MIDP-2.0, CLDC 1.1 and JSR-75 and test -->
 	<target name="compile.2.0.cldc1.1.jsr75" >
 		<antcall target="compile" >
 			<param name="wtk.properties" value="wtk2.0cldc1.1.jsr75.properties${wtk.template}" />
+			<param name="no.staging" value="true" />
+			<param name="no.release" value="true" />
+		</antcall>
+	</target>
+
+	<!-- Compile using WTK with MIDP-2.0, CLDC 1.1 and JSR-135 and test -->
+	<target name="compile.2.0.cldc1.1.jsr135" >
+		<antcall target="compile" >
+			<param name="wtk.properties" value="wtk2.0cldc1.1.jsr135.properties${wtk.template}" />
 			<param name="no.staging" value="true" />
 			<param name="no.release" value="true" />
 		</antcall>
@@ -955,6 +1008,15 @@
 	<target name="compile.2.0.cldc1.1.large.jsr75.jsr82.jsr184" >
 		<antcall target="compile" >
 			<param name="wtk.properties" value="wtk2.0large.cldc1.1.jsr75.jsr82.jsr184.properties${wtk.template}" />
+			<param name="no.staging" value="true" />
+			<param name="no.release" value="true" />
+		</antcall>
+	</target>
+
+	<!-- Compile using WTK with Large memory, MIDP-2.0 and JSR-75 and test -->
+	<target name="compile.2.0.cldc1.1.large.jsr75.jsr82.jsr135.jsr184" >
+		<antcall target="compile" >
+			<param name="wtk.properties" value="wtk2.0large.cldc1.1.jsr75.jsr82.jsr135.jsr184.properties${wtk.template}" />
 			<param name="no.staging" value="true" />
 			<param name="no.release" value="true" />
 		</antcall>
@@ -1112,6 +1174,15 @@
 		</antcall>
 	</target>
 
+	<!-- Compile for MIDP 2.0 and JSR-135 for release -->
+	<target name="dist.compile.2.0.jsr135" >
+		<antcall target="compile" >
+			<param name="wtk.properties" value="wtk2.0jsr135.properties${wtk.template}" />
+			<param name="no.test" value="true" />
+			<param name="no.staging" value="true" />
+		</antcall>
+	</target>
+
 	<!-- Compile for MIDP 2.0, CLDC 1.1 and JSR-75 for release -->
 	<target name="dist.compile.2.0.cldc1.1.jsr75" >
 		<antcall target="compile" >
@@ -1121,10 +1192,19 @@
 		</antcall>
 	</target>
 
-	<!-- Compile for MIDP 2.0, JSR-75, JSR-82, and JSR-184 for release -->
-	<target name="dist.compile.2.0.cldc1.1.large.jsr75.jsr82.jsr184" >
+	<!-- Compile for MIDP 2.0, CLDC 1.1 and JSR-135 for release -->
+	<target name="dist.compile.2.0.cldc1.1.jsr135" >
 		<antcall target="compile" >
-			<param name="wtk.properties" value="wtk2.0large.cldc1.1.jsr75.jsr82.jsr184.properties${wtk.template}" />
+			<param name="wtk.properties" value="wtk2.0cldc1.1.jsr135.properties${wtk.template}" />
+			<param name="no.test" value="true" />
+			<param name="no.staging" value="true" />
+		</antcall>
+	</target>
+
+	<!-- Compile for MIDP 2.0, JSR-75, JSR-82, JSR-135, and JSR-184 for release -->
+	<target name="dist.compile.2.0.cldc1.1.large.jsr75.jsr82.jsr135.jsr184" >
+		<antcall target="compile" >
+			<param name="wtk.properties" value="wtk2.0large.cldc1.1.jsr75.jsr82.jsr135.jsr184.properties${wtk.template}" />
 			<param name="no.test" value="true" />
 			<param name="no.staging" value="true" />
 		</antcall>
@@ -1153,11 +1233,31 @@
 		</antcall>
 	</target>
 
+	<target name="dist.midp.1.0.large" unless="no.1.0.large" >
+		<antcall target="dist.version" inheritAll="yes" >
+			<param name="wtk.properties" value="wtk1.0large.properties${wtk.template}" />
+			<param name="dist.vers" value="${dist.midp10.large}" />
+			<param name="build.vers" value="${build.midp10.large}" />
+			<param name="no.test" value="true" />
+			<param name="no.staging" value="true" />
+		</antcall>
+	</target>
+
 	<target name="dist.midp.2.0" unless="no.2.0" >
 		<antcall target="dist.version" inheritAll="true" >
 			<param name="wtk.properties" value="wtk2.0.properties${wtk.template}" />
 			<param name="dist.vers" value="${dist.midp20}" />
 			<param name="build.vers" value="${build.midp20}" />
+			<param name="no.test" value="true" />
+			<param name="no.staging" value="true" />
+		</antcall>
+	</target>
+
+	<target name="dist.midp.2.0.large" unless="no.2.0.large" >
+		<antcall target="dist.version" inheritAll="true" >
+			<param name="wtk.properties" value="wtk2.0large.properties${wtk.template}" />
+			<param name="dist.vers" value="${dist.midp20.large}" />
+			<param name="build.vers" value="${build.midp20.large}" />
 			<param name="no.test" value="true" />
 			<param name="no.staging" value="true" />
 		</antcall>
@@ -1183,11 +1283,41 @@
 		</antcall>
 	</target>
 
+	<target name="dist.midp.2.0.jsr135" unless="no.2.0.jsr135" >
+		<antcall target="dist.version" inheritAll="true" >
+			<param name="wtk.properties" value="wtk2.0jsr135.properties${wtk.template}" />
+			<param name="dist.vers" value="${dist.midp20.jsr135}" />
+			<param name="build.vers" value="${build.midp20.jsr135}" />
+			<param name="no.test" value="true" />
+			<param name="no.staging" value="true" />
+		</antcall>
+	</target>
+
+	<target name="dist.midp.2.0.jsr135.large" unless="no.2.0.jsr135.large" >
+		<antcall target="dist.version" inheritAll="true" >
+			<param name="wtk.properties" value="wtk2.0large.jsr135.properties${wtk.template}" />
+			<param name="dist.vers" value="${dist.midp20.large.jsr135}" />
+			<param name="build.vers" value="${build.midp20.large.jsr135}" />
+			<param name="no.test" value="true" />
+			<param name="no.staging" value="true" />
+		</antcall>
+	</target>
+
 	<target name="dist.midp.2.0.cldc.1.1.jsr75" unless="no.2.0.cldc.1.1.jsr75" >
 		<antcall target="dist.version" inheritAll="true" >
 			<param name="wtk.properties" value="wtk2.0cldc1.1.jsr75.properties${wtk.template}" />
 			<param name="dist.vers" value="${dist.midp20.cldc11.jsr75}" />
 			<param name="build.vers" value="${build.midp20.cldc11.jsr75}" />
+			<param name="no.test" value="true" />
+			<param name="no.staging" value="true" />
+		</antcall>
+	</target>
+
+	<target name="dist.midp.2.0.cldc.1.1.jsr135" unless="no.2.0.cldc.1.1.jsr135" >
+		<antcall target="dist.version" inheritAll="true" >
+			<param name="wtk.properties" value="wtk2.0cldc1.1.jsr135.properties${wtk.template}" />
+			<param name="dist.vers" value="${dist.midp20.cldc11.jsr135}" />
+			<param name="build.vers" value="${build.midp20.cldc11.jsr135}" />
 			<param name="no.test" value="true" />
 			<param name="no.staging" value="true" />
 		</antcall>
@@ -1218,6 +1348,16 @@
 			<param name="wtk.properties" value="wtk2.0large.cldc1.1.jsr75.jsr82.jsr184.properties${wtk.template}" />
 			<param name="dist.vers" value="${dist.midp20.cldc11.jsr75.jsr82.jsr184.largemem}" />
 			<param name="build.vers" value="${build.midp20.cldc11.jsr75.jsr82.jsr184.largemem}" />
+			<param name="no.test" value="true" />
+			<param name="no.staging" value="true" />
+		</antcall>
+	</target>
+
+	<target name="dist.midp.2.0.jsr75.jsr82.jsr135.jsr184.largemem" unless="no.2.0.cldc.1.1.jsr75.jsr82.jsr135.jsr184.largemem" >
+		<antcall target="dist.version" inheritAll="true" >
+			<param name="wtk.properties" value="wtk2.0large.cldc1.1.jsr75.jsr82.jsr135.jsr184.properties${wtk.template}" />
+			<param name="dist.vers" value="${dist.midp20.cldc11.jsr75.jsr82.jsr135.jsr184.largemem}" />
+			<param name="build.vers" value="${build.midp20.cldc11.jsr75.jsr82.jsr135.jsr184.largemem}" />
 			<param name="no.test" value="true" />
 			<param name="no.staging" value="true" />
 		</antcall>
@@ -1312,7 +1452,27 @@
 			<param name="build.number" value="${build.number}" />
 			<param name="release.buildno" value="true" />
 		</antcall>
+		<antcall target="dist.midp.1.0.large" >
+			<param name="build.number" value="${build.number}" />
+			<param name="release.buildno" value="true" />
+		</antcall>
+		<antcall target="dist.midp.2.0.jsr135" >
+			<param name="build.number" value="${build.number}" />
+			<param name="release.buildno" value="true" />
+		</antcall>
+		<antcall target="dist.midp.2.0.jsr135.large" >
+			<param name="build.number" value="${build.number}" />
+			<param name="release.buildno" value="true" />
+		</antcall>
+		<antcall target="dist.midp.2.0.large" >
+			<param name="build.number" value="${build.number}" />
+			<param name="release.buildno" value="true" />
+		</antcall>
 		<antcall target="dist.midp.2.0.cldc.1.1" >
+			<param name="build.number" value="${build.number}" />
+			<param name="release.buildno" value="true" />
+		</antcall>
+		<antcall target="dist.midp.2.0.cldc.1.1.jsr135" >
 			<param name="build.number" value="${build.number}" />
 			<param name="release.buildno" value="true" />
 		</antcall>
@@ -1324,6 +1484,10 @@
 		</antcall>
 		-->
 		<antcall target="dist.midp.2.0.jsr75.jsr82.jsr184.largemem" >
+			<param name="build.number" value="${build.number}" />
+			<param name="release.buildno" value="true" />
+		</antcall>
+		<antcall target="dist.midp.2.0.jsr75.jsr82.jsr135.jsr184.largemem" >
 			<param name="build.number" value="${build.number}" />
 			<param name="release.buildno" value="true" />
 		</antcall>
@@ -1352,15 +1516,39 @@
 			<param name="Reversi-concat.nbr" value="1" />
 			<param name="Oware-concat.jad" value="" />
 			<param name="Minesweeper-concat.jad" value="" />
+			<param name="Testsuite-concat.jad" value="" />
 			<param name="src.excludes" value="**/testsuite/**,**/minesweeper/**,**/Oware*,**/Mine*,testsuite/**,minesweeper/**,Oware*,Mine*" />
 			<param name="res.excludes" value="**/oware*,**/mine*,**/testsuite*,oware*,mine*,testsuite*" />
 		</antcall>
 	</target>
 
+	<target name="dist.testsuite" >
+		<antcall target="dist" inheritAll="true" >
+			<!--UNDO when fix tests. -->
+			<param name="no.1.0" value="true" />
+			<param name="no.2.0" value="true" />
+			<param name="no.2.0.cldc.1.1" value="true" />
+			<param name="no.2.0.jsr75" value="true" />
+			<param name="no.2.0.jsr135" value="true" />
+			<param name="no.2.0.cldc.1.1.jsr75" value="true" />
+			<param name="no.2.0.cldc.1.1.jsr135" value="true" />
+			<param name="no.2.0.jsr238" value="true" />
+			<param name="release.name" value="TestSuite" />
+			<param name="MIDLETICON" value="/testsuite_icon.png" />
+			<param name="MIDLETDESC" value="Test Suite" />
+			<param name="Testsuite-concat.nbr" value="1" />
+			<param name="Oware-concat.jad" value="" />
+			<param name="Minesweeper-concat.jad" value="" />
+			<param name="Reversi-concat.jad" value="" />
+			<param name="src.excludes" value="**/reversi/**,**/minesweeper/**,**/Oware*,**/Reversi*,**/Mine*,reversi/**,minesweeper/**,Oware*,Mine*" />
+			<param name="res.excludes" value="**/oware*,**/mine*,**/reversi*,oware*,mine*,reversi*" />
+		</antcall>
+	</target>
+
 	<target name="dist.games" >
 		<antcall target="dist" inheritAll="true" >
-			<param name="src.excludes" value="**/testsuite/**" />
-			<param name="res.excludes" value="**/test*" />
+			<param name="src.excludes" value="**/testsuite/**,testsuite/**" />
+			<param name="res.excludes" value="**/testsuite*,testsuite*" />
 		</antcall>
 	</target>
 
