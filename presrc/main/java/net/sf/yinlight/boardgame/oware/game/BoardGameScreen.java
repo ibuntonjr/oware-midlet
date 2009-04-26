@@ -62,7 +62,8 @@ import net.sf.jlogmicro.util.logging.Level;
 	*/
 abstract public class BoardGameScreen extends GameScreen implements Runnable {
 
-  protected static final byte STORE_VERS = 2;
+  protected static final byte STORE_VERS = 3;
+  protected static final String IGNORE_KEYCODES = "boardgame-ignore-keycodes";
   protected static final byte SCREEN_STORE_BYTES = 6;
   protected static final char NL = '\n';
   protected static final int WIDTH_SEPARATERS = 2;
@@ -96,6 +97,7 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
   public static final int INVALID_KEY_CODE = -2000;
   public int keyCode = INVALID_KEY_CODE;
   public int[] pointerPress = new int[] {-1, -1};
+  final protected String ignoreKeycodes;
 
   public long messageEnd;
 
@@ -132,6 +134,7 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
   protected boolean fineLoggable = logger.isLoggable(Level.FINE);
   protected boolean finerLoggable = logger.isLoggable(Level.FINER);
   protected boolean finestLoggable = logger.isLoggable(Level.FINEST);
+  protected boolean traceLoggable = logger.isLoggable(Level.TRACE);
   protected int tableDraws = 0;
   protected boolean drawItems = false;
   //#endif
@@ -150,10 +153,15 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 		} finally {
 			featureMgr = new FeatureMgr(this);
 			//#ifdef DMIDP10
-			featureMgr.setCommandListener(GameApp.midlet, false);
+			featureMgr.setCommandListener(BaseApp.midlet, false);
 			super.setCommandListener(featureMgr);
 			//#endif
 			featureMgr.setRunnable(this, true);
+			ignoreKeycodes = "," + BaseApp.midlet.readAppProperty(
+					IGNORE_KEYCODES, "") + ",";
+			//#ifdef DLOGGING
+			if (finestLoggable) {logger.finest("constructor ignoreKeycodes=" + ignoreKeycodes);}
+			//#endif
 		}
 	}
 
@@ -420,6 +428,21 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
    */
   public void hide() {
 		try {
+			storeRecordStore();
+			super.hide();
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("hide save parameters error", e);
+			//#endif
+		}
+	}
+
+  /**
+   * Executed when hidden.  Stop animation thread, turn off full screen.
+   */
+  public void storeRecordStore() {
+		try {
 			byte[] gameRec = saveRecordStore();
 			if (gameRec != null) {
 				RecordStore gstore = BaseApp.getRecordStore(BoardGameApp.storeName, true, true);
@@ -434,7 +457,6 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 			logger.severe("hide save parameters error", e);
 			//#endif
 		}
-		super.hide();
 	}
 
   protected void drawMessage() {
@@ -640,54 +662,72 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 				midlet.doGameStop();
 			}
 			else {
-				switch (super.getGameAction(keyCode)) {
-					case Canvas.UP:
-						sely = (sely + table.nbrRow - 1) % table.nbrRow;
-						setMessage(null);
-					//#ifdef DLOGGING
-					if (finestLoggable) {logger.finest("procKeyPressed up selx,sely,BoardGameScreen.actPlayer=" + selx + "," + sely + "," + BoardGameScreen.actPlayer);}
-					//#endif
-						break;
-					case Canvas.DOWN:
-						sely = (sely + 1) % table.nbrRow;
-						setMessage(null);
-					//#ifdef DLOGGING
-					if (finestLoggable) {logger.finest("procKeyPressed down selx,sely,BoardGameScreen.actPlayer=" + selx + "," + sely + "," + BoardGameScreen.actPlayer);}
-					//#endif
-						break;
-					case Canvas.LEFT:
-						selx = (selx + table.nbrCol - 1) % table.nbrCol;
-						setMessage(null);
-					//#ifdef DLOGGING
-					if (finestLoggable) {logger.finest("procKeyPressed left selx,sely,BoardGameScreen.actPlayer=" + selx + "," + sely + "," + BoardGameScreen.actPlayer);}
-					//#endif
-						break;
-					case Canvas.RIGHT:
-						selx = (selx + 1) % table.nbrCol;
-						setMessage(null);
-					//#ifdef DLOGGING
-					if (finestLoggable) {logger.finest("procKeyPressed right selx,sely,BoardGameScreen.actPlayer=" + selx + "," + sely + "," + BoardGameScreen.actPlayer);}
-					//#endif
-						break;
-					case Canvas.FIRE:
-						String cmessage = null;
-						synchronized (this) {
-							cmessage = message;
-						}
-						if (cmessage != null) {
+				try {
+					switch (super.getGameAction(keyCode)) {
+						case Canvas.UP:
+							sely = (sely + table.nbrRow - 1) % table.nbrRow;
 							setMessage(null);
+						//#ifdef DLOGGING
+						if (finestLoggable) {logger.finest("procKeyPressed up selx,sely,BoardGameScreen.actPlayer=" + selx + "," + sely + "," + BoardGameScreen.actPlayer);}
+						//#endif
+							break;
+						case Canvas.DOWN:
+							sely = (sely + 1) % table.nbrRow;
+							setMessage(null);
+						//#ifdef DLOGGING
+						if (finestLoggable) {logger.finest("procKeyPressed down selx,sely,BoardGameScreen.actPlayer=" + selx + "," + sely + "," + BoardGameScreen.actPlayer);}
+						//#endif
+							break;
+						case Canvas.LEFT:
+							selx = (selx + table.nbrCol - 1) % table.nbrCol;
+							setMessage(null);
+						//#ifdef DLOGGING
+						if (finestLoggable) {logger.finest("procKeyPressed left selx,sely,BoardGameScreen.actPlayer=" + selx + "," + sely + "," + BoardGameScreen.actPlayer);}
+						//#endif
+							break;
+						case Canvas.RIGHT:
+							selx = (selx + 1) % table.nbrCol;
+							setMessage(null);
+						//#ifdef DLOGGING
+						if (finestLoggable) {logger.finest("procKeyPressed right selx,sely,BoardGameScreen.actPlayer=" + selx + "," + sely + "," + BoardGameScreen.actPlayer);}
+						//#endif
+							break;
+						case Canvas.FIRE:
+							String cmessage = null;
+							synchronized (this) {
+								cmessage = message;
+							}
+							if (cmessage != null) {
+								setMessage(null);
+								//#ifdef DLOGGING
+								if (finestLoggable) {logger.finest("procKeyPressed fire msg on selx,sely,BoardGameScreen.actPlayer=" + selx + "," + sely + "," + BoardGameScreen.actPlayer);}
+								//#endif
+							}
+							else {
+								nextTurn(sely, selx);
+							}
+							break;
+						default:
 							//#ifdef DLOGGING
-							if (finestLoggable) {logger.finest("procKeyPressed fire msg on selx,sely,BoardGameScreen.actPlayer=" + selx + "," + sely + "," + BoardGameScreen.actPlayer);}
+							if (finestLoggable) {logger.finest("procKeyPressed unprocessed keyCode=" + keyCode);}
 							//#endif
+							if (acceptKeyCode(keyCode)) {
+								//#ifdef DLOGGING
+								if (traceLoggable) {logger.trace("procKeyPressed pause with keyCode=" + keyCode);}
+								//#endif
+								gMiniMax.cancel(true);
+								midlet.doGamePause();
+							}
+							break;
+					}
+				} catch (IllegalArgumentException e) {
+						//#ifdef DLOGGING
+						logger.warning("procKeyPressed IllegalArgumentException keyCode=" + keyCode, e);
+						//#endif
+						if (acceptKeyCode(keyCode)) {
+							gMiniMax.cancel(true);
+							midlet.doGamePause();
 						}
-						else {
-							nextTurn(sely, selx);
-						}
-						break;
-					default:
-						gMiniMax.cancel(true);
-						midlet.doGamePause();
-						break;
 				}
 			}
 		} catch (Throwable e) {
@@ -699,6 +739,15 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 				super.wakeup(3);
 		}
   }
+
+  public boolean acceptKeyCode(int keyCode) {
+		boolean rtn = (ignoreKeycodes.indexOf(
+					"," + Integer.toString(keyCode) + ",") < 0);
+		//#ifdef DLOGGING
+		if (traceLoggable) {logger.trace("acceptKeyCode keyCode,rtn=" + keyCode + "," + rtn);}
+		//#endif
+		return rtn;
+	}
 
   public void procPointerPressed(final int x, final int y) {
 		//#ifdef DLOGGING
