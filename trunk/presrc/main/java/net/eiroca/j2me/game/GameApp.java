@@ -24,6 +24,8 @@
  */
 // Expand to define MIDP define
 @DMIDPVERS@
+// Expand to define DJSR135 define
+@DJSR135@
 // Expand to define JMUnit test define
 @DJMTESTDEF@
 // Expand to define logging define
@@ -39,7 +41,7 @@ import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.List;
 import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextField;
-//#ifdef DMIDP20
+//#ifdef DJSR135
 import javax.microedition.media.Player;
 //#endif
 import net.eiroca.j2me.app.Application;
@@ -335,7 +337,7 @@ public abstract class GameApp extends Application {
 		} catch (Throwable e) {
 			e.printStackTrace();
 			//#ifdef DLOGGING
-			logger.severe("doAbout error", e);
+			logger.severe("doGameAbort error", e);
 			//#endif
 		}
   }
@@ -647,7 +649,7 @@ public abstract class GameApp extends Application {
     }
   }
 
-//#ifdef DMIDP20
+  //#ifdef DJSR135
   /**
    * Play a sound
    * @param p
@@ -667,6 +669,6 @@ public abstract class GameApp extends Application {
       }
     }
   }
-//#endif
+  //#endif
 
 }
