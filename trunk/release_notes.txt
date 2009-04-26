@@ -156,6 +156,16 @@
 + Support multi-lap the first place that last seed lands.  This needs testing.
 + Support capture of empty, 2 or 3 or 4 in house.  This needs testing.
 
+1.1.2 2009-04-25 Beta 1 Version
++ Fix Oware board images and text.
++ Fix references to MIDP 2.0, Bluethooth (JSR-82), Multi Media API (JSR-135), 3D Graphics (JSR-184) so that they are only used the right JSR is enabled for compile.
++ Add test suite JAD concatenation .
++ Add properties and build targets to make test suite (large memory) for MIDP 1.0 and MIDP 2.0.
++ Fix possibl problems with feature manager with hangs.
++ Fix possible hangs in test suite.
++ Allow ignoring key codes in the JAD file.
++ Put store of board, in it's own method.
+
 Issues:
 
 Highlighting of lower player is not the right place for Oware.
