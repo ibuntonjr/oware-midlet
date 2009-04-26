@@ -6,6 +6,7 @@ debug = debug
 DMIDPVERS = DMIDP20
 #Don't allow Itunes to save performance and memory
 DITUNESDEF = DNOITUNES
+DJSR75 = DNOJSR75
 DJSR135 = DJSR135
 DJSR238 = DNOJSR238
 DMEMSIZEDEF = DLARGEMEM
@@ -14,6 +15,6 @@ DCLDCVERS = DCLDCV11
 JMIDPVERS = MIDP-2.0 
 JCLDCVERS = CLDC-1.1
 file.prefix = midp20_cldc11_jsr135_large_
-bin = ${target}/bin20cldc11large
+bin = ${target}/bin20cldc11jsr135large
 MIDLETVERS = ${MIDLETVERSROOT}
 SUFFIXVERS = 2.0-cldc1.1-jsr135-large
