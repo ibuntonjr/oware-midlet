@@ -1,3 +1,7 @@
+Reversi midlet v@MIDLETVERS@-@PROGVERS@
+
+Copyright (C) 2008-2009 Irving Bunton, Jr
+Third party copyrights for modified and unmodified software/images
 Based upon Mobile Device Tools written by Andrew Scott
 Copyright (C) 2004 Andrew Scott
 Copyright (C) 2006-2008 eIrOcA (eNrIcO Croce & sImOnA Burzio)
