@@ -19,6 +19,8 @@
  */
 // Expand to define MIDP define
 @DMIDPVERS@
+// Expand to define DJSR135 define
+@DJSR135@
 // Expand to define logging define
 @DLOGDEF@
 // Expand to define test define
@@ -36,8 +38,10 @@ import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 //#ifdef DMIDP20
 import javax.microedition.lcdui.game.Sprite;
+//#ifdef DJSR135
 import javax.microedition.media.Manager;
 import javax.microedition.media.Player;
+//#endif
 import javax.microedition.media.control.VolumeControl;
 //#endif
 import net.eiroca.j2me.app.BaseApp;
@@ -72,9 +76,11 @@ public final class MineSweeperScreen extends BoardGameScreen {
   private final Image iAll;
 
   //#ifdef DMIDP20
+  //#ifdef DJSR135
   private Player pBomb;
   private Player pTicTac;
-	//#endif
+  //#endif
+  //#endif
   private int sec = 0;
   private long last;
   private final Font textFont;
@@ -99,10 +105,12 @@ public final class MineSweeperScreen extends BoardGameScreen {
 			//#ifdef DLOGGING
 			if (finestLoggable) {logger.finest("constructor ");}
 			//#endif
+			//#ifdef DJSR135
       pBomb = Manager.createPlayer(getClass().getResourceAsStream(MineSweeper.RES_BOMB), "audio/x-wav");
       pTicTac = Manager.createPlayer(getClass().getResourceAsStream(MineSweeper.RES_CLOCK), "audio/x-wav");
 			//#ifdef DLOGGING
 			if (finestLoggable) {logger.finest("constructor pBomb,pTicTac=" + pBomb + "," + pTicTac);}
+			//#endif
 			//#endif
     }
     catch (final Exception e1) {
@@ -166,7 +174,7 @@ public final class MineSweeperScreen extends BoardGameScreen {
 			sizeY = (screenHeight - MineSweeperScreen.TOPSPACE) / MineSweeperScreen.BLKSIZE;
 			sely = Math.min(sizeX, game.size_height) / 2;
 			selx = Math.min(sizeY, game.size_width) / 2;
-			//#ifdef DMIDP20
+			//#ifdef DJSR135
 			VolumeControl vol;
 			try {
 				vol = (VolumeControl) pBomb.getControl("VolumeControl");
@@ -385,12 +393,12 @@ public final class MineSweeperScreen extends BoardGameScreen {
     else if (action == Canvas.FIRE) {
       final Vector v = game.checkCell(selx, sely);
       if (game.status == MineSweeperGame.GE_EXPLODED) {
-				//#ifdef DMIDP20
+				//#ifdef DJSR135
         GameApp.play(pBomb);
 				//#endif
       }
       else {
-				//#ifdef DMIDP20
+				//#ifdef DJSR135
         GameApp.play(pTicTac);
 				//#endif
       }
@@ -403,12 +411,12 @@ public final class MineSweeperScreen extends BoardGameScreen {
       if (game.canDoubleClick(selx, sely)) {
         final Vector v = game.doubleClick(selx, sely);
         if (game.status == MineSweeperGame.GE_EXPLODED) {
-					//#ifdef DMIDP20
+					//#ifdef DJSR135
           GameApp.play(pBomb);
 					//#endif
         }
         else {
-					//#ifdef DMIDP20
+					//#ifdef DJSR135
           GameApp.play(pTicTac);
 					//#endif
         }
