@@ -19,6 +19,8 @@
 /**
  * This was modified no later than 2009-04-20 by Irving Bunton, Jr
  */
+// Expand to define DJSR184 define
+//#define DNOJSR184
 // Expand to define memory size define
 //#define DREGULARMEM
 //#ifdef DLARGEMEM
@@ -26,7 +28,9 @@
 //@
 //@import java.util.Enumeration;
 //@import java.util.Hashtable;
+//#ifdef DJSR184
 //@import javax.microedition.m3g.Graphics3D;
+//#endif
 //@import net.eiroca.j2me.app.BaseApp;
 //@import net.eiroca.j2me.testsuite.testutil.AbstractProcessor;
 //@
@@ -41,7 +45,11 @@
 //@
 //@  public void execute() {
 //@    if (BaseApp.isClass("javax.microedition.m3g.Graphics3D")) {
+			//#ifdef DJSR184
 //@      final Hashtable props = Graphics3D.getProperties();
+			//#else
+//@      final Hashtable props = new Hashtable();
+			//#endif
 //@      Object key;
 //@      Object val;
 //@      for (final Enumeration e = props.keys(); e.hasMoreElements();) {
