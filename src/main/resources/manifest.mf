@@ -11,3 +11,4 @@ MicroEdition-Profile: @JMIDPVERS@
 Program-Version: @PROGVERS@
 boardgame-graphics: @GRAPHICS@
 boardgame-precalulate: @PRECALCULATE@
+boardgame-ignore-keycodes: @IGNOREKEYS@
