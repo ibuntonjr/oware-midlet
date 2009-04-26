@@ -19,6 +19,8 @@
  */
 // Expand to define MIDP define
 //#define DMIDP20
+// Expand to define DJSR135 define
+//#define DNOJSR135
 // Expand to define logging define
 //#define DNOLOGGING
 // Expand to define test define
@@ -36,8 +38,10 @@ import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 //#ifdef DMIDP20
 import javax.microedition.lcdui.game.Sprite;
-import javax.microedition.media.Manager;
-import javax.microedition.media.Player;
+//#ifdef DJSR135
+//@import javax.microedition.media.Manager;
+//@import javax.microedition.media.Player;
+//#endif
 import javax.microedition.media.control.VolumeControl;
 //#endif
 import net.eiroca.j2me.app.BaseApp;
@@ -72,9 +76,11 @@ public final class MineSweeperScreen extends BoardGameScreen {
   private final Image iAll;
 
   //#ifdef DMIDP20
-  private Player pBomb;
-  private Player pTicTac;
-	//#endif
+  //#ifdef DJSR135
+//@  private Player pBomb;
+//@  private Player pTicTac;
+  //#endif
+  //#endif
   private int sec = 0;
   private long last;
   private final Font textFont;
@@ -99,10 +105,12 @@ public final class MineSweeperScreen extends BoardGameScreen {
 			//#ifdef DLOGGING
 //@			if (finestLoggable) {logger.finest("constructor ");}
 			//#endif
-      pBomb = Manager.createPlayer(getClass().getResourceAsStream(MineSweeper.RES_BOMB), "audio/x-wav");
-      pTicTac = Manager.createPlayer(getClass().getResourceAsStream(MineSweeper.RES_CLOCK), "audio/x-wav");
+			//#ifdef DJSR135
+//@      pBomb = Manager.createPlayer(getClass().getResourceAsStream(MineSweeper.RES_BOMB), "audio/x-wav");
+//@      pTicTac = Manager.createPlayer(getClass().getResourceAsStream(MineSweeper.RES_CLOCK), "audio/x-wav");
 			//#ifdef DLOGGING
 //@			if (finestLoggable) {logger.finest("constructor pBomb,pTicTac=" + pBomb + "," + pTicTac);}
+			//#endif
 			//#endif
     }
     catch (final Exception e1) {
@@ -166,17 +174,17 @@ public final class MineSweeperScreen extends BoardGameScreen {
 			sizeY = (screenHeight - MineSweeperScreen.TOPSPACE) / MineSweeperScreen.BLKSIZE;
 			sely = Math.min(sizeX, game.size_height) / 2;
 			selx = Math.min(sizeY, game.size_width) / 2;
-			//#ifdef DMIDP20
-			VolumeControl vol;
-			try {
-				vol = (VolumeControl) pBomb.getControl("VolumeControl");
-				vol.setLevel(GameApp.usVolume * 20);
-				vol = (VolumeControl) pTicTac.getControl("VolumeControl");
-				vol.setLevel(GameApp.usVolume * 20);
-			}
-			catch (final Exception e) {
-				//
-			}
+			//#ifdef DJSR135
+//@			VolumeControl vol;
+//@			try {
+//@				vol = (VolumeControl) pBomb.getControl("VolumeControl");
+//@				vol.setLevel(GameApp.usVolume * 20);
+//@				vol = (VolumeControl) pTicTac.getControl("VolumeControl");
+//@				vol.setLevel(GameApp.usVolume * 20);
+//@			}
+//@			catch (final Exception e) {
+//@				//
+//@			}
 			//#endif
 			sec = 0;
 			last = System.currentTimeMillis();
@@ -385,13 +393,13 @@ public final class MineSweeperScreen extends BoardGameScreen {
     else if (action == Canvas.FIRE) {
       final Vector v = game.checkCell(selx, sely);
       if (game.status == MineSweeperGame.GE_EXPLODED) {
-				//#ifdef DMIDP20
-        GameApp.play(pBomb);
+				//#ifdef DJSR135
+//@        GameApp.play(pBomb);
 				//#endif
       }
       else {
-				//#ifdef DMIDP20
-        GameApp.play(pTicTac);
+				//#ifdef DJSR135
+//@        GameApp.play(pTicTac);
 				//#endif
       }
       for (int i = 0; i < v.size(); i++) {
@@ -403,13 +411,13 @@ public final class MineSweeperScreen extends BoardGameScreen {
       if (game.canDoubleClick(selx, sely)) {
         final Vector v = game.doubleClick(selx, sely);
         if (game.status == MineSweeperGame.GE_EXPLODED) {
-					//#ifdef DMIDP20
-          GameApp.play(pBomb);
+					//#ifdef DJSR135
+//@          GameApp.play(pBomb);
 					//#endif
         }
         else {
-					//#ifdef DMIDP20
-          GameApp.play(pTicTac);
+					//#ifdef DJSR135
+//@          GameApp.play(pTicTac);
 					//#endif
         }
         for (int i = 0; i < v.size(); i++) {
