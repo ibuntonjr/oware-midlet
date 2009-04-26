@@ -24,6 +24,8 @@
  */
 // Expand to define MIDP define
 //#define DMIDP20
+// Expand to define DJSR135 define
+//#define DNOJSR135
 // Expand to define JMUnit test define
 //#define DNOJMTEST
 // Expand to define logging define
@@ -39,8 +41,8 @@ import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.List;
 import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextField;
-//#ifdef DMIDP20
-import javax.microedition.media.Player;
+//#ifdef DJSR135
+//@import javax.microedition.media.Player;
 //#endif
 import net.eiroca.j2me.app.Application;
 import net.eiroca.j2me.app.BaseApp;
@@ -335,7 +337,7 @@ public abstract class GameApp extends Application {
 		} catch (Throwable e) {
 			e.printStackTrace();
 			//#ifdef DLOGGING
-//@			logger.severe("doAbout error", e);
+//@			logger.severe("doGameAbort error", e);
 			//#endif
 		}
   }
@@ -647,26 +649,26 @@ public abstract class GameApp extends Application {
     }
   }
 
-//#ifdef DMIDP20
-  /**
-   * Play a sound
-   * @param p
-   */
-  public static void play(final Player p) {
+  //#ifdef DJSR135
+//@  /**
+//@   * Play a sound
+//@   * @param p
+//@   */
+//@  public static void play(final Player p) {
 		//#ifdef DLOGGING
 //@		Logger logger = Logger.getLogger("GameApp");
 //@		logger.finest("play p,GameApp.usVolume=" + p + "," + GameApp.usVolume);
 		//#endif
-    if (GameApp.usVolume > 0) {
-      try {
-        p.start();
-      }
-      catch (final Exception e) {
-        // Nothing to do
-				e.printStackTrace();
-      }
-    }
-  }
-//#endif
+//@    if (GameApp.usVolume > 0) {
+//@      try {
+//@        p.start();
+//@      }
+//@      catch (final Exception e) {
+//@        // Nothing to do
+//@				e.printStackTrace();
+//@      }
+//@    }
+//@  }
+  //#endif
 
 }
