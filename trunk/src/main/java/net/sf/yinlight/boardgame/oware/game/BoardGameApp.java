@@ -63,7 +63,6 @@ import net.eiroca.j2me.game.tpg.GameMinMax;
 //#endif
 import net.sf.yinlight.boardgame.oware.game.BoardGameScreen;
 import com.substanceofcode.rssreader.presentation.FeatureForm;
-import com.substanceofcode.rssreader.presentation.FeatureMgr;
 import net.eiroca.j2me.rms.Settings;
 import net.sf.yinlight.boardgame.oware.midlet.AppConstants;
 
