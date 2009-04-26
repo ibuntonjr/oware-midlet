@@ -19,6 +19,8 @@
 /**
  * This was modified no later than 2009-04-20 by Irving Bunton, Jr
  */
+// Expand to define DJSR184 define
+@DJSR184@
 // Expand to define memory size define
 @DMEMSIZEDEF@
 // Expand to define logging define
