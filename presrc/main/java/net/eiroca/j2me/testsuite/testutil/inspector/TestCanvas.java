@@ -25,6 +25,8 @@
 /**
  * This was modified no later than 2009-04-20 by Irving Bunton, Jr
  */
+// Expand to define MIDP define
+@DMIDPVERS@
 // Expand to define memory size define
 @DMEMSIZEDEF@
 //#ifdef DLARGEMEM
@@ -36,7 +38,9 @@ import javax.microedition.lcdui.Graphics;
 public class TestCanvas extends Canvas {
 
   public TestCanvas(final boolean fullScreen) {
+		//#ifdef DMIDP20
     setFullScreenMode(fullScreen);
+		//#endif
   }
 
   protected void paint(final Graphics g) {
