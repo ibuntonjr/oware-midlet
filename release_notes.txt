@@ -1,17 +1,17 @@
-1.0 2008-12-27 Alpha 2 Version
+0.1 2008-12-27 Alpha 2 Version
 + Handle grand slam variations.  
 + Don't allow move if opponent has no seeds.  
 + Support changes in max holes captured.
 + Fix redo
 + Fix JAR URL
 
-1.0 2008-12-31 Alpha 3 Version
+0.1 2008-12-31 Alpha 3 Version
 + Handle pointer press/drag
 + Future font support
 + Fix top piece above board not shown
 + Fix JAD jar size problem
 
-1.0 2009-01-04 Alpha 4 Version
+0.1 2009-01-04 Alpha 4 Version
 + Save game settings
 + Convenience method for choice group with messages
 + Convenience method for choice group with number range
@@ -31,7 +31,7 @@
 + Allow testing with JMUnit
 + Allow interactive testing.
 
-1.0 2009-02-03 Alpha 5 Version
+0.1 2009-02-03 Alpha 5 Version
 + Handle if opponent get seeds if they cannot make a move or the player gets
   them
 + Allow settings of initial seeds
@@ -60,7 +60,7 @@
 + More logging
 + Fix saving/loading of initial seeds for Oware
 
-1.0 2009-02-04 Alpha 6 Version
+0.1 2009-02-04 Alpha 6 Version
 + Fix exception when setting options
 + Optionally modify game parameters based on limit < 0
 + More logging
@@ -68,14 +68,14 @@
   JSR's that are not used)
 + Fix JSR75 properties file (Not used)
 
-1.0 2009-02-16 Alpha 7 Version
+0.1 2009-02-16 Alpha 7 Version
 + Add end game so people can decide to end the game.
 + Make Reversi more thread safe
 + Share more code with BoardGameScreen.
 + Fix end of game scoring
 + Allow prompt command from list used as command menu (not finished).
 
-1.0 2009-02-27 Beta 1 Version
+0.1 2009-02-27 Beta 1 Version
 + Fixed introduced bug where Oware no longer works due to problems with precalculate.  Now, precalculation is turned off for Oware.
 + Support feature form for logging report.
 + Simplify support concatenation of Reversi and logging in build file.
@@ -116,7 +116,7 @@
 + Remove logging entries from manifest/jad. 
 + Workedaround exceptions with pre calculate on for Reversi.  Pre calculcate needs to be disabled as it has bugs.
 
-1.0 2009-04-17 Beta 2 Version
+0.1 2009-04-17 Beta 2 Version
 + Highlight pieces in verticle bar.
 + Start of minesweeper app.  This is only available for test version.
 + Remove unneeded declaratoins.
@@ -133,14 +133,14 @@
 + Put in help text for Reversi.
 + Allow creating a program with just one app.
 
-1.0 2009-04-21 Beta 3 Version
+0.1 2009-04-21 Beta 3 Version
 + Check in missing classes.
 + Set up for test suite.
 + Use large memory define for test classes.
 + Fix copyrights.
 + Remove empty directories.
 
-1.1.1 2009-04-24 Beta 1 Version
+0.1.1 2009-04-24 Beta 1 Version
 + Fix image references in Oware.
 + Fix creation of games only release to allow Oware and Minsweeper.
 + Change Reversi applet icon.
@@ -156,7 +156,7 @@
 + Support multi-lap the first place that last seed lands.  This needs testing.
 + Support capture of empty, 2 or 3 or 4 in house.  This needs testing.
 
-1.1.2 2009-04-25 Beta 1 Version
+0.1.2 2009-04-25 Beta 1 Version
 + Fix Oware board images and text.
 + Fix references to MIDP 2.0, Bluethooth (JSR-82), Multi Media API (JSR-135), 3D Graphics (JSR-184) so that they are only used the right JSR is enabled for compile.
 + Add test suite JAD concatenation .
@@ -169,6 +169,5 @@
 Issues:
 
 Highlighting of lower player is not the right place for Oware.
-Oware images/text in the wrong places.
 Minesweeper does not work at all.
 
