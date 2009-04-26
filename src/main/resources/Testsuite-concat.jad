@@ -1,0 +1,2 @@
+POSTURL: http://www.eiroca.net/services/testsuite/store.php
+MIDlet-@MIDLETNBR@: TestSuite, @ICONDIR@testsuite_icon.png, net.eiroca.j2me.testsuite.midlet.TestSuite
