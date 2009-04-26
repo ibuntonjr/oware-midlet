@@ -62,6 +62,8 @@
 //@import net.eiroca.j2me.testsuite.testutil.inspector.PropertyInspector;
 //@import net.eiroca.j2me.testsuite.testutil.inspector.SystemInspector;
 //@import net.eiroca.j2me.testsuite.classbrowser.ClassBrowserHelper;
+//@import com.substanceofcode.rssreader.presentation.FeatureForm;
+//@import com.substanceofcode.rssreader.presentation.FeatureList;
 //@
 //#ifdef DLOGGING
 //@import net.sf.jlogmicro.util.logging.Logger;
@@ -159,7 +161,7 @@
 //@					break;
 //@				case AC_SHOWINSPECTOR:
 //@					if (fMenuInspector == null) {
-//@						fMenuInspector = new List("Inspectors", Choice.IMPLICIT, INSPECTOR_CAT, null);
+//@						fMenuInspector = new FeatureList("Inspectors", Choice.IMPLICIT, INSPECTOR_CAT, null);
 //@						BaseApp.setup(fMenuInspector, BaseApp.cBACK, null);
 //@						BaseApp.registerList(fMenuInspector, TestSuite.AC_DOINSPECTOR);
 //@					}
@@ -167,7 +169,7 @@
 //@					break;
 //@				case AC_SHOWBENCHMARK:
 //@					if (fMenuBenchmark == null) {
-//@						fMenuBenchmark = new List("Benchmark", Choice.IMPLICIT, BENCHMARK_CAT, null);
+//@						fMenuBenchmark = new FeatureList("Benchmark", Choice.IMPLICIT, BENCHMARK_CAT, null);
 //@						BaseApp.setup(fMenuBenchmark, BaseApp.cBACK, null);
 //@						BaseApp.registerList(fMenuBenchmark, TestSuite.AC_DOBENCHMARK);
 //@					}
@@ -178,7 +180,7 @@
 //@						ClassBrowserHelper.imPlus = BaseApp.createImage("testsuite_Plus.png");
 //@						ClassBrowserHelper.imDash = BaseApp.createImage("testsuite_Dash.png");
 //@						classes = BaseApp.readStrings("testsuite_classes.txt");
-//@						fClassBrowser = new List("", Choice.IMPLICIT);
+//@						fClassBrowser = new FeatureList("", Choice.IMPLICIT);
 //@						cbPackagePath = "";
 //@						loadClasses();
 //@						BaseApp.setup(fClassBrowser, cPREV, BaseApp.cBACK);
@@ -207,7 +209,7 @@
 //@					break;
 //@				case AC_DOINSPECTOR:
 //@					i = fMenuInspector.getSelectedIndex();
-//@					fSpec = new Form("Inspector: " + INSPECTOR_CAT[i]);
+//@					fSpec = new FeatureForm("Inspector: " + INSPECTOR_CAT[i]);
 //@					BaseApp.setup(fSpec, BaseApp.cBACK, null);
 //@					if (suite != null) {
 //@						suite.export(fSpec, INSPECTOR_CAT[i]);
@@ -216,7 +218,7 @@
 //@					break;
 //@				case AC_DOBENCHMARK:
 //@					i = fMenuBenchmark.getSelectedIndex();
-//@					fSpec = new Form("Benchmark: " + BENCHMARK_CAT[i]);
+//@					fSpec = new FeatureForm("Benchmark: " + BENCHMARK_CAT[i]);
 //@					BaseApp.setup(fSpec, BaseApp.cBACK, null);
 //@					if (suite != null) {
 //@						suite.benchmark(fSpec, BENCHMARK_CAT[i]);
@@ -287,7 +289,7 @@
 //@      menuDesc = new String[] {
 //@          "Inspectors", "Benchmark", "Class browser", "Keys", "Post data", "About"
 //@      };
-//@      fMenu = new List("Main Menu", Choice.IMPLICIT, menuDesc, icons);
+//@      fMenu = new FeatureList("Main Menu", Choice.IMPLICIT, menuDesc, icons);
 //@      BaseApp.cOK = BaseApp.newCommand(TestSuite.MSG_OK, Command.OK, 30, TestSuite.AC_OK);
 //@      BaseApp.cBACK = BaseApp.newCommand(TestSuite.MSG_BACK, Command.BACK, 20, BaseApp.AC_BACK);
 //@      BaseApp.cEXIT = BaseApp.newCommand(TestSuite.MSG_EXIT, Command.EXIT, 10, BaseApp.AC_EXIT);
@@ -308,7 +310,7 @@
 //@
 //@  private Form getPostDataForm() {
 //@		try {
-//@			final Form f = new Form("Post Data");
+//@			final Form f = new FeatureForm("Post Data");
 //@			f.append("Post data to server " + url);
 //@			BaseApp.setup(f, BaseApp.cBACK, BaseApp.cOK);
 //@			return f;
