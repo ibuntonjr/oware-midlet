@@ -19,6 +19,8 @@
 /**
  * This was modified no later than 2009-04-20 by Irving Bunton, Jr
  */
+// Expand to define DJSR184 define
+@DJSR82@
 // Expand to define memory size define
 @DMEMSIZEDEF@
 //#ifdef DLARGEMEM
@@ -26,7 +28,9 @@ package net.eiroca.j2me.testsuite.testutil.inspector;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
+//#ifdef DJSR82
 import javax.bluetooth.LocalDevice;
+//#endif
 import net.eiroca.j2me.app.BaseApp;
 import net.eiroca.j2me.testsuite.testutil.AbstractProcessor;
 
@@ -44,13 +48,15 @@ public class LocalDeviceInspector extends AbstractProcessor {
   }
 
   final private void testProp(final String name, final String prop) {
-    String val;
+    String val = null;
+		//#ifdef DJSR82
     try {
       val = LocalDevice.getProperty(prop);
     }
     catch (final Exception e) {
       val = null;
     }
+		//#endif
     addResult(name, val);
   }
 
