@@ -138,6 +138,7 @@ public class OwareMIDlet extends BoardGameApp {
 		BoardGameApp.gsPiece2Images = BoardGameApp.gsPiece1Images;
     GameApp.hsName = "Oware";
 		GameApp.resSplash = "oware_splash.png";
+		 BoardGameApp.gsTextRow = 2;
 		BoardGameApp.gsDepth = new int[] {3, 3, 1, -14, 2};
 		BoardGameApp.gsRow =  new int[] {2, 2, 2, -4, 2};
 		// Unee has only 3 columns.
