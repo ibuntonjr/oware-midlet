@@ -19,6 +19,8 @@
 /**
  * This was modified no later than 2009-04-20 by Irving Bunton, Jr
  */
+// Expand to define MIDP define
+@DMIDPVERS@
 // Expand to define memory size define
 @DMEMSIZEDEF@
 //#ifdef DLARGEMEM
@@ -115,7 +117,9 @@ public class CanvasInspector extends AbstractProcessor {
     testBool(CanvasInspector.RES_ID05, canvas.isDoubleBuffered());
     testInt(CanvasInspector.RES_ID06, d.numColors());
     testBool(CanvasInspector.RES_ID07, d.isColor());
+		//#ifdef DMIDP20
     testInt(CanvasInspector.RES_ID08, d.numAlphaLevels());
+		//#endif
     testFont(CanvasInspector.RES_ID09, Font.getDefaultFont());
     testFont(CanvasInspector.RES_ID10, Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
     testFont(CanvasInspector.RES_ID11, Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL));
