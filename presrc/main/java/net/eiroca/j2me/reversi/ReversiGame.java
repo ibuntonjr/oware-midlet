@@ -365,6 +365,9 @@ public final class ReversiGame extends BoardGame {
     rTable = (ReversiTable) table;
     rPlayer = player;
     ++evalNum;
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("setTable rTable != null,rPlayer,player,evalNum,fullProcess=" + (rTable != null) + "," + rPlayer + "," + player + "," + ReversiTable.getPlayerItem(player) + "," + evalNum + "," + fullProcess);}
+		//#endif
     eval(fullProcess);
   }
 
