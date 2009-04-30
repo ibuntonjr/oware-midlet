@@ -45,6 +45,7 @@ Number of Players
 Good Luck
 Thinking
 Invalid Move
+Extra Move
 Computer won
 You won
  won
@@ -63,6 +64,15 @@ Multi-Lap
 One lap
 Land lap
 Next lap
+Start sowing
+Sow next
+Sow first
+Loop Skip starting
+Skip starting
+Sow starting
+Sow store rule
+Skip store
+Sow store
 Capture rules
 Empty
 2-3 seeds
