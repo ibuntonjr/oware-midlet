@@ -50,11 +50,12 @@ abstract public class BoardGameTable implements GameTable {
    */
 	// Many of this is partially implemented
   public final static int NBR_PLAYERS = 2;
-  public final static int BOARD_TABLE_STORE_SIZE = 4;
+  public final static int BOARD_TABLE_STORE_SIZE = 5;
   public int nbrRow = 0;
   public int nbrCol = 0;
   public int nbrPlayers = 2;
   protected int passNum;
+  protected int repeatNum;
   protected BoardGameMove[] lastMove;
 
   //#ifdef DLOGGING
@@ -70,6 +71,7 @@ abstract public class BoardGameTable implements GameTable {
 
   public BoardGameTable(final int nbrRow, final int nbrCol, final int nbrPlayers) {
     passNum = 0;
+    repeatNum = 0;
 		this.nbrRow = nbrRow;
 		this.nbrCol = nbrCol;
 		this.nbrPlayers = nbrPlayers;
@@ -86,15 +88,16 @@ abstract public class BoardGameTable implements GameTable {
 		try {
 			int coffset = offset;
 			passNum = byteArray[coffset++];
+			repeatNum = byteArray[coffset++];
 			nbrRow = byteArray[coffset++];
 			nbrCol = byteArray[coffset++];
 			nbrPlayers = byteArray[coffset++];
 			//#ifdef DLOGGING
-			if (traceLoggable) {logger.trace("constructor passNum,nbrRow,nbrCol,nbrPlayers,offset=" + passNum + "," + nbrRow + "," + nbrCol + "," + nbrPlayers + "," + offset);}
+			if (traceLoggable) {logger.trace("constructor passNum,repeatNum,nbrRow,nbrCol,nbrPlayers,offset=" + passNum + "," + repeatNum + "," + nbrRow + "," + nbrCol + "," + nbrPlayers + "," + offset);}
 			//#endif
 			lastMove = new BoardGameMove[nbrPlayers];
 			//#ifdef DLOGGING
-			if (traceLoggable) {logger.trace("passNum,coffset,nbrRow,nbrCol=" + passNum + "," + coffset + "," + nbrRow + "," + nbrCol);}
+			if (traceLoggable) {logger.trace("passNum,repeatNum,coffset,nbrRow,nbrCol=" + passNum + "," + repeatNum + "," + coffset + "," + nbrRow + "," + nbrCol);}
 			//#endif
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -106,6 +109,7 @@ abstract public class BoardGameTable implements GameTable {
 
   public BoardGameTable(final BoardGameTable table) {
 		passNum = table.passNum;
+		repeatNum = table.repeatNum;
 		nbrRow = table.nbrRow;
 		nbrCol = table.nbrCol;
 		nbrPlayers = table.nbrPlayers;
@@ -122,6 +126,7 @@ abstract public class BoardGameTable implements GameTable {
   public void copyDataFrom(final GameTable table) {
 		final BoardGameTable rtable = (BoardGameTable) table;
 			passNum = rtable.passNum;
+			repeatNum = rtable.repeatNum;
 			nbrRow = rtable.nbrRow;
 			nbrCol = rtable.nbrCol;
 			nbrPlayers = rtable.nbrPlayers;
@@ -167,6 +172,22 @@ abstract public class BoardGameTable implements GameTable {
   }
 
   /**
+   * Set the value of passNum.
+   * @param v Value to assign to passNum.
+   */
+  public void setPassNum(final int v) {
+    passNum = v;
+  }
+
+	public void setRepeatNum(int repeatNum) {
+			this.repeatNum = repeatNum;
+	}
+
+	public int getRepeatNum() {
+			return (repeatNum);
+	}
+
+  /**
    * Set the player for the coordinates
    * @param row
    * @param col
@@ -174,14 +195,6 @@ abstract public class BoardGameTable implements GameTable {
    * @author Irv Bunton
    */
   abstract public void setItem(final int row, final int col, final byte value);
-
-  /**
-   * Set the value of passNum.
-   * @param v Value to assign to passNum.
-   */
-  public void setPassNum(final int v) {
-    passNum = v;
-  }
 
   abstract public int tableStoreSize();
 
@@ -193,6 +206,7 @@ abstract public class BoardGameTable implements GameTable {
 		int coffset = offset;
 		try {
 			byteArray[coffset++] = (byte) passNum;
+			byteArray[coffset++] = (byte) repeatNum;
 			byteArray[coffset++] = (byte) nbrRow;
 			byteArray[coffset++] = (byte) nbrCol;
 			byteArray[coffset++] = (byte) nbrPlayers;
