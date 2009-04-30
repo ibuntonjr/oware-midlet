@@ -111,6 +111,7 @@ abstract public class BoardGameApp extends GameApp {
   final public static int MSG_GOODLUCK = GameApp.MSG_USERDEF + msgOffset++;
   final public static int MSG_THINKING = GameApp.MSG_USERDEF + msgOffset++;
   final public static int MSG_INVALIDMOVE = GameApp.MSG_USERDEF + msgOffset++;
+  final public static int MSG_EXTRAMOVE = GameApp.MSG_USERDEF + msgOffset++;
   final public static int MSG_WONCOMPUTER = GameApp.MSG_USERDEF + msgOffset++;
   final public static int MSG_HUMANWON = GameApp.MSG_USERDEF + msgOffset++;
   final public static int MSG_PLAYERWON = GameApp.MSG_USERDEF + msgOffset++;
