@@ -52,6 +52,15 @@ public class AppConstants {
   final public static int MSG_ONE_LAP = BoardGameApp.MSG_USERDEF + msgOffset++;
   final public static int MSG_1ST_LAP = BoardGameApp.MSG_USERDEF + msgOffset++;
   final public static int MSG_2ND_LAP = BoardGameApp.MSG_USERDEF + msgOffset++;
+  final public static int MSG_START_SOWING = BoardGameApp.MSG_USERDEF + msgOffset++;
+  final public static int MSG_SOW_NEXT = BoardGameApp.MSG_USERDEF + msgOffset++;
+  final public static int MSG_SOW_FIRST = BoardGameApp.MSG_USERDEF + msgOffset++;
+  final public static int MSG_LOOP_SKIP = BoardGameApp.MSG_USERDEF + msgOffset++;
+  final public static int MSG_SKIP_STARTING = BoardGameApp.MSG_USERDEF + msgOffset++;
+  final public static int MSG_SOW_STARTING = BoardGameApp.MSG_USERDEF + msgOffset++;
+  final public static int MSG_SOW_STORE_RULE = BoardGameApp.MSG_USERDEF + msgOffset++;
+  final public static int MSG_SKIP_STORE = BoardGameApp.MSG_USERDEF + msgOffset++;
+  final public static int MSG_SOW_STORE = BoardGameApp.MSG_USERDEF + msgOffset++;
   final public static int MSG_CAPTURE_RULES = BoardGameApp.MSG_USERDEF + msgOffset++;
   final public static int MSG_CAPTURE_EMPTY = BoardGameApp.MSG_USERDEF + msgOffset++;
   final public static int MSG_CAPTURE_2_3 = BoardGameApp.MSG_USERDEF + msgOffset++;
