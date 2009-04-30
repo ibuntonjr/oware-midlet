@@ -181,7 +181,7 @@ public final class OwareScreen extends BoardGameScreen {
   protected void drawTable() {
 		try {
 			//#ifdef DLOGGING
-//@			if ((tableDraws-- > 0) && finestLoggable) {drawItems = true;logger.finest("drawTable up BoardGameScreen.actPlayer=" + BoardGameScreen.actPlayer);}
+//@			if ((tableDraws-- > 0) && finestLoggable) {drawItems = true;logger.finest("drawTable BoardGameScreen.actPlayer=" + BoardGameScreen.actPlayer);}
 			//#endif
 			OwareTable ot = (OwareTable)BoardGameScreen.table;
 
@@ -241,7 +241,7 @@ public final class OwareScreen extends BoardGameScreen {
 					cadjust, 0); /* y, x */
 			if (BoardGameScreen.actPlayer == 1) {
 				drawSelectionBox(BoardGameScreen.table.nbrCol,
-						BoardGameScreen.table.nbrRow, cadjust);
+						BoardGameScreen.table.nbrRow - 1, 0);
 			}
 			// numbers
 			screen.setColor(BaseApp.foreground);
@@ -297,6 +297,8 @@ public final class OwareScreen extends BoardGameScreen {
 		//#ifdef DMIDP10
 //@		super.wakeup(3);
 		//#endif
+		// If the game is over, or still human player, return.  If we get another
+		// turn, the player will be human.
     if (gameEnded || isHuman[BoardGameScreen.actPlayer]) {
 			return;
 		}
@@ -347,9 +349,10 @@ public final class OwareScreen extends BoardGameScreen {
 			tables = BoardGameScreen.rgame.animatedTurn(BoardGameScreen.table, BoardGameScreen.actPlayer, move, newTable);
 			boolean goodMove = (tables != null);
 			if (!goodMove) {
-				setMessage(BaseApp.messages[BoardGameApp.MSG_INVALIDMOVE], 2000);
+				setMessage(BaseApp.messages[BoardGameApp.MSG_INVALIDMOVE], 60);
+				super.wakeup(3);
 				//#ifdef DLOGGING
-//@				if (finestLoggable) {logger.finest("No valid move BoardGameScreen.actPlayer,=isHuman[BoardGameScreen.actPlayer])" + BoardGameScreen.actPlayer + "," + isHuman[BoardGameScreen.actPlayer]);}
+//@				if (finestLoggable) {logger.finest("processMove No valid move BoardGameScreen.actPlayer,=isHuman[BoardGameScreen.actPlayer])" + BoardGameScreen.actPlayer + "," + isHuman[BoardGameScreen.actPlayer]);}
 				//#endif
 				return false;
 			}
@@ -396,9 +399,16 @@ public final class OwareScreen extends BoardGameScreen {
 						procEndGame((byte)(1 - BoardGameScreen.actPlayer));
 					}
 					else {
+						BoardGameScreen.turnNum++;
+						if (BoardGameScreen.table.getRepeatNum() > 0) {
+							BoardGameScreen.table.setRepeatNum(
+								BoardGameScreen.table.getRepeatNum() - 1);
+							setMessage(BaseApp.messages[BoardGameApp.MSG_EXTRAMOVE], 60);
+							return true;
+						}
+
 						/* Change to other player. */
 						BoardGameScreen.actPlayer = (byte) (1 - BoardGameScreen.actPlayer);
-						BoardGameScreen.turnNum++;
 						//#ifdef DLOGGING
 //@						if (finerLoggable) {logger.finer("2 loop BoardGameScreen.actPlayer=" + BoardGameScreen.actPlayer);}
 						//#endif
@@ -415,7 +425,7 @@ public final class OwareScreen extends BoardGameScreen {
 							else {
 								message = BaseApp.messages[BoardGameApp.MSG_COMPUTER];
 							}
-							setMessage(message + BoardGameApp.MSG_PASS, 3000);
+							setMessage(message + BoardGameApp.MSG_PASS, 30);
 							BoardGameScreen.table.setPassNum(BoardGameScreen.table.getPassNum() + 1);
 							// just to be sure
 							gMiniMax.clearPrecalculatedMoves();
