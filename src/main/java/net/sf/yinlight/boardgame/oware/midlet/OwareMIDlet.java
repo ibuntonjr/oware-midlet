@@ -85,6 +85,9 @@ public class OwareMIDlet extends BoardGameApp {
   protected ChoiceGroup opInitSeeds;
   protected ChoiceGroup opMaxHouses;
   protected ChoiceGroup opMultiLap;
+  protected ChoiceGroup opStartFirst;
+  protected ChoiceGroup opSkipStarting;
+  protected ChoiceGroup opSowStore;
   protected ChoiceGroup opCapture;
   protected ChoiceGroup opGrandSlam;
   protected ChoiceGroup opOpponentEmpty;
@@ -93,6 +96,9 @@ public class OwareMIDlet extends BoardGameApp {
   final static public String OWARE_GRAND_SLAM = "oware-grand-slam";
   final static public String OWARE_MAX_HOUSES = "oware-max-houses";
   final static public String OWARE_MULTI_LAP = "oware-multi-lap";
+  final static public String OWARE_START_FIRST = "oware-start-first";
+  final static public String OWARE_SKIP_STARTING = "oware-skip-starting";
+  final static public String OWARE_SOW_STORE = "oware-sow-store";
   final static public String OWARE_CAPTURE = "oware-capture";
   final static public String OWARE_OPP_NO_SEEDS = "oware-opp-no-seeds";
 	/* How many human players. */
@@ -101,8 +107,11 @@ public class OwareMIDlet extends BoardGameApp {
   final static public int LEVEL_DIFFICULT = 1;
   final static public int LEVEL_HARD = 2;
   public static int[] gsInitSeeds = new int[] {OwareTable.INIT_SEEDS,
-			OwareTable.INIT_SEEDS, 1, -6, 1};
+			OwareTable.INIT_SEEDS, 1, -9, 1};
   public static int[] gsMultiLap = new int[] {0, 0, 0, -2, 1};
+  public static int[] gsStartFirst = new int[] {0, 0, 0, -1, 1};
+  public static int[] gsSkipStarting = new int[] {0, 0, 0, -1, 1};
+  public static int[] gsSowStore = new int[] {0, 0, 0, -1, 1};
   public static int[] gsCapture = new int[] {1, 1, 0, -2, 1};
   public static int[] gsMaxHouses = new int[] {6, 6, 1, -8, 1};
   public static int[] gsGrandSlam = new int[]{ 0, 0, 0,
@@ -142,7 +151,7 @@ public class OwareMIDlet extends BoardGameApp {
 		BoardGameApp.gsDepth = new int[] {3, 3, 1, -14, 2};
 		BoardGameApp.gsRow =  new int[] {2, 2, 2, -4, 2};
 		// Unee has only 3 columns.
-		BoardGameApp.gsCol =  new int[] {6, 6, 3, -8, 1};
+		BoardGameApp.gsCol =  new int[] {6, 6, 3, -9, 1};
 		BoardGameApp.gsNbrPlayers =  new int[] {2, 2, 2, 2, 1};
 		setGameDefaults();
   }
@@ -151,6 +160,9 @@ public class OwareMIDlet extends BoardGameApp {
 		super.setGameDefaults();
 		OwareMIDlet.gsMaxHouses[PD_CURR] = OwareMIDlet.gsMaxHouses[PD_DFLT];
 		OwareMIDlet.gsMultiLap[PD_CURR] = OwareMIDlet.gsMultiLap[PD_DFLT];
+		OwareMIDlet.gsStartFirst[PD_CURR] = OwareMIDlet.gsStartFirst[PD_DFLT];
+		OwareMIDlet.gsSkipStarting[PD_CURR] = OwareMIDlet.gsSkipStarting[PD_DFLT];
+		OwareMIDlet.gsSowStore[PD_CURR] = OwareMIDlet.gsSowStore[PD_DFLT];
 		OwareMIDlet.gsCapture[PD_CURR] = OwareMIDlet.gsCapture[PD_DFLT];
 		OwareMIDlet.gsInitSeeds[PD_CURR] = OwareMIDlet.gsInitSeeds[PD_DFLT];
 		BoardGameApp.gsLevel = BoardGameApp.gsLevelDifficult;
@@ -211,6 +223,17 @@ public class OwareMIDlet extends BoardGameApp {
 			opMultiLap = Application.createChoiceGroup(AppConstants.MSG_MULTI_LAP,
 					Choice.EXCLUSIVE, new int[] {AppConstants.MSG_ONE_LAP,
 					AppConstants.MSG_1ST_LAP, AppConstants.MSG_2ND_LAP});
+			opStartFirst = Application.createChoiceGroup(
+					AppConstants.MSG_START_SOWING,
+					Choice.EXCLUSIVE, new int[] {AppConstants.MSG_SOW_NEXT,
+					AppConstants.MSG_SOW_FIRST});
+			opSkipStarting = Application.createChoiceGroup(AppConstants.MSG_LOOP_SKIP,
+					Choice.EXCLUSIVE, new int[] {AppConstants.MSG_SKIP_STARTING,
+					AppConstants.MSG_SOW_STARTING});
+			opSowStore = Application.createChoiceGroup(
+					AppConstants.MSG_SOW_STORE_RULE,
+					Choice.EXCLUSIVE, new int[] {AppConstants.MSG_SKIP_STORE,
+					AppConstants.MSG_SOW_STORE});
 			opCapture = Application.createChoiceGroup(AppConstants.MSG_CAPTURE_RULES,
 					Choice.EXCLUSIVE, new int[] {AppConstants.MSG_CAPTURE_EMPTY,
 					AppConstants.MSG_CAPTURE_2_3, AppConstants.MSG_CAPTURE_4});
@@ -223,11 +246,11 @@ public class OwareMIDlet extends BoardGameApp {
 					Choice.EXCLUSIVE,
 					new int[] { AppConstants.MSG_OPPONENT_EMPTY1,
 			AppConstants.MSG_OPPONENT_EMPTY2});
-			if (opInitSeeds != null) {
-				form.append(opInitSeeds);
-			}
+			form.append(opInitSeeds);
 			form.append(opMaxHouses);
 			form.append(opMultiLap);
+			form.append(opSkipStarting);
+			form.append(opSowStore);
 			form.append(opCapture);
 			form.append(opGrandSlam);
 			form.append(opOpponentEmpty);
@@ -250,6 +273,8 @@ public class OwareMIDlet extends BoardGameApp {
 			BoardGameApp.setSelectedChoicePD(opInitSeeds, OwareMIDlet.gsInitSeeds);
 			BoardGameApp.setSelectedChoicePD(opMaxHouses, OwareMIDlet.gsMaxHouses);
 			BoardGameApp.setSelectedChoicePD(opMultiLap, OwareMIDlet.gsMultiLap);
+			BoardGameApp.setSelectedChoicePD(opSkipStarting, OwareMIDlet.gsSkipStarting);
+			BoardGameApp.setSelectedChoicePD(opSowStore, OwareMIDlet.gsSowStore);
 			BoardGameApp.setSelectedChoicePD(opCapture, OwareMIDlet.gsCapture);
 			BoardGameApp.setSelectedChoicePD(opGrandSlam, OwareMIDlet.gsGrandSlam);
 			opOpponentEmpty.setSelectedIndex(
@@ -274,6 +299,10 @@ public class OwareMIDlet extends BoardGameApp {
 					OwareMIDlet.OWARE_MAX_HOUSES);
 			BoardGameApp.settingsUpdPD(opMultiLap, OwareMIDlet.gsMultiLap,
 					OwareMIDlet.OWARE_MULTI_LAP);
+			BoardGameApp.settingsUpdPD(opSkipStarting, OwareMIDlet.gsSkipStarting,
+					OwareMIDlet.OWARE_SKIP_STARTING);
+			BoardGameApp.settingsUpdPD(opSowStore, OwareMIDlet.gsSowStore,
+					OwareMIDlet.OWARE_SOW_STORE);
 			BoardGameApp.settingsUpdPD(opCapture, OwareMIDlet.gsCapture,
 					OwareMIDlet.OWARE_CAPTURE);
 			BoardGameApp.settingsUpdPD(opGrandSlam, OwareMIDlet.gsGrandSlam,
@@ -297,6 +326,8 @@ public class OwareMIDlet extends BoardGameApp {
 			getIntPD(OwareMIDlet.OWARE_GRAND_SLAM, OwareMIDlet.gsGrandSlam); 
 			getIntPD(OwareMIDlet.OWARE_MAX_HOUSES, OwareMIDlet.gsMaxHouses); 
 			getIntPD(OwareMIDlet.OWARE_MULTI_LAP, OwareMIDlet.gsMultiLap); 
+			getIntPD(OwareMIDlet.OWARE_SKIP_STARTING, OwareMIDlet.gsSkipStarting); 
+			getIntPD(OwareMIDlet.OWARE_SOW_STORE, OwareMIDlet.gsSowStore); 
 			getIntPD(OwareMIDlet.OWARE_CAPTURE, OwareMIDlet.gsCapture); 
 			OwareMIDlet.gsOpponentEmpty = (BaseApp.settings.getInt(OwareMIDlet.OWARE_OPP_NO_SEEDS,  (OwareMIDlet.gsOpponentEmpty ? 1 : 0)) == 1);
 		} catch (Throwable e) {
