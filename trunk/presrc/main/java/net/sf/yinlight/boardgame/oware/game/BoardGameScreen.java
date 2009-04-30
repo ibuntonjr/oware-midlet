@@ -33,6 +33,7 @@
 package net.sf.yinlight.boardgame.oware.game;
 
 import java.util.Timer;
+import java.util.Date;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import javax.microedition.lcdui.Canvas;
@@ -62,7 +63,7 @@ import net.sf.jlogmicro.util.logging.Level;
 	*/
 abstract public class BoardGameScreen extends GameScreen implements Runnable {
 
-  protected static final byte STORE_VERS = 3;
+  protected static final byte STORE_VERS = 4;
   protected static final String IGNORE_KEYCODES = "boardgame-ignore-keycodes";
   protected static final byte SCREEN_STORE_BYTES = 6;
   protected static final char NL = '\n';
@@ -158,7 +159,7 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 			//#endif
 			featureMgr.setRunnable(this, true);
 			ignoreKeycodes = "," + BaseApp.midlet.readAppProperty(
-					IGNORE_KEYCODES, "") + ",";
+					IGNORE_KEYCODES, "").trim() + ",";
 			//#ifdef DLOGGING
 			if (finestLoggable) {logger.finest("constructor ignoreKeycodes=" + ignoreKeycodes);}
 			//#endif
@@ -385,6 +386,9 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 
   public boolean tick() {
 		try {
+			//#ifdef DLOGGING
+			if (traceLoggable) {logger.trace("tick");}
+			//#endif
 			screen.setColor(BaseApp.background);
 			screen.fillRect(0, 0, screenWidth, screenHeight);
 			drawBoard();
@@ -393,6 +397,9 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 			drawPossibleMoves();
 			drawVertInfo();
 			drawMessage();
+			//#ifdef DLOGGING
+			if (traceLoggable) {logger.trace("tick end true");}
+			//#endif
 			return true;
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -461,13 +468,16 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 
   protected void drawMessage() {
 		// Avoid synchronization errors.
+		//#ifdef DLOGGING
+		if (traceLoggable) {logger.trace("drawMessage message,messageEnd,current time=" + message + "," + messageEnd + "," + System.currentTimeMillis());}
+		//#endif
 		String cmessage = null;
 		long cmessageEnd;
 		synchronized (this) {
 			cmessage = message;
 			cmessageEnd = messageEnd;
 		}
-    if ((cmessage == null) || ((cmessageEnd != 0) && (cmessageEnd > System.currentTimeMillis()))) { return; }
+    if ((cmessage == null) || ((cmessageEnd != 0) && (cmessageEnd < System.currentTimeMillis()))) { return; }
     int startIndex;
     int endIndex = -1;
     final int breaks = BaseApp.lineBreaks(cmessage);
@@ -498,6 +508,9 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
   }
 
   protected void drawBoard() {
+		//#ifdef DLOGGING
+		if (traceLoggable) {logger.trace("drawBoard");}
+		//#endif
     screen.setColor(BoardGameScreen.COLOR_BG);
 		if (squareImage != null) {
 			screen.fillRect(off_x, off_y, squareWidth, squareWidth);
@@ -538,8 +551,11 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
   abstract protected void drawPiece(final int row, final int col, final int player,
 			boolean onBoard, Image cupImage, int yadjust, int lastMovePoint);
 
-  protected void drawPossibleMoves() {
+	protected void drawPossibleMoves() {
 		try {
+			//#ifdef DLOGGING
+			if (traceLoggable) {logger.trace("drawPossibleMoves");}
+			//#endif
 			BoardGameMove[] cpossibleMoves = null;
 			synchronized(this) {
 				cpossibleMoves = possibleMoves;
@@ -562,25 +578,31 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 			logger.severe("drawPossibleMoves error", e);
 			//#endif
 		}
-  }
+	}
 
-  protected void drawSelectionBox(int x, int y, int yadjust) {
-    if (BoardGameScreen.getActPlayer() == 0) {
-      screen.setColor(BoardGameScreen.COLOR_P1);
-    }
-    else {
-      screen.setColor(BoardGameScreen.COLOR_P2);
-    }
-    screen.drawRect(off_x + x * sizex, off_y + yadjust + y * sizey, sizex,
+	protected void drawSelectionBox(int x, int y, int yadjust) {
+		//#ifdef DLOGGING
+		if (traceLoggable) {logger.trace("drawSelectionBox x,y,yadjust=" + x + "," + y + "," + yadjust);}
+		//#endif
+		if (BoardGameScreen.getActPlayer() == 0) {
+			screen.setColor(BoardGameScreen.COLOR_P1);
+		}
+		else {
+			screen.setColor(BoardGameScreen.COLOR_P2);
+		}
+		screen.drawRect(off_x + x * sizex, off_y + yadjust + y * sizey, sizex,
 				sizey);
-    screen.drawRect(off_x + x * sizex + 1, off_y + yadjust + y * sizey + 1,
+		screen.drawRect(off_x + x * sizex + 1, off_y + yadjust + y * sizey + 1,
 				sizex - 2, sizey - 2);
-  }
+	}
 
   abstract protected void drawTable();
 
   public void drawVertInfo() {
 		try {
+			//#ifdef DLOGGING
+			if (finestLoggable) {logger.finest("drawVertInfo");}
+			//#endif
 			// two pieces
 			drawPiece(0, table.nbrCol, 1, false,
 				((BoardGameApp.gsFirst == 0) ? piece2Image : piece1Image), 0, 0); /* y, x */
@@ -663,6 +685,9 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 			}
 			else {
 				try {
+					//#ifdef DLOGGING
+					if (traceLoggable) {logger.trace("procKeyPressed selx,sely,keyCode=" + selx + "," + sely + "," + keyCode);}
+					//#endif
 					switch (super.getGameAction(keyCode)) {
 						case Canvas.UP:
 							sely = (sely + table.nbrRow - 1) % table.nbrRow;
@@ -813,8 +838,8 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 		//#endif
 		synchronized (this) {
 			this.message = message;
+			this.messageEnd = 0;
 		}
-		messageEnd = 0;
 		//#ifdef DMIDP10
 		super.wakeup(3);
 		//#endif
@@ -826,8 +851,11 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 		//#endif
 		synchronized (this) {
 			this.message = message;
+			this.messageEnd = System.currentTimeMillis() + delay * 1000;
 		}
-    messageEnd = System.currentTimeMillis() + delay * 1000;
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("setMessage this.messageEnd,current time=" + new Date(this.messageEnd).toString() + "," + new Date(System.currentTimeMillis()).toString());}
+		//#endif
   }
 
   public void updatePossibleMoves() {
