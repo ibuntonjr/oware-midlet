@@ -149,6 +149,13 @@ abstract public class BoardGame extends TwoPlayerGame {
 		return rTable;
 	}
 
+  /**
+   * This gets the current rPlayer, but this is NOT the same as the actual
+	 * current player because after this is set, the player may change.
+   *
+   * @return    byte
+   * @author Irv Bunton
+   */
   protected byte getPlayer() {
 		return rPlayer;
 	}
