@@ -166,7 +166,7 @@
 + Allow ignoring key codes in the JAD file.
 + Put store of board, in it's own method.
 
-0.1.3 2009-04-30 Beta 1 Version
+0.1.3 2009-05-01 Beta 1 Version
 + More logging.
 + More comments.
 + Support repeat (another turn) if seed lands in store.
@@ -179,6 +179,7 @@
 + Fix highlighting of players store.
 + Shorten time that message is shown.
 + Fix Reversi A.I. so that it uses heuristic vs only actual points.
++ Add target for MIDP 2.0, CLDC 1.1, JSR-75, JSR-85, JSR-135, and JSR-184.
 
 Issues:
 
