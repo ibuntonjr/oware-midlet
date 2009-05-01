@@ -113,6 +113,8 @@ public abstract class TwoPlayerGame {
   public abstract GameMove[] possibleMoves(GameTable t, byte player);
 
   public void process(final GameTable t, final byte player) {
+		// Use false for full process, so that it gets the actual score instead
+		// of the estimted goodness of the score (based on heuristic).
     setTable(t, player, false);
   }
 
@@ -121,6 +123,8 @@ public abstract class TwoPlayerGame {
    */
   public abstract void resetEvalNum();
 
+	// If full process is false, it gets the actual score instead
+	// of the estimted goodness of the score (based on heuristic).
   protected abstract void setTable(GameTable table, byte player, boolean fullProcess);
 
   protected abstract GameTable getTable();
