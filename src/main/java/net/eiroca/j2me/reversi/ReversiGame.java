@@ -156,6 +156,17 @@ public final class ReversiGame extends BoardGame {
     heurMatrix[i + id][j + jd] = 0;
   }
 
+  /**
+   *  Evaluate the table either with actual points or estimated goodness with
+	 *  heuristic
+	 *
+   * @param lazyProcess - If lazyProcess is true, it gets actual points
+	 * 											else it get goodness of board using heuristic.
+   * @param bg			    - Board game
+   * @param t           - Board table
+   * @param player      - Current player
+   * @param endGame     - End of game
+   */
   public void eval(boolean lazyProcess, BoardGame bg, GameTable t,
 			final byte player, boolean endGame) {
 		BoardGameTable bgt = (BoardGameTable)t;
@@ -244,6 +255,11 @@ public final class ReversiGame extends BoardGame {
     }
   }
 
+  /**
+   * Evaluate points
+	 *
+   * @param fullProcess - If true, use estimate of goodness with heuristic.
+   */
   protected void eval(boolean fullProcess) {
     boolean lazyProcess = !fullProcess || isGameEnded() || (numFirstPlayer + numSecondPlayer > 58);
 		eval(lazyProcess, this, rTable, rPlayer, isGameEnded());
@@ -291,7 +307,8 @@ public final class ReversiGame extends BoardGame {
 
   public int getTblPoint(final GameTable t, final byte player) {
 	  ReversiGame rg = new ReversiGame(this);
-		eval(true, rg, t, player, false);
+		// Use estimate of goodness based on heuristic.
+		eval(false, rg, t, player, false);
 		return rg.getPoint();
   }
 
@@ -348,18 +365,25 @@ public final class ReversiGame extends BoardGame {
   protected void restoreSquareHeuristic(final int[][] heurMatrix,
 			final int[] savedCells, final int i, final int j, final int id,
 			final int jd) {
-	  try {
-		heurMatrix[i][j + jd] = savedCells[S01_IX];
-		heurMatrix[i + id][j] = savedCells[S01_IX];
-		heurMatrix[i + id][j + jd] = savedCells[S11_IX];
-	} catch (Throwable e) {
-		e.printStackTrace();
-		//#ifdef DLOGGING
-//@		logger.severe("restoreSquareHeuristic error", e);
-		//#endif
+		try {
+			heurMatrix[i][j + jd] = savedCells[S01_IX];
+			heurMatrix[i + id][j] = savedCells[S01_IX];
+			heurMatrix[i + id][j + jd] = savedCells[S11_IX];
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+//@			logger.severe("restoreSquareHeuristic error", e);
+			//#endif
+		}
 	}
-  }
 
+  /**
+   * Set the table to the parameter and evauate points.
+	 *
+   * @param table - Board table
+   * @param player - current player
+   * @param fullProcess - If true, use estimate of goodness with heuristic.
+   */
   protected void setTable(final GameTable table, final byte player, final boolean fullProcess) {
     if (!(table instanceof ReversiTable)) { throw new IllegalArgumentException(); }
     rTable = (ReversiTable) table;
@@ -376,6 +400,7 @@ public final class ReversiGame extends BoardGame {
 //@		if (finerLoggable) {logger.finer("procEndGame");}
 		//#endif
 		try {
+			// Use actual points instead of estimated points (lazyProcess = true).
 			eval(true, this, rTable, player, true);
 		} catch (Throwable e) {
 			e.printStackTrace();
