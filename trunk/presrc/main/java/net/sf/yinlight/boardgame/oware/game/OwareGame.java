@@ -480,11 +480,15 @@ public final class OwareGame extends BoardGame {
   }
 
   /**
-   * Evaluate the board to determine points.
+   *  Evaluate the table either with actual points or estimated goodness with
+	 *  heuristic (actually currently there is no heuristic.)
 	 *
-   * @param fullProcess
-   * @param endGame
-   * @author Irv Bunton
+   * @param lazyProcess - If lazyProcess is true, it gets actual points
+	 * 											else it get goodness of board using heuristic.
+   * @param bg			    - Board game
+   * @param t           - Board table
+   * @param player      - Current player
+   * @param endGame     - End of game
    */
   public void eval(boolean lazyProcess, BoardGame bg, GameTable t,
 			final byte player, boolean endGame) {
@@ -527,13 +531,21 @@ public final class OwareGame extends BoardGame {
 		}
   }
 
+  /**
+   *  Evaluate the table either with actual points or estimated goodness with
+	 *  heuristic (actually currently there is no heuristic.)
+	 *
+   * @param fullProcess - If true, use estimate of goodness with heuristic.
+   * @param endGame     - End of game
+   * @param player      - Current player
+   */
   protected void eval(boolean fullProcess, boolean endGame, byte player) {
     boolean lazyProcess = !fullProcess || isGameEnded();
 		eval(lazyProcess, this, rTable, player, endGame);
 	}
 
   public int getGameResult(final byte player) {
-		eval(false, true, player);
+		eval(true, true, player);
     int score = point;
 		//#ifdef DLOGGING
 		if (finestLoggable) {logger.finest("getGameResult player,score=" + player + "," + score);}
@@ -664,6 +676,14 @@ public final class OwareGame extends BoardGame {
 		}
   }
 
+  /**
+   * Set the table to the parameter and evauate points.
+	 *
+   * @param table - Board table
+   * @param player - current player
+   * @param fullProcess - If true, use estimate of goodness with heuristic.
+	 * 										    (actually currently there is no heuristic.)
+   */
   protected void setTable(final GameTable table, final byte player, final boolean fullProcess) {
     if (!(table instanceof OwareTable)) { throw new IllegalArgumentException(); }
     rTable = (OwareTable) table;
@@ -680,7 +700,7 @@ public final class OwareGame extends BoardGame {
 		if (finerLoggable) {logger.finer("procEndGame");}
 		//#endif
 		try {
-			eval(false, true, player);
+			eval(true, true, player);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			//#ifdef DLOGGING
