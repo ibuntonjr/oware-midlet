@@ -1,5 +1,5 @@
 wtk.midp.version = 2.0
-wtk.cldc.version = 1.0
+wtk.cldc.version = 1.1
 wtk.optionalpda.enabled = true
 wtk.mmapi.enabled  = true
 wtk.java3d.enabled = true
@@ -16,10 +16,10 @@ DJSR184 = DJSR184
 DJSR238 = DNOJSR238
 DMEMSIZEDEF = DREGULARMEM
 #1.1 kills us.
-DCLDCVERS = DCLDCV10
+DCLDCVERS = DCLDCV11
 JMIDPVERS = MIDP-2.0 
-JCLDCVERS = CLDC-1.0
-file.prefix = midp20_jsr75_
-bin = ${target}/bin20jsr75
+JCLDCVERS = CLDC-1.1
+file.prefix = midp20_jsr75_jsr82_jsr135_jsr184_
+bin = ${target}/bin20jsr75jsr82jsr135jsr184
 MIDLETVERS = ${MIDLETVERSROOT}
 SUFFIXVERS =  2.0-cldc1.1-jsr75-jsr82-jsr135-jsr184
