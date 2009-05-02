@@ -154,7 +154,10 @@ public final class ReversiScreen extends BoardGameScreen {
 						int lastRow = -10;
 						ReversiMove clastMove =
 							(ReversiMove)BoardGameScreen.table.getLastMove(item - 1);
-						if (clastMove != null) {
+						// Invalid move with row/col = max nbr row/col, it is off the
+						// table.  Highlight in vertical info.
+						if ((clastMove != null) &&
+								clastMove.valid(BoardGameScreen.table, clastMove)) {
 							lastRow = clastMove.row;
 							lastCol = clastMove.col;
 						}
@@ -182,18 +185,17 @@ public final class ReversiScreen extends BoardGameScreen {
 
   public void drawVertInfo() {
     // two pieces
-		drawPiece(0, BoardGameScreen.table.nbrCol, 1, false,
-				((BoardGameApp.gsFirst == 0) ? piece2Image : piece1Image), 0, 0); /* y, x */
+		drawVertPiece(0, BoardGameScreen.table.nbrCol, 1,
+				((BoardGameApp.gsFirst == 0) ? piece2Image : piece1Image), 0);
 		if (BoardGameScreen.actPlayer == 0) {
 			drawSelectionBox(BoardGameScreen.table.nbrCol, 0, 0);
 		}
-		drawPiece(BoardGameScreen.table.nbrRow - 1, BoardGameScreen.table.nbrCol, 0,
-				false,
-				((BoardGameApp.gsFirst == 1) ? piece2Image : piece1Image), 0, 0); /* y, x */
-			if (BoardGameScreen.actPlayer == 1) {
-				drawSelectionBox(BoardGameScreen.table.nbrCol,
-						BoardGameScreen.table.nbrRow - 1, 0);
-			}
+		drawVertPiece(BoardGameScreen.table.nbrRow - 1, BoardGameScreen.table.nbrCol, 2,
+				((BoardGameApp.gsFirst == 1) ? piece2Image : piece1Image), 0); /* y, x */
+		if (BoardGameScreen.actPlayer == 1) {
+			drawSelectionBox(BoardGameScreen.table.nbrCol,
+					BoardGameScreen.table.nbrRow - 1, 0);
+		}
     // numbers
     screen.setColor(BaseApp.foreground);
     screen.drawString(infoLines[0], width + vertWidth, off_y + sizey + 2, Graphics.TOP | Graphics.RIGHT);
@@ -208,6 +210,14 @@ public final class ReversiScreen extends BoardGameScreen {
       screen.drawString(infoLines[2], width + vertWidth, screenHeight / 2, Graphics.BASELINE | Graphics.RIGHT);
     }
   }
+
+  protected void drawVertPiece(final int row, final int col, final int player,
+			Image cupImage, int yadjust) {
+		ReversiMove clastMove =
+			(ReversiMove)BoardGameScreen.table.getLastMove(player - 1);
+		drawPiece(row, col, player, false, cupImage, yadjust,
+				((clastMove == null) ? 0 : (clastMove.valid(BoardGameScreen.table, clastMove) ? 0 : 1))); /* y, x */
+	}
 
   public void nextTurn(final int row, final int col) {
 		//#ifdef DLOGGING
@@ -229,11 +239,16 @@ public final class ReversiScreen extends BoardGameScreen {
     }
     if (gameEnded) { return; }
     final ReversiMove move = new ReversiMove(row, col);
-    processMove(move, false);
+    boolean validMove = processMove(move, false);
     updatePossibleMoves();
+		if (!validMove) {
+			return;
+		}
 		int numMoves = 0;
+		final int maxMoves = BoardGameScreen.table.nbrRow *
+			BoardGameScreen.table.nbrCol;
     while (!gameEnded && !isHuman[BoardGameScreen.actPlayer] &&
-				(numMoves++ < 2)) {
+				(numMoves++ < maxMoves)) {
 			if (BoardGameApp.precalculate) {
 				mtt = new MinimaxTimerTask();
 			}
@@ -273,12 +288,19 @@ public final class ReversiScreen extends BoardGameScreen {
 	//#endif
   boolean processMove(final BoardGameMove pmove, final boolean startForeThinking) {
 		final ReversiMove move = (ReversiMove)pmove;
+		//#ifdef DLOGGING
+//@		if (finerLoggable) {logger.finer("processMove 1 move.row,move.col,BoardGameScreen.actPlayer,startForeThinking=" + move.row + "," + move.col + "," + BoardGameScreen.actPlayer + "," + startForeThinking);}
+		//#endif
+		byte lastPlayer = BoardGameScreen.actPlayer;
 		try {
 			final ReversiTable newTable = (ReversiTable)((BoardGameTable)BoardGameScreen.table).getEmptyTable();
 			tables = BoardGameScreen.rgame.animatedTurn(BoardGameScreen.table, BoardGameScreen.actPlayer, move, newTable);
 			boolean goodMove = (tables != null);
 			if (!goodMove) {
-				setMessage(BaseApp.messages[BoardGameApp.MSG_INVALIDMOVE], 2000);
+				setMessage(BaseApp.messages[BoardGameApp.MSG_INVALIDMOVE], 60);
+				//#ifdef DLOGGING
+//@				if (finestLoggable) {logger.finest("processMove No valid move BoardGameScreen.actPlayer,=isHuman[BoardGameScreen.actPlayer])" + BoardGameScreen.actPlayer + "," + isHuman[BoardGameScreen.actPlayer]);}
+				//#endif
 				return false;
 			}
 			else {
@@ -287,6 +309,9 @@ public final class ReversiScreen extends BoardGameScreen {
 								(ReversiGame)BoardGameScreen.rgame)),
 								tables[tables.length - 1], getActSkill(), getActPlayer());
 					timer.schedule(mtt, 0);
+					//#ifdef DLOGGING
+//@					if (finestLoggable) {logger.finest("processMove 1b scheduled");}
+					//#endif
 				}
 				synchronized (this) {
 					for (int i = 0; i < tables.length; ++i) {
@@ -305,15 +330,24 @@ public final class ReversiScreen extends BoardGameScreen {
 				BoardGameScreen.table = newTable;
 				BoardGameScreen.rgame.saveLastTable(BoardGameScreen.table,
 						BoardGameScreen.actPlayer, BoardGameScreen.turnNum);
+				//#ifdef DLOGGING
+//@				if (finestLoggable) {logger.finest("processMove 2 BoardGameScreen.actPlayer,goodMove=" + BoardGameScreen.actPlayer + "," + goodMove);}
+				//#endif
 				while (!nonPass && !gameEnded) {
 					BoardGameScreen.rgame.process(newTable, BoardGameScreen.actPlayer);
 					if (BoardGameScreen.rgame.isGameEnded()) {
 						gameEnded = true;
+						//#ifdef DLOGGING
+//@						if (finerLoggable) {logger.finer("1 loop BoardGameScreen.actPlayer,gameEnded=" + BoardGameScreen.actPlayer + "," + gameEnded);}
+						//#endif
 						procEndGame((byte)(1 - BoardGameScreen.actPlayer));
 					}
 					else {
 						BoardGameScreen.actPlayer = (byte) (1 - BoardGameScreen.actPlayer);
 						BoardGameScreen.turnNum++;
+						//#ifdef DLOGGING
+//@						if (finerLoggable) {logger.finer("2 loop player change BoardGameScreen.actPlayer=" + BoardGameScreen.actPlayer);}
+						//#endif
 						if (!BoardGameScreen.rgame.hasPossibleMove(BoardGameScreen.table, BoardGameScreen.actPlayer)) {
 							String message;
 							if (isHuman[BoardGameScreen.actPlayer]) {
@@ -327,16 +361,24 @@ public final class ReversiScreen extends BoardGameScreen {
 							else {
 								message = BaseApp.messages[BoardGameApp.MSG_COMPUTER];
 							}
-							setMessage(message + BoardGameApp.MSG_PASS, 3000);
+							setMessage(message + BoardGameApp.MSG_PASS, 61);
 							BoardGameScreen.table.setPassNum(BoardGameScreen.table.getPassNum() + 1);
 							// just to be sure
 							gMiniMax.clearPrecalculatedMoves();
+							final ReversiMove passMove = new ReversiMove(BoardGameScreen.table.nbrRow, BoardGameScreen.table.nbrCol);
+							BoardGameScreen.table.setLastMove(BoardGameScreen.actPlayer, passMove);
 							// Save pass
 							BoardGameScreen.rgame.saveLastTable(BoardGameScreen.table,
 									BoardGameScreen.actPlayer, BoardGameScreen.turnNum);
+							//#ifdef DLOGGING
+//@							if (finestLoggable) {logger.finest("processMove has increase pass number possible move BoardGameScreen.table.getPassNum()=" + BoardGameScreen.table.getPassNum());}
+							//#endif
 						}
 						else {
 							nonPass = true;
+							//#ifdef DLOGGING
+//@							if (finestLoggable) {logger.finest("processMove nonPass=" + nonPass);}
+							//#endif
 						}
 					}
 				}
@@ -347,7 +389,7 @@ public final class ReversiScreen extends BoardGameScreen {
 			//#ifdef DLOGGING
 //@			logger.severe("processMove error", e);
 			//#endif
-			return false;
+			return (lastPlayer != BoardGameScreen.actPlayer);
 		} finally {
 			//#ifdef DLOGGING
 //@			if (finerLoggable) {logger.finer("processMove return move.row,move.col,BoardGameScreen.actPlayer,startForeThinking,tables.length=" + move.row + "," + move.col + "," + BoardGameScreen.actPlayer + "," + startForeThinking + "," + ((tables == null) ? "tables is null" : String.valueOf(tables.length)));}
