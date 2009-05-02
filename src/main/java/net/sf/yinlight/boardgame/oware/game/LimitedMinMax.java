@@ -46,11 +46,15 @@ public class LimitedMinMax extends GameMinMax {
 	//#ifdef DLOGGING
 //@	private Logger logger = Logger.getLogger("LimitedMinMax");
 //@	private boolean fineLoggable = logger.isLoggable(Level.FINE);
+//@	private boolean finerLoggable = logger.isLoggable(Level.FINER);
 //@	private boolean finestLoggable = logger.isLoggable(Level.FINEST);
 	//#endif
 
   public GameMove minimax(final int depth, final GameTable state, final byte player, final TwoPlayerGame tpg, final boolean alphabeta, final int alpha, final boolean order, final boolean kill, final GameMove killerMove) {
 		try {
+			//#ifdef DLOGGING
+//@			if (finerLoggable) {logger.finer("minimax depth,state,player,move.col,BoardGameScreen.actPlayer=" + depth + "," + state + "," +  player);}
+			//#endif
 			if (cancelled) {
 				cancelled = false;
 				return null;
