@@ -54,6 +54,10 @@ abstract public class BoardGameMove implements GameMove {
     return (row >= 0) && (row < bgt.nbrRow) && (col >= 0) && (col < bgt.nbrCol);
   }
 
+  public static boolean valid(BoardGameTable bgt, final BoardGameMove bgm) {
+		return valid(bgt, bgm.row, bgm.col);
+  }
+
   abstract public BoardGameMove getBoardGameMove(final BoardGameMove move);
 
   abstract public boolean equals(final Object o);
