@@ -942,15 +942,18 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 			if (BoardGameApp.precalculate) {
 				mtt = new MinimaxTimerTask();
 			}
-      final BoardGameMove computerMove = computerTurn(move);
+      BoardGameMove computerMove = computerTurn(move);
 			//#ifdef DLOGGING
 			if (finerLoggable) {logger.finer("nextTurn computerMove.row,computerMove.col,BoardGameScreen.actPlayer=" + ((computerMove == null) ? "computerMoves null" : (computerMove.row + "," + computerMove.col)) + "," + BoardGameScreen.actPlayer);}
 			//#endif
       if (computerMove == null) {
-				break;
+				computerMove = (BoardGameMove)(BoardGameScreen.table).getEmptyMove();
+				computerMove.row = ((BoardGameTable)BoardGameScreen.table).nbrRow;
+				computerMove.col = ((BoardGameTable)BoardGameScreen.table).nbrCol;
+			} else {
+				selx = computerMove.col;
+				sely = computerMove.row;
 			}
-      selx = computerMove.col;
-      sely = computerMove.row;
 			processMove(computerMove, BoardGameApp.precalculate);
       updatePossibleMoves();
 			//#ifdef DMIDP10
