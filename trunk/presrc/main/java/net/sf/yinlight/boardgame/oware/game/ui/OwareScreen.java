@@ -410,7 +410,7 @@ public final class OwareScreen extends BoardGameScreen {
 						/* Change to other player. */
 						BoardGameScreen.actPlayer = (byte) (1 - BoardGameScreen.actPlayer);
 						//#ifdef DLOGGING
-						if (finerLoggable) {logger.finer("2 loop BoardGameScreen.actPlayer=" + BoardGameScreen.actPlayer);}
+						if (finerLoggable) {logger.finer("2 loop player change BoardGameScreen.actPlayer=" + BoardGameScreen.actPlayer);}
 						//#endif
 						if (!BoardGameScreen.rgame.hasPossibleMove(BoardGameScreen.table, BoardGameScreen.actPlayer)) {
 							String message;
