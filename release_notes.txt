@@ -180,6 +180,12 @@
 + Shorten time that message is shown.
 + Fix Reversi A.I. so that it uses heuristic vs only actual points.
 + Add target for MIDP 2.0, CLDC 1.1, JSR-75, JSR-85, JSR-135, and JSR-184.
++ Copy table with game for better A.I.
++ Fix index out of range for A.I.
++ Change evaluate to use parameter's point to prevent corruption of score.
++ Show pass if last move by putting black bar over pieces on the side.
++ Use pass if there is no computer move.
++ Allow multiple passes.
 
 Issues:
 
