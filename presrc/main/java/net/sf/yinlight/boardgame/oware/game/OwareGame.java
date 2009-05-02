@@ -493,6 +493,9 @@ public final class OwareGame extends BoardGame {
   public void eval(boolean lazyProcess, BoardGame bg, GameTable t,
 			final byte player, boolean endGame) {
 		try {
+			//#ifdef DLOGGING
+			if (finestLoggable) {logger.finest("eval lazyProcess,player,endGame=" + lazyProcess + "," + player + "," + endGame);}
+			//#endif
 			OwareTable ctable = (OwareTable)t;
 			int pointFirstPlayer = ctable.getPoint((byte)0);
 			int pointSecondPlayer = ctable.getPoint((byte)1);
@@ -587,6 +590,9 @@ public final class OwareGame extends BoardGame {
     OwareTable ot = (OwareTable)t;
     if ((ot.getPoint((byte)0) >= OwareTable.WINNING_SCORE) || (ot.getPoint((byte)1) >= OwareTable.WINNING_SCORE) || (t.getPassNum() == 2) ||
 				(allEmptyHoles(ot, player) && allEmptyHoles(ot, (1 - player)))) { return true; }
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("isGameEnded return false");}
+		//#endif
     return false;
   }
 
