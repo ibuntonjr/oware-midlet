@@ -72,14 +72,28 @@ public final class ReversiGame extends BoardGame {
 
   public ReversiGame(final ReversiGame rg) {
 		this(new int[rg.rTable.nbrRow][rg.rTable.nbrCol], rg.libertyPenalty, rg.sBonus, rg.squareErase);
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("constructor rg.rTable += null=" + (rg.rTable != null));}
+		//#endif
 		for (int i = 0; i < rg.rTable.nbrRow; i++) {
 			System.arraycopy(rg.heurMatrix[i], 0, heurMatrix[i], 0, rg.rTable.nbrCol);
 		}
+		if (rg.rTable != null) {
+			this.rTable = new ReversiTable((ReversiTable)rg.rTable);
+		}
+		this.numFirstPlayer = rg.numFirstPlayer;
+		this.numFirstPlayer = rg.numSecondPlayer;
   }
 
-  private GameTable[] _turn(final ReversiTable table, final byte player, final ReversiMove move, final ReversiTable newTable, final boolean animated) {
+  private GameTable[] _turn(final ReversiTable table, final byte player, final ReversiMove move, final ReversiTable newTable, final boolean animated
+			//#ifdef DLOGGING
+			,Logger logger
+			//#endif
+			) {
     final int row = move.row;
     final int col = move.col;
+		// If a move is not a pass (!= nbrRow), and already has a piece
+		// in it, we cannot make a move.
     if ((row != table.nbrRow) && (table.getItem(row, col) != 0)) { return null; }
     Vector vTables = null;
     GameTable tables[];
@@ -87,6 +101,10 @@ public final class ReversiGame extends BoardGame {
       vTables = new Vector();
     }
     newTable.copyDataFrom(table);
+		newTable.setLastMove(player, move);
+		//#ifdef DLOGGING
+		if (traceLoggable) {logger.trace("_turn row,col=" + row + "," + col);}
+		//#endif
     if (row == table.nbrRow) {
       // pass
       newTable.setPassNum(newTable.getPassNum() + 1);
@@ -96,7 +114,6 @@ public final class ReversiGame extends BoardGame {
     }
     newTable.setPassNum(0);
     newTable.setItem(row, col, ReversiTable.getPlayerItem(player));
-		newTable.setLastMove(player, move);
     if (animated) {
       vTables.addElement(new ReversiTable(newTable));
     }
@@ -144,7 +161,11 @@ public final class ReversiGame extends BoardGame {
    *      byte, net.eiroca.j2me.minmax.Move, net.eiroca.j2me.minmax.Table)
    */
   public GameTable[] animatedTurn(final GameTable table, final byte player, final GameMove move, final GameTable newt) {
-    return _turn((ReversiTable) table, player, (ReversiMove) move, (ReversiTable) newt, true);
+    return _turn((ReversiTable) table, player, (ReversiMove) move, (ReversiTable) newt, true
+		//#ifdef DLOGGING
+				, logger
+		//#endif
+				);
   }
 
   protected void eraseSquareHeuristic(final int[][] heurMatrix,
@@ -169,90 +190,100 @@ public final class ReversiGame extends BoardGame {
    */
   public void eval(boolean lazyProcess, BoardGame bg, GameTable t,
 			final byte player, boolean endGame) {
-		BoardGameTable bgt = (BoardGameTable)t;
-		ReversiGame rg = (ReversiGame)bg;
-		int[][] tableIntArray = new int[bgt.nbrRow][bgt.nbrCol];
-    bgt.convertToIntArray(tableIntArray);
-    rg.numFirstPlayer = 0;
-    rg.numSecondPlayer = 0;
-		int pointFirstPlayer = 0;
-		int pointSecondPlayer = 0;
-		int numFirstFreeNeighbours = 0;
-		int numSecondFreeNeighbours = 0;
-		int[] savedCells = new int[2];
-		boolean saved = false;
-    if (!lazyProcess && rg.squareErase) {
-			int lastRowIx = bgt.nbrRow - 1;
-			int lastColIx = bgt.nbrCol - 1;
-      if (tableIntArray[0][0] != 0) {
-        rg.eraseSquareHeuristic(rg.heurMatrix, savedCells, 0, 0, 1, 1);
-				saved = true;
-      }
-      if (tableIntArray[0][lastColIx] != 0) {
-        rg.eraseSquareHeuristic(rg.heurMatrix, savedCells, 0, ReversiTable.MAX_NBR_COL - 1, 1, -1);
-				saved = true;
-      }
-      if (tableIntArray[lastRowIx][lastColIx] != 0) {
-        rg.eraseSquareHeuristic(rg.heurMatrix, savedCells, ReversiTable.MAX_NBR_ROW - 1, ReversiTable.MAX_NBR_COL - 1, -1, -1);
-				saved = true;
-      }
-      if (tableIntArray[lastRowIx][0] != 0) {
-        rg.eraseSquareHeuristic(rg.heurMatrix, savedCells, ReversiTable.MAX_NBR_ROW - 1, 0, -1, 1);
-				saved = true;
-      }
-    }
-    for (int i = 0; i < bgt.nbrRow; ++i) {
-      for (int j = 0; j < bgt.nbrCol; ++j) {
-        final int item = tableIntArray[i][j];
-        switch (item) {
-          case 1:
-            ++rg.numFirstPlayer;
-            if (!lazyProcess) {
-              pointFirstPlayer += rg.heurMatrix[i][j];
-              if (libertyPenalty != 0) {
-                numFirstFreeNeighbours += rg.freeNeighbours(tableIntArray, i, j);
-              }
-            }
-            break;
-          case 2:
-            ++rg.numSecondPlayer;
-            if (!lazyProcess) {
-              pointSecondPlayer += rg.heurMatrix[i][j];
-              if (libertyPenalty != 0) {
-                numSecondFreeNeighbours += rg.freeNeighbours(tableIntArray, i, j);
-              }
-            }
-            break;
-        }
-      }
-    }
-    if (!lazyProcess && rg.squareErase && saved) {
-      rg.restoreSquareHeuristic(rg.heurMatrix, savedCells, 0, 0, 1, 1);
-      rg.restoreSquareHeuristic(rg.heurMatrix, savedCells, 0, ReversiTable.MAX_NBR_COL - 1, 1, -1);
-      rg.restoreSquareHeuristic(rg.heurMatrix, savedCells, ReversiTable.MAX_NBR_ROW - 1, ReversiTable.MAX_NBR_COL - 1, -1, -1);
-      rg.restoreSquareHeuristic(rg.heurMatrix, savedCells, ReversiTable.MAX_NBR_ROW - 1, 0, -1, 1);
-    }
-    int squareBonusPoint = 0;
-    if (!lazyProcess && (rg.sBonus != 0)) {
-      squareBonusPoint = rg.squareBonus(tableIntArray);
-    }
-    if (lazyProcess) {
-      point = rg.numFirstPlayer - rg.numSecondPlayer;
-      if (rg.isGameEnded()) {
-        if (point > 0) {
-          point += GameMinMax.MAX_POINT;
-        }
-        else if (point < 0) {
-          point -= GameMinMax.MAX_POINT;
-        }
-      }
-    }
-    else {
-      point = pointFirstPlayer - pointSecondPlayer + libertyPenalty * (numSecondFreeNeighbours - numFirstFreeNeighbours) + rg.sBonus * squareBonusPoint;
-    }
-    if (player == 1) {
-      point = -point;
-    }
+		try {
+			//#ifdef DLOGGING
+			if (finestLoggable) {logger.finest("eval lazyProcess,endGame=" + lazyProcess + "," + endGame);}
+			//#endif
+			BoardGameTable bgt = (BoardGameTable)t;
+			ReversiGame rg = (ReversiGame)bg;
+			int[][] tableIntArray = new int[bgt.nbrRow][bgt.nbrCol];
+			bgt.convertToIntArray(tableIntArray);
+			rg.numFirstPlayer = 0;
+			rg.numSecondPlayer = 0;
+			int pointFirstPlayer = 0;
+			int pointSecondPlayer = 0;
+			int numFirstFreeNeighbours = 0;
+			int numSecondFreeNeighbours = 0;
+			int[] savedCells = new int[2];
+			boolean saved = false;
+			if (!lazyProcess && rg.squareErase) {
+				int lastRowIx = bgt.nbrRow - 1;
+				int lastColIx = bgt.nbrCol - 1;
+				if (tableIntArray[0][0] != 0) {
+					rg.eraseSquareHeuristic(rg.heurMatrix, savedCells, 0, 0, 1, 1);
+					saved = true;
+				}
+				if (tableIntArray[0][lastColIx] != 0) {
+					rg.eraseSquareHeuristic(rg.heurMatrix, savedCells, 0, ReversiTable.MAX_NBR_COL - 1, 1, -1);
+					saved = true;
+				}
+				if (tableIntArray[lastRowIx][lastColIx] != 0) {
+					rg.eraseSquareHeuristic(rg.heurMatrix, savedCells, ReversiTable.MAX_NBR_ROW - 1, ReversiTable.MAX_NBR_COL - 1, -1, -1);
+					saved = true;
+				}
+				if (tableIntArray[lastRowIx][0] != 0) {
+					rg.eraseSquareHeuristic(rg.heurMatrix, savedCells, ReversiTable.MAX_NBR_ROW - 1, 0, -1, 1);
+					saved = true;
+				}
+			}
+			for (int i = 0; i < bgt.nbrRow; ++i) {
+				for (int j = 0; j < bgt.nbrCol; ++j) {
+					final int item = tableIntArray[i][j];
+					switch (item) {
+						case 1:
+							++rg.numFirstPlayer;
+							if (!lazyProcess) {
+								pointFirstPlayer += rg.heurMatrix[i][j];
+								if (libertyPenalty != 0) {
+									numFirstFreeNeighbours += rg.freeNeighbours(tableIntArray, i, j);
+								}
+							}
+							break;
+						case 2:
+							++rg.numSecondPlayer;
+							if (!lazyProcess) {
+								pointSecondPlayer += rg.heurMatrix[i][j];
+								if (libertyPenalty != 0) {
+									numSecondFreeNeighbours += rg.freeNeighbours(tableIntArray, i, j);
+								}
+							}
+							break;
+					}
+				}
+			}
+			if (!lazyProcess && rg.squareErase && saved) {
+				rg.restoreSquareHeuristic(rg.heurMatrix, savedCells, 0, 0, 1, 1);
+				rg.restoreSquareHeuristic(rg.heurMatrix, savedCells, 0, ReversiTable.MAX_NBR_COL - 1, 1, -1);
+				rg.restoreSquareHeuristic(rg.heurMatrix, savedCells, ReversiTable.MAX_NBR_ROW - 1, ReversiTable.MAX_NBR_COL - 1, -1, -1);
+				rg.restoreSquareHeuristic(rg.heurMatrix, savedCells, ReversiTable.MAX_NBR_ROW - 1, 0, -1, 1);
+			}
+			int squareBonusPoint = 0;
+			if (!lazyProcess && (rg.sBonus != 0)) {
+				squareBonusPoint = rg.squareBonus(tableIntArray);
+			}
+			if (lazyProcess) {
+				rg.point = rg.numFirstPlayer - rg.numSecondPlayer;
+				if (rg.isGameEnded(bg, bgt, player)) {
+					if (rg.point > 0) {
+						rg.point += GameMinMax.MAX_POINT;
+					}
+					else if (rg.point < 0) {
+						rg.point -= GameMinMax.MAX_POINT;
+					}
+				}
+			}
+			else {
+				rg.point = pointFirstPlayer - pointSecondPlayer + libertyPenalty * (numSecondFreeNeighbours - numFirstFreeNeighbours) + rg.sBonus * squareBonusPoint;
+			}
+			if (player == 1) {
+				rg.point = -rg.point;
+			}
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("eval error", e);
+			//#endif
+		}
   }
 
   /**
@@ -300,13 +331,26 @@ public final class ReversiGame extends BoardGame {
   }
 
   public boolean hasPossibleMove(final GameTable table, final byte player) {
-    if (!(table instanceof BoardGameTable)) { return false; }
-    final ReversiMove[] moves = (ReversiMove[]) possibleMoves(table, player);
-    return (moves != null) && ((moves.length > 1) || (moves[0].row != ((BoardGameTable)table).nbrRow));
+		try {
+			if (!(table instanceof BoardGameTable)) { return false; }
+			final ReversiMove[] moves = (ReversiMove[]) possibleMoves(table, player);
+			//#ifdef DLOGGING
+			if (finestLoggable) {logger.finest("hasPossibleMove moves.length,moves[0].row=" + ((moves == null) ? "null" : Integer.toString(moves.length) +
+					"," + moves[0].row));}
+			//#endif
+			return (moves != null) && ((moves.length > 1) || (moves[0].row != ((BoardGameTable)table).nbrRow));
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("hasPossibleMove error player=" + player, e);
+			//#endif
+			return false;
+		}
   }
 
   public int getTblPoint(final GameTable t, final byte player) {
 	  ReversiGame rg = new ReversiGame(this);
+	  rg.rTable = (BoardGameTable)t;
 		// Use estimate of goodness based on heuristic.
 		eval(false, rg, t, player, false);
 		return rg.getPoint();
@@ -317,7 +361,13 @@ public final class ReversiGame extends BoardGame {
     if (!(t instanceof ReversiTable)) { return false; }
 		ReversiGame rg = (ReversiGame)bg;
 		ReversiTable rt = (ReversiTable)t;
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("isGameEnded rg.numFirstPlayer,rg.numSecondPlayer,rt.getPassNum()=" + rg.numFirstPlayer + "," + rg.numSecondPlayer + "," + rt.getPassNum());}
+		//#endif
     if ((rg.numFirstPlayer + rg.numSecondPlayer == 64) || (rg.numFirstPlayer == 0) || (rg.numSecondPlayer == 0) || (rt.getPassNum() == 2)) { return true; }
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("isGameEnded false");}
+		//#endif
     return false;
   }
 
@@ -326,36 +376,53 @@ public final class ReversiGame extends BoardGame {
   }
 
   public GameMove[] possibleMoves(final GameTable table, final byte player) {
-    if (!(table instanceof ReversiTable)) { return null; }
-    final Vector moves = new Vector();
-    if (((ReversiTable) table).getPassNum() == 2) {
-      // two passes: end of the game
-      return null;
-    }
-		BoardGameTable bgt = (BoardGameTable)table;
-    final ReversiTable newTable = (ReversiTable)bgt.getEmptyTable();
-    final ReversiMove move = new ReversiMove(0, 0);
-    boolean hasMove = false;
-    for (int row = 0; row < bgt.nbrRow; ++row) {
-      for (int col = 0; col < ((BoardGameTable)table).nbrCol; ++col) {
-        move.setCoordinates(row, col);
-        if (!hasMove && (((ReversiTable) table).getItem(row, col) == 0)) {
-          hasMove = true;
-        }
-        final boolean goodMove = turn(table, player, move, newTable);
-        if (goodMove) {
-          moves.addElement(new ReversiMove(move));
-        }
-      }
-    }
-    if (!hasMove) { return null; }
-    if (moves.size() == 0) {
-      // need to pass
-      moves.addElement(new ReversiMove(bgt.nbrRow, bgt.nbrCol));
-    }
-    final GameMove[] retMoves = new ReversiMove[moves.size()];
-		moves.copyInto(retMoves);
-    return retMoves;
+		try {
+			if (!(table instanceof ReversiTable)) { return null; }
+			final Vector moves = new Vector();
+			if (((ReversiTable) table).getPassNum() == 2) {
+				// two passes: end of the game
+				//#ifdef DLOGGING
+				if (finestLoggable) {logger.finest("possibleMoves pass num == 2");}
+				//#endif
+				return null;
+			}
+			BoardGameTable bgt = (BoardGameTable)table;
+			final ReversiTable newTable = (ReversiTable)bgt.getEmptyTable();
+			final ReversiMove move = new ReversiMove(0, 0);
+			boolean hasMove = false;
+			//#ifdef DLOGGING
+			if (finestLoggable) {logger.finest("possibleMoves starting player=" + player);}
+			//#endif
+			for (int row = 0; row < bgt.nbrRow; ++row) {
+				for (int col = 0; col < ((BoardGameTable)table).nbrCol; ++col) {
+					move.setCoordinates(row, col);
+					if (!hasMove && (((ReversiTable) table).getItem(row, col) == 0)) {
+						hasMove = true;
+					}
+					final boolean goodMove = turn(table, player, move, newTable);
+					if (goodMove) {
+						moves.addElement(new ReversiMove(move));
+					}
+				}
+			}
+			//#ifdef DLOGGING
+			if (finestLoggable) {logger.finest("possibleMoves player,hasMove,moves.size()=" + player + "," + hasMove + "," + moves.size());}
+			//#endif
+			if (!hasMove) { return null; }
+			if (moves.size() == 0) {
+				// need to pass
+				moves.addElement(new ReversiMove(bgt.nbrRow, bgt.nbrCol));
+			}
+			final GameMove[] retMoves = new ReversiMove[moves.size()];
+			moves.copyInto(retMoves);
+			return retMoves;
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("possibleMoves error player=" + player, e);
+			//#endif
+			return null;
+		}
   }
 
   public void resetEvalNum() {
@@ -453,7 +520,7 @@ public final class ReversiGame extends BoardGame {
 					c3 = false;
 				}
 			}
-			final int corner3 = tableIntArray[rTable.nbrRow][rTable.nbrCol];
+			final int corner3 = tableIntArray[lastRowIx][lastRowIx];
 			if (corner3 != 0) {
 				if (c3) {
 					int c3l = 1;
@@ -506,7 +573,11 @@ public final class ReversiGame extends BoardGame {
   }
 
   public boolean turn(final GameTable table, final byte player, final GameMove move, final GameTable newt) {
-    return _turn((ReversiTable) table, player, (ReversiMove) move, (ReversiTable) newt, false) != null;
+    return _turn((ReversiTable) table, player, (ReversiMove) move, (ReversiTable) newt, false
+		//#ifdef DLOGGING
+				, logger
+		//#endif
+				) != null;
   }
 
 }
