@@ -83,6 +83,7 @@ public final class ReversiGame extends BoardGame {
 		}
 		this.numFirstPlayer = rg.numFirstPlayer;
 		this.numFirstPlayer = rg.numSecondPlayer;
+		this.rPlayer = rg.rPlayer;
   }
 
   private GameTable[] _turn(final ReversiTable table, final byte player, final ReversiMove move, final ReversiTable newTable, final boolean animated
@@ -364,7 +365,7 @@ public final class ReversiGame extends BoardGame {
 		//#ifdef DLOGGING
 //@		if (finestLoggable) {logger.finest("isGameEnded rg.numFirstPlayer,rg.numSecondPlayer,rt.getPassNum()=" + rg.numFirstPlayer + "," + rg.numSecondPlayer + "," + rt.getPassNum());}
 		//#endif
-    if ((rg.numFirstPlayer + rg.numSecondPlayer == 64) || (rg.numFirstPlayer == 0) || (rg.numSecondPlayer == 0) || (rt.getPassNum() == 2)) { return true; }
+    if ((rg.numFirstPlayer + rg.numSecondPlayer == 64) || (rg.numFirstPlayer == 0) || (rg.numSecondPlayer == 0) || (rt.getPassNum() >= 2)) { return true; }
 		//#ifdef DLOGGING
 //@		if (finestLoggable) {logger.finest("isGameEnded false");}
 		//#endif
