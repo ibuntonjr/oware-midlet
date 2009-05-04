@@ -278,15 +278,20 @@ public class OwareTest {
 			OwareMove move = new OwareMove(
 					Integer.valueOf(smove.substring(0, 1)).intValue(),
 			Integer.valueOf(smove.substring(1)).intValue());
+			OwareScreen os = (OwareScreen)GameApp.game;
+			(os).actPlayer = (byte)move.row;
 			((OwareScreen)GameApp.game).actPlayer = (byte)move.row;
-			((OwareScreen)GameApp.game).rgame.setPlayer((byte)move.row);
+			OwareGame og = (OwareGame)((OwareScreen)GameApp.game).rgame;
+			OwareTable ot = (OwareTable)os.table;
+			og.setPlayer((byte)move.row);
 			result.mveResult = ((OwareScreen)GameApp.game).processMove(move, false);
 			cmpTable.fromRowString(0, sexpRow0);
 			System.out.println("JUnit sexpRow0:" + sexpRow0);
 			cmpTable.fromRowString(1, sexpRow1);
 			System.out.println("JUnit sexpRow1:" + sexpRow1);
 			result.success = BoardGameScreen.table.equals(cmpTable);
-			result.gameOver = ((OwareScreen)GameApp.game).rgame.isGameEnded();
+			result.gameOver = ((OwareScreen)GameApp.game).rgame.isGameEnded(
+					og, ot, (os).actPlayer);
 			result.actRow0 = BoardGameScreen.table.toRowString(0);
 			result.actRow1 = BoardGameScreen.table.toRowString(1);
 		} catch (IllegalArgumentException e) {
