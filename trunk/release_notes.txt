@@ -166,7 +166,7 @@
 + Allow ignoring key codes in the JAD file.
 + Put store of board, in it's own method.
 
-0.1.3 2009-05-01 Beta 1 Version
+0.1.3 2009-05-04 Beta 1 Version
 + More logging.
 + More comments.
 + Support repeat (another turn) if seed lands in store.
@@ -186,6 +186,9 @@
 + Show pass if last move by putting black bar over pieces on the side.
 + Use pass if there is no computer move.
 + Allow multiple passes.
++ Make sure that rPlayer is copied.  End game if pass is >= 2 to make sure that we do not end if pass is > 2.
++ Fix target to copy resources for English to replace midlet vers and prog vers with actual midlet/prog vers.
++ Use more more parameters for isGameEnded as it is more accurate.
 
 Issues:
 
