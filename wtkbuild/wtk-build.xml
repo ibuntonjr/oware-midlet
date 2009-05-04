@@ -575,6 +575,12 @@
 			<fileset dir="${icon.dir}" >
 				<include name="**/*.png" />
 				<include name="**/*.wav" />
+				<exclude name="${res.excludes}" />
+			</fileset>
+		</copy>
+		<copy todir="${to.res.dir}" >
+			<filterset refid="midlet.info" />
+			<fileset dir="${icon.dir}" >
 				<include name="**/*.txt" />
 				<exclude name="${res.excludes}" />
 			</fileset>
@@ -591,6 +597,13 @@
 			<fileset dir="${icon.dir}" >
 				<include name="**/*.png" />
 				<include name="**/*.wav" />
+				<exclude name="${res.excludes}" />
+			</fileset>
+		</copy>
+		<copy todir="${to.res.dir}/en" >
+			<filterset refid="midlet.info" />
+			<fileset dir="${icon.dir}" >
+				<include name="**/*.txt" />
 				<exclude name="${res.excludes}" />
 			</fileset>
 		</copy>
