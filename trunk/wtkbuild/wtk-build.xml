@@ -1539,6 +1539,14 @@
 
 	<target name="dist.reversi" >
 		<antcall target="dist" inheritAll="true" >
+			<param name="no.1.0.large" value="true" />
+			<param name="no.2.0.jsr135.large" value="true" />
+			<param name="no.2.0.large" value="true" />
+			<param name="no.2.0.jsr135.large" value="true" />
+			<param name="no.2.0.cldc.1.1.jsr75.largemem" value="true" />
+			<param name="no.2.0.cldc.1.1.largemem" value="true" />
+			<param name="no.2.0.cldc.1.1.jsr75.jsr82.jsr184.largemem" value="true" />
+			<param name="no.2.0.cldc.1.1.jsr75.jsr82.jsr135.jsr184.largemem" value="true" />
 			<param name="release.name" value="Reversi" />
 			<param name="MIDLETICON" value="/reversi_icon.png" />
 			<param name="MIDLETDESC" value="Reversi Game" />
@@ -1576,6 +1584,14 @@
 
 	<target name="dist.games" >
 		<antcall target="dist" inheritAll="true" >
+			<param name="no.1.0.large" value="true" />
+			<param name="no.2.0.jsr135.large" value="true" />
+			<param name="no.2.0.large" value="true" />
+			<param name="no.2.0.jsr135.large" value="true" />
+			<param name="no.2.0.cldc.1.1.jsr75.largemem" value="true" />
+			<param name="no.2.0.cldc.1.1.largemem" value="true" />
+			<param name="no.2.0.cldc.1.1.jsr75.jsr82.jsr184.largemem" value="true" />
+			<param name="no.2.0.cldc.1.1.jsr75.jsr82.jsr135.jsr184.largemem" value="true" />
 			<param name="src.excludes" value="**/testsuite/**,testsuite/**" />
 			<param name="res.excludes" value="**/testsuite*,testsuite*" />
 			<param name="Testsuite-concat.jad" value="" />
