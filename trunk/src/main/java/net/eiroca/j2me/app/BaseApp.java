@@ -1329,6 +1329,10 @@ implements CommandListener
 		try {
 			s.copyInto(out);
 		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+//@			logger.severe("readPairs copyInto error for " + res, e);
+			//#endif
 			for (int i = 0; i < s.size(); i++) {
 				out[i] = (Pair) s.elementAt(i);
 			}
