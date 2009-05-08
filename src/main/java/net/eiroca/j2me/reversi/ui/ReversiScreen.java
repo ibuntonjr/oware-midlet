@@ -253,7 +253,8 @@ public final class ReversiScreen extends BoardGameScreen {
 				mtt = new MinimaxTimerTask();
 			}
       ReversiMove computerMove = (ReversiMove)computerTurn(
-					new ReversiGame((ReversiGame)BoardGameScreen.rgame), move);
+					new ReversiGame((ReversiGame)BoardGameScreen.rgame,
+						BoardGameScreen.table), move);
       if (computerMove == null) {
 				computerMove = (ReversiMove)((ReversiTable)BoardGameScreen.table).getEmptyMove();
 				computerMove.row = ((ReversiTable)BoardGameScreen.table).nbrRow;
