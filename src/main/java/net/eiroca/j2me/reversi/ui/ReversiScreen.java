@@ -252,7 +252,8 @@ public final class ReversiScreen extends BoardGameScreen {
 			if (BoardGameApp.precalculate) {
 				mtt = new MinimaxTimerTask();
 			}
-      ReversiMove computerMove = (ReversiMove)computerTurn(move);
+      ReversiMove computerMove = (ReversiMove)computerTurn(
+					new ReversiGame((ReversiGame)BoardGameScreen.rgame), move);
       if (computerMove == null) {
 				computerMove = (ReversiMove)((ReversiTable)BoardGameScreen.table).getEmptyMove();
 				computerMove.row = ((ReversiTable)BoardGameScreen.table).nbrRow;
@@ -313,11 +314,13 @@ public final class ReversiScreen extends BoardGameScreen {
 //@					if (finestLoggable) {logger.finest("processMove 1b scheduled");}
 					//#endif
 				}
+				/* Show each move on the board separately. */
 				synchronized (this) {
 					for (int i = 0; i < tables.length; ++i) {
 						BoardGameScreen.table = (ReversiTable) tables[i];
 						if (i < tables.length - 1) {
 							try {
+								super.wakeup(3);
 								wait(300);
 							}
 							catch (final InterruptedException e) {
@@ -396,6 +399,7 @@ public final class ReversiScreen extends BoardGameScreen {
 //@			tableDraws = 2;
 			//#endif
 			super.wakeup(3);
+			Thread.currentThread().yield();
 		}
   }
 
