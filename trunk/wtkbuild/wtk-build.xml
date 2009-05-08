@@ -132,6 +132,58 @@
 		<property file="${basedir}/staging.properties" />
 	</target>
 
+	<target name="prepare.no.large" >
+			<property name="no.1.0.large" value="true" />
+			<property name="no.2.0.jsr135.large" value="true" />
+			<property name="no.2.0.large" value="true" />
+			<property name="no.2.0.jsr135.large" value="true" />
+			<property name="no.2.0.cldc.1.1.jsr75.largemem" value="true" />
+			<property name="no.2.0.cldc.1.1.largemem" value="true" />
+			<property name="no.2.0.cldc.1.1.jsr75.jsr82.jsr184.largemem" value="true" />
+			<property name="no.2.0.cldc.1.1.jsr75.jsr82.jsr135.jsr184.largemem" value="true" />
+	</target>
+
+	<target name="prepare.large" >
+			<property name="no.1.0" value="true" />
+			<property name="no.2.0" value="true" />
+			<property name="no.2.0.cldc.1.1" value="true" />
+			<property name="no.2.0.jsr75" value="true" />
+			<property name="no.2.0.jsr135" value="true" />
+			<property name="no.2.0.cldc.1.1.jsr75" value="true" />
+			<property name="no.2.0.cldc.1.1.jsr135" value="true" />
+			<property name="no.2.0.jsr238" value="true" />
+	</target>
+
+	<target name="prepare.games" depends="prepare.no.large" >
+			<property name="Testsuite-concat.jad" value="" />
+			<property name="src.excludes" value="**/testsuite/**,testsuite/**" />
+			<property name="res.excludes" value="**/testsuite*,testsuite*" />
+	</target>
+
+	<target name="prepare.reversi" depends="prepare.no.large" >
+			<property name="release.name" value="Reversi" />
+			<property name="MIDLETICON" value="/reversi_icon.png" />
+			<property name="MIDLETDESC" value="Reversi Game" />
+			<property name="Reversi-concat.nbr" value="1" />
+			<property name="Oware-concat.jad" value="" />
+			<property name="Minesweeper-concat.jad" value="" />
+			<property name="Testsuite-concat.jad" value="" />
+			<property name="src.excludes" value="**/testsuite/**,**/minesweeper/**,**/Oware*,**/Mine*,testsuite/**,minesweeper/**,Oware*,Mine*" />
+			<property name="res.excludes" value="**/oware*,**/mine*,**/testsuite*,oware*,mine*,testsuite*" />
+	</target>
+
+	<target name="prepare.testsuite" depends="prepare.large" >
+			<property name="release.name" value="TestSuite" />
+			<property name="MIDLETICON" value="/testsuite_icon.png" />
+			<property name="MIDLETDESC" value="Test Suite" />
+			<property name="Testsuite-concat.nbr" value="1" />
+			<property name="Oware-concat.jad" value="" />
+			<property name="Minesweeper-concat.jad" value="" />
+			<property name="Reversi-concat.jad" value="" />
+			<property name="src.excludes" value="**/reversi/**,**/minesweeper/**,**/Oware*,**/Reversi*,**/Mine*,reversi/**,minesweeper/**,Oware*,Mine*" />
+			<property name="res.excludes" value="**/oware*,**/mine*,**/reversi*,oware*,mine*,reversi*" />
+	</target>
+
 	<!-- prepare the target folder -->
 	<target name="prepare" depends="test.prepare,release.prepare" >
 		<property name="release.name" value="${project.name}" />
@@ -1238,7 +1290,7 @@
 	<!-- These are do create release versions for MIDP-1.0, MIDP-2.0, -->
 	<!-- MIDP-2.0 itunes, MIDP-2.0 and JSR-75, and MIDP-2.0 and -->
 	<!--JSR-75 -->
-	<target name="dist.midp.1.0" unless="no.1.0" >
+	<target name="dist.midp.1.0" unless="no.1.0" depends="prepare.games" >
 		<antcall target="dist.version" inheritAll="yes" >
 			<param name="wtk.properties" value="wtk1.0.properties${wtk.template}" />
 			<param name="dist.vers" value="${dist.midp10}" />
@@ -1537,52 +1589,18 @@
 		</antcall>
 	</target>
 
-	<target name="dist.reversi" >
+	<target name="dist.reversi" depends="prepare.reversi" >
 		<antcall target="dist" inheritAll="true" >
-			<param name="no.1.0.large" value="true" />
-			<param name="no.2.0.jsr135.large" value="true" />
-			<param name="no.2.0.large" value="true" />
-			<param name="no.2.0.jsr135.large" value="true" />
-			<param name="no.2.0.cldc.1.1.jsr75.largemem" value="true" />
-			<param name="no.2.0.cldc.1.1.largemem" value="true" />
-			<param name="no.2.0.cldc.1.1.jsr75.jsr82.jsr184.largemem" value="true" />
-			<param name="no.2.0.cldc.1.1.jsr75.jsr82.jsr135.jsr184.largemem" value="true" />
-			<param name="release.name" value="Reversi" />
-			<param name="MIDLETICON" value="/reversi_icon.png" />
-			<param name="MIDLETDESC" value="Reversi Game" />
-			<param name="Reversi-concat.nbr" value="1" />
-			<param name="Oware-concat.jad" value="" />
-			<param name="Minesweeper-concat.jad" value="" />
-			<param name="Testsuite-concat.jad" value="" />
-			<param name="src.excludes" value="**/testsuite/**,**/minesweeper/**,**/Oware*,**/Mine*,testsuite/**,minesweeper/**,Oware*,Mine*" />
-			<param name="res.excludes" value="**/oware*,**/mine*,**/testsuite*,oware*,mine*,testsuite*" />
 		</antcall>
 	</target>
 
-	<target name="dist.testsuite" >
+	<target name="dist.testsuite" depends="prepare.testsuite" >
 		<antcall target="dist" inheritAll="true" >
 			<!--UNDO when fix tests. -->
-			<param name="no.1.0" value="true" />
-			<param name="no.2.0" value="true" />
-			<param name="no.2.0.cldc.1.1" value="true" />
-			<param name="no.2.0.jsr75" value="true" />
-			<param name="no.2.0.jsr135" value="true" />
-			<param name="no.2.0.cldc.1.1.jsr75" value="true" />
-			<param name="no.2.0.cldc.1.1.jsr135" value="true" />
-			<param name="no.2.0.jsr238" value="true" />
-			<param name="release.name" value="TestSuite" />
-			<param name="MIDLETICON" value="/testsuite_icon.png" />
-			<param name="MIDLETDESC" value="Test Suite" />
-			<param name="Testsuite-concat.nbr" value="1" />
-			<param name="Oware-concat.jad" value="" />
-			<param name="Minesweeper-concat.jad" value="" />
-			<param name="Reversi-concat.jad" value="" />
-			<param name="src.excludes" value="**/reversi/**,**/minesweeper/**,**/Oware*,**/Reversi*,**/Mine*,reversi/**,minesweeper/**,Oware*,Mine*" />
-			<param name="res.excludes" value="**/oware*,**/mine*,**/reversi*,oware*,mine*,reversi*" />
 		</antcall>
 	</target>
 
-	<target name="dist.games" >
+	<target name="dist.games" depends="prepare.games" >
 		<antcall target="dist" inheritAll="true" >
 			<param name="no.1.0.large" value="true" />
 			<param name="no.2.0.jsr135.large" value="true" />
