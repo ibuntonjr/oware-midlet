@@ -91,7 +91,7 @@ public class Reversi extends BoardGameApp {
 		BoardGameApp.gsLevelMsg = new int[0];
     GameApp.hsName = "Reversi";
 		GameApp.resSplash = "reversi_splash.png";
-		BoardGameApp.gsDepth = new int[] {3, 3, 1, -14, 2};
+		BoardGameApp.gsDepth = new int[] {3, 3, 1, -14, 1};
 		BoardGameApp.gsRow =  new int[] {8, 8, 4, 8, 1};
 		BoardGameApp.gsCol =  new int[] {8, 8, 4, 8, 1};
 		BoardGameApp.gsNbrPlayers =  new int[] {2, 2, 2, 2, 1};
