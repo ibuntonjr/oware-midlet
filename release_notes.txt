@@ -190,6 +190,16 @@
 + Fix target to copy resources for English to replace midlet vers and prog vers with actual midlet/prog vers.
 + Use more more parameters for isGameEnded as it is more accurate.
 
+0.1.4 2009-05-08 Beta 1 Version
++ More logging.
++ Minor performance improvement in calculating best move.
++ Wake up after each move to show the pieces flipping.
++ Fix MIDP 1.0 program failing after splash screen on Sony T637.
++ Change logging to not write out string version of the table.
++ Fix skill levels going up by 2 instead of 1.
++ Build file changes to simplify targets.  
++ Try to show move and thinking message after move.  Sometimes, for higher levels, this is not shown.
+
 Issues:
 
 Minesweeper does not work at all.
