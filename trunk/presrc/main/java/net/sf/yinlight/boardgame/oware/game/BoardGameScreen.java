@@ -736,7 +736,7 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 							//#ifdef DLOGGING
 							if (finestLoggable) {logger.finest("procKeyPressed unprocessed keyCode=" + keyCode);}
 							//#endif
-							if (acceptKeyCode(keyCode)) {
+							if (!acceptKeyCode(keyCode)) {
 								//#ifdef DLOGGING
 								if (traceLoggable) {logger.trace("procKeyPressed pause with keyCode=" + keyCode);}
 								//#endif
@@ -749,7 +749,7 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 						//#ifdef DLOGGING
 						logger.warning("procKeyPressed IllegalArgumentException keyCode=" + keyCode, e);
 						//#endif
-						if (acceptKeyCode(keyCode)) {
+						if (!acceptKeyCode(keyCode)) {
 							gMiniMax.cancel(true);
 							midlet.doGamePause();
 						}
@@ -767,7 +767,7 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 
   public boolean acceptKeyCode(int keyCode) {
 		boolean rtn = (ignoreKeycodes.indexOf(
-					"," + Integer.toString(keyCode) + ",") < 0);
+					"," + Integer.toString(keyCode) + ",") >= 0);
 		//#ifdef DLOGGING
 		if (traceLoggable) {logger.trace("acceptKeyCode keyCode,rtn=" + keyCode + "," + rtn);}
 		//#endif
@@ -878,21 +878,23 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
     }
   }
 
-  protected BoardGameMove computerTurn(final BoardGameMove prevMove) {
+  protected BoardGameMove computerTurn(final TwoPlayerGame tpg, final BoardGameMove prevMove) {
     BoardGameMove move = (BoardGameMove) gMiniMax.precalculatedBestMove(prevMove);
     if (move == null) {
       setMessage(BaseApp.messages[BoardGameApp.MSG_THINKING]);
+			super.wakeup(3);
+			Thread.currentThread().yield();
       gMiniMax.cancel(false);
 			//#ifdef DLOGGING
 			if (finerLoggable) {logger.finer("computerTurn 1 prevMove.row,prevMove.col, move.row,move.col,BoardGameScreen.actPlayer=" + prevMove.row + "," + prevMove.col + "," + ((move == null) ? "move null" : move.row + "," + move.col) + "," + BoardGameScreen.actPlayer);}
 			//#endif
-      move = (BoardGameMove) gMiniMax.minimax(BoardGameScreen.getActSkill(), BoardGameScreen.table, BoardGameScreen.actPlayer, BoardGameScreen.rgame, true, 0, true, true, null);
+      move = (BoardGameMove) gMiniMax.minimax(BoardGameScreen.getActSkill(), BoardGameScreen.table, BoardGameScreen.actPlayer, tpg, true, 0, true, true, null);
     }
 		//#ifdef DLOGGING
 		if (finerLoggable) {logger.finer("2 computerTurn prevMove.row,prevMove.col, move.row,move.col,BoardGameScreen.actPlayer=" + prevMove.row + "," + prevMove.col + "," + ((move == null) ? "move null" : move.row + "," + move.col) + "," + BoardGameScreen.actPlayer);}
 		//#endif
     setMessage(null);
-    BoardGameScreen.rgame.resetEvalNum();
+    tpg.resetEvalNum();
     return move;
   }
 
@@ -942,7 +944,7 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 			if (BoardGameApp.precalculate) {
 				mtt = new MinimaxTimerTask();
 			}
-      BoardGameMove computerMove = computerTurn(move);
+      BoardGameMove computerMove = computerTurn(BoardGameScreen.rgame, move);
 			//#ifdef DLOGGING
 			if (finerLoggable) {logger.finer("nextTurn computerMove.row,computerMove.col,BoardGameScreen.actPlayer=" + ((computerMove == null) ? "computerMoves null" : (computerMove.row + "," + computerMove.col)) + "," + BoardGameScreen.actPlayer);}
 			//#endif
