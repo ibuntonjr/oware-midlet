@@ -86,6 +86,11 @@ public final class ReversiGame extends BoardGame {
 		this.rPlayer = rg.rPlayer;
   }
 
+  public ReversiGame(final ReversiGame rg, final ReversiTable rt) {
+		this(rg);
+		this.rTable = rt;
+	}
+
   private GameTable[] _turn(final ReversiTable table, final byte player, final ReversiMove move, final ReversiTable newTable, final boolean animated
 			//#ifdef DLOGGING
 			,Logger logger
@@ -142,9 +147,7 @@ public final class ReversiGame extends BoardGame {
     if (flipped) {
       if (animated) {
         tables = new GameTable[vTables.size()];
-        for (int i = 0; i < vTables.size(); ++i) {
-          tables[i] = (GameTable) vTables.elementAt(i);
-        }
+				vTables.copyInto(tables);
       }
       else {
         tables = new GameTable[1];
@@ -350,11 +353,9 @@ public final class ReversiGame extends BoardGame {
   }
 
   public int getTblPoint(final GameTable t, final byte player) {
-	  ReversiGame rg = new ReversiGame(this);
-	  rg.rTable = (BoardGameTable)t;
 		// Use estimate of goodness based on heuristic.
-		eval(false, rg, t, player, false);
-		return rg.getPoint();
+		eval(false, this, t, player, false);
+		return getPoint();
   }
 
   public boolean isGameEnded(BoardGame bg, BoardGameTable t, byte player) {
@@ -395,7 +396,7 @@ public final class ReversiGame extends BoardGame {
 			if (finestLoggable) {logger.finest("possibleMoves starting player=" + player);}
 			//#endif
 			for (int row = 0; row < bgt.nbrRow; ++row) {
-				for (int col = 0; col < ((BoardGameTable)table).nbrCol; ++col) {
+				for (int col = 0; col < bgt.nbrCol; ++col) {
 					move.setCoordinates(row, col);
 					if (!hasMove && (((ReversiTable) table).getItem(row, col) == 0)) {
 						hasMove = true;
