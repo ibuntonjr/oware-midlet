@@ -53,7 +53,7 @@ public class LimitedMinMax extends GameMinMax {
   public GameMove minimax(final int depth, final GameTable state, final byte player, final TwoPlayerGame tpg, final boolean alphabeta, final int alpha, final boolean order, final boolean kill, final GameMove killerMove) {
 		try {
 			//#ifdef DLOGGING
-//@			if (finerLoggable) {logger.finer("minimax depth,state,player,move.col,BoardGameScreen.actPlayer=" + depth + "," + state + "," +  player);}
+//@			if (finerLoggable) {logger.finer("minimax depth,state,player,move.col,BoardGameScreen.actPlayer=" + depth + "," + (state != null) + "," +  player);}
 			//#endif
 			if (cancelled) {
 				cancelled = false;
