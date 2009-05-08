@@ -175,7 +175,7 @@ abstract public class BoardGame extends TwoPlayerGame {
 
 	public void saveLastTable(BoardGameTable bgt, byte player, int turnNum) {
 		//#ifdef DLOGGING
-		if (finestLoggable) {logger.finest("saveLastTable bgt,player=" + bgt + "," + player);}
+		if (finestLoggable) {logger.finest("saveLastTable bgt,player=" + (bgt != null) + "," + player);}
 		//#endif
 		if (prevTbls.size() >= NBR_MAX_STACK) {
 			prevTbls.removeElementAt(0);
