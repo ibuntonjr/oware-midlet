@@ -305,7 +305,8 @@ public final class OwareScreen extends BoardGameScreen {
 		if (BoardGameApp.precalculate) {
 			mtt = new MinimaxTimerTask();
 		}
-		final OwareMove computerMove = (OwareMove)computerTurn(move);
+		final OwareMove computerMove = (OwareMove)computerTurn(
+				(OwareGame)BoardGameScreen.rgame, move);
 		//#ifdef DLOGGING
 //@		if (finerLoggable) {logger.finer("nextTurn computerMove.row,computerMove.col,BoardGameScreen.actPlayer=" + ((computerMove == null) ? "computerMoves null" : (computerMove.row + "," + computerMove.col)) + "," + BoardGameScreen.actPlayer);}
 		//#endif
@@ -455,6 +456,7 @@ public final class OwareScreen extends BoardGameScreen {
 //@			if (finerLoggable) {logger.finer("processMove return move.row,move.col,BoardGameScreen.actPlayer,startForeThinking,tables.length=" + move.row + "," + move.col + "," + BoardGameScreen.actPlayer + "," + startForeThinking + "," + ((tables == null) ? "tables is null" : String.valueOf(tables.length)));}
 			//#endif
 			super.wakeup(3);
+			Thread.currentThread().yield();
 		}
   }
 
