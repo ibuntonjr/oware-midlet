@@ -169,7 +169,12 @@ public abstract class GameApp extends Application {
 			final String gval = super.readAppProperty(GRAPHICS_PROPERY, "true");
 			GameApp.graphics = gval.equals("true");
 			BaseApp.messages = BaseApp.readStrings(GameApp.RES_MSGS);
-			if (GameApp.graphics) {
+			//#ifdef DMIDP20
+			if (GameApp.graphics)
+			//#else
+//@			if (false)
+			//#endif
+			{
 				BaseApp.icons = BaseApp.splitImages(GameApp.RES_MENUICON, 9, 12, 12);
 			} else {
 				BaseApp.icons = new Image[9];
