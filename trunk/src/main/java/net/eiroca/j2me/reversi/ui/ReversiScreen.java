@@ -94,9 +94,11 @@ public final class ReversiScreen extends BoardGameScreen {
 
   public void init() {
 		try {
-			BoardGameScreen.table = new ReversiTable(
-					BoardGameApp.gsRow[BoardGameApp.PD_CURR],
-					BoardGameApp.gsCol[BoardGameApp.PD_CURR]);
+			synchronized (this) {
+				BoardGameScreen.table = new ReversiTable(
+						BoardGameApp.gsRow[BoardGameApp.PD_CURR],
+						BoardGameApp.gsCol[BoardGameApp.PD_CURR]);
+			}
 			super.init();
 			//#ifdef DLOGGING
 //@			if (finestLoggable) {tableDraws = 2;}
@@ -109,7 +111,7 @@ public final class ReversiScreen extends BoardGameScreen {
 		}
   }
 
-  protected void drawPiece(final int row, final int col, final int player,
+  protected void drawPiece(BoardGameTable bgt, final int row, final int col, final int player,
 			boolean onBoard, Image cupImage, int yadjust, int lastMovePoint) {
 		final int x = off_x + col * sizex + piece_offx;
 		int y = off_y + row * sizey + piece_offy + yadjust;
@@ -130,7 +132,7 @@ public final class ReversiScreen extends BoardGameScreen {
 		if (lastMovePoint > 0) {
       screen.setColor(BoardGameScreen.COLOR_FG);
 			screen.fillRect(x, y + (pieceHeight / 2) +
-					(pieceHeight / ((ReversiTable)BoardGameScreen.table).nbrRow),
+					(pieceHeight / bgt.nbrRow),
 											pieceWidth, (pieceHeight / 4));
 			//#ifdef DLOGGING
 //@			if ((drawItems || (tableDraws-- > 0)) && finestLoggable) {logger.finest("drawPiece line row,col=" + row + "," + col);}
@@ -138,7 +140,7 @@ public final class ReversiScreen extends BoardGameScreen {
 		}
   }
 
-  protected void drawTable() {
+  protected void drawTable(BoardGameTable bgt) {
 		try {
 			//#ifdef DLOGGING
 //@			if ((tableDraws-- > 0) && finestLoggable) {drawItems = true;logger.finest("drawTable up BoardGameScreen.actPlayer=" + BoardGameScreen.actPlayer);}
@@ -146,22 +148,22 @@ public final class ReversiScreen extends BoardGameScreen {
 			pnums[0] = 0;
 			pnums[1] = 0;
 			int item;
-			for (int i = 0; i < table.nbrRow; ++i) {
-				for (int j = 0; j < table.nbrCol; ++j) {
-					item = BoardGameScreen.table.getItem(i, j);
+			for (int i = 0; i < bgt.nbrRow; ++i) {
+				for (int j = 0; j < bgt.nbrCol; ++j) {
+					item = bgt.getItem(i, j);
 					if (item != 0) {
 						int lastCol = -10;
 						int lastRow = -10;
 						ReversiMove clastMove =
-							(ReversiMove)BoardGameScreen.table.getLastMove(item - 1);
+							(ReversiMove)bgt.getLastMove(item - 1);
 						// Invalid move with row/col = max nbr row/col, it is off the
 						// table.  Highlight in vertical info.
 						if ((clastMove != null) &&
-								clastMove.valid(BoardGameScreen.table, clastMove)) {
+								clastMove.valid(bgt, clastMove)) {
 							lastRow = clastMove.row;
 							lastCol = clastMove.col;
 						}
-						drawPiece(i, j, item, true, (item == 1) ? piece1Image : piece2Image,
+						drawPiece(bgt, i, j, item, true, (item == 1) ? piece1Image : piece2Image,
 								0, ((i == lastRow) && (j == lastCol)) ? 1 : 0);
 						pnums[item - 1]++;
 					}
@@ -183,40 +185,40 @@ public final class ReversiScreen extends BoardGameScreen {
 		}
   }
 
-  public void drawVertInfo() {
+  public void drawVertInfo(BoardGameTable bgt) {
     // two pieces
-		drawVertPiece(0, BoardGameScreen.table.nbrCol, 1,
+		drawVertPiece(bgt, 0, bgt.nbrCol, 1,
 				((BoardGameApp.gsFirst == 0) ? piece2Image : piece1Image), 0);
 		if (BoardGameScreen.actPlayer == 0) {
-			drawSelectionBox(BoardGameScreen.table.nbrCol, 0, 0);
+			drawSelectionBox(bgt.nbrCol, 0, 0);
 		}
-		drawVertPiece(BoardGameScreen.table.nbrRow - 1, BoardGameScreen.table.nbrCol, 2,
+		drawVertPiece(bgt, bgt.nbrRow - 1, bgt.nbrCol, 2,
 				((BoardGameApp.gsFirst == 1) ? piece2Image : piece1Image), 0); /* y, x */
 		if (BoardGameScreen.actPlayer == 1) {
-			drawSelectionBox(BoardGameScreen.table.nbrCol,
-					BoardGameScreen.table.nbrRow - 1, 0);
+			drawSelectionBox(bgt.nbrCol,
+					bgt.nbrRow - 1, 0);
 		}
     // numbers
     screen.setColor(BaseApp.foreground);
     screen.drawString(infoLines[0], width + vertWidth, off_y + sizey + 2, Graphics.TOP | Graphics.RIGHT);
     screen.drawString(infoLines[1], width + vertWidth, off_y +
-				((BoardGameScreen.table.nbrRow - 1)  * sizey),
+				((bgt.nbrRow - 1)  * sizey),
 				Graphics.BOTTOM | Graphics.RIGHT);
     // active player
-    screen.fillRect((BoardGameScreen.table.nbrRow + 1) * sizex - sizex / 2,
-				off_y + sizey / 2 + BoardGameScreen.getActPlayer() * (BoardGameScreen.table.nbrRow - 1) * sizey, 2, 2);
+    screen.fillRect((bgt.nbrRow + 1) * sizex - sizex / 2,
+				off_y + sizey / 2 + BoardGameScreen.getActPlayer() * (bgt.nbrRow - 1) * sizey, 2, 2);
     // skill
     if (infoLines[2] != null) {
       screen.drawString(infoLines[2], width + vertWidth, screenHeight / 2, Graphics.BASELINE | Graphics.RIGHT);
     }
   }
 
-  protected void drawVertPiece(final int row, final int col, final int player,
-			Image cupImage, int yadjust) {
+  protected void drawVertPiece(BoardGameTable bgt, final int row, final int col,
+			final int player, Image cupImage, int yadjust) {
 		ReversiMove clastMove =
-			(ReversiMove)BoardGameScreen.table.getLastMove(player - 1);
-		drawPiece(row, col, player, false, cupImage, yadjust,
-				((clastMove == null) ? 0 : (clastMove.valid(BoardGameScreen.table, clastMove) ? 0 : 1))); /* y, x */
+			(ReversiMove)bgt.getLastMove(player - 1);
+		drawPiece(bgt, row, col, player, false, cupImage, yadjust,
+				((clastMove == null) ? 0 : (clastMove.valid(bgt, clastMove) ? 0 : 1))); /* y, x */
 	}
 
   public void nextTurn(final int row, final int col) {
@@ -254,7 +256,7 @@ public final class ReversiScreen extends BoardGameScreen {
 			}
       ReversiMove computerMove = (ReversiMove)computerTurn(
 					new ReversiGame((ReversiGame)BoardGameScreen.rgame,
-						BoardGameScreen.table), move);
+						(ReversiTable)BoardGameScreen.table), move);
       if (computerMove == null) {
 				computerMove = (ReversiMove)((ReversiTable)BoardGameScreen.table).getEmptyMove();
 				computerMove.row = ((ReversiTable)BoardGameScreen.table).nbrRow;
@@ -318,7 +320,7 @@ public final class ReversiScreen extends BoardGameScreen {
 				/* Show each move on the board separately. */
 				synchronized (this) {
 					for (int i = 0; i < tables.length; ++i) {
-						BoardGameScreen.table = (ReversiTable) tables[i];
+						BoardGameScreen.table = (ReversiTable)tables[i];
 						if (i < tables.length - 1) {
 							try {
 								super.wakeup(3);
@@ -331,7 +333,9 @@ public final class ReversiScreen extends BoardGameScreen {
 					}
 				}
 				boolean nonPass = false;
-				BoardGameScreen.table = newTable;
+				synchronized (this) {
+					BoardGameScreen.table = newTable;
+				}
 				BoardGameScreen.rgame.saveLastTable(BoardGameScreen.table,
 						BoardGameScreen.actPlayer, BoardGameScreen.turnNum);
 				//#ifdef DLOGGING
