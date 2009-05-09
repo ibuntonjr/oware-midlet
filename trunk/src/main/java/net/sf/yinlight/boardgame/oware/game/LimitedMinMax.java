@@ -43,6 +43,8 @@ import net.eiroca.j2me.game.tpg.TwoPlayerGame;
 	*/
 public class LimitedMinMax extends GameMinMax {
 
+	Thread cthread = Thread.currentThread();
+
 	//#ifdef DLOGGING
 //@	private Logger logger = Logger.getLogger("LimitedMinMax");
 //@	private boolean fineLoggable = logger.isLoggable(Level.FINE);
@@ -127,6 +129,13 @@ public class LimitedMinMax extends GameMinMax {
 					}
 					else {
 						kMove = null;
+					}
+					cthread.yield();
+					synchronized(this) {
+						try {
+							wait(1L);
+						} catch (InterruptedException e) {
+						}
 					}
 					actMove = minimax(depth - 1, newState, (byte) (1 - player), tpg, alphabeta, -maxPoint, order, kill, kMove);
 					if (actMove == null) { return null; }
