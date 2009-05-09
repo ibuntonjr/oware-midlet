@@ -46,6 +46,8 @@ public final class OwareMinMax extends GameMinMax {
 	/* Array of heuristics.  Each elmement is a different skill level. */
 	static private OwareHeuristic[] heuristics = new OwareHeuristic[256];
 	static private int gheuristic = 0;
+	Thread cthread = Thread.currentThread();
+
 
 	//#ifdef DLOGGING
 	private Logger logger = Logger.getLogger("OwareMinMax");
@@ -123,6 +125,13 @@ public final class OwareMinMax extends GameMinMax {
 					if (finerLoggable) {logger.finer("alphabetaPly recursive i,row,col,depth - 1,player,heuristic,bestmax,bestmin=" + i + ",(" + pMoves[i].row + "," + pMoves[i].col + ")," + (depth - 1) + "," + player + "," + heuristic + "," + bestmax + "," + bestmin);}
 					//#endif
 
+					cthread.yield();
+					synchronized(this) {
+						try {
+							wait(1L);
+						} catch (InterruptedException e) {
+						}
+					}
 					OwareMove tmpmove = alphabetaPly( depth - 1, testTable,
 							(byte) (1 - player), g, heuristic, bestmax, bestmin);
 					if (tmpmove == null) {
