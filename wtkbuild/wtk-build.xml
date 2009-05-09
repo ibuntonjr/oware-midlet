@@ -1300,6 +1300,10 @@
 		</antcall>
 	</target>
 
+	<target name="dist.midp.1.0.reversi" unless="no.1.0.reversi" depends="prepare.reversi" >
+		<antcall target="dist.midp.1.0" inheritAll="yes" />
+	</target>
+
 	<target name="dist.midp.1.0.large" unless="no.1.0.large" >
 		<antcall target="dist.version" inheritAll="yes" >
 			<param name="wtk.properties" value="wtk1.0large.properties${wtk.template}" />
