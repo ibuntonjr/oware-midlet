@@ -102,10 +102,12 @@ public final class OwareScreen extends BoardGameScreen {
 
   public void init() {
 		try {
-			BoardGameScreen.table = new OwareTable(BoardGameApp.gsRow[BoardGameApp.PD_CURR],
-					BoardGameApp.gsCol[BoardGameApp.PD_CURR],
-					BoardGameApp.gsNbrPlayers[BoardGameApp.PD_CURR],
-					OwareMIDlet.gsInitSeeds[BoardGameApp.PD_CURR]);
+			synchronized (this) {
+				BoardGameScreen.table = new OwareTable(BoardGameApp.gsRow[BoardGameApp.PD_CURR],
+						BoardGameApp.gsCol[BoardGameApp.PD_CURR],
+						BoardGameApp.gsNbrPlayers[BoardGameApp.PD_CURR],
+						OwareMIDlet.gsInitSeeds[BoardGameApp.PD_CURR]);
+			}
 			super.init();
 			//#ifdef DLOGGING
 			if (finestLoggable) {tableDraws = 2;}
@@ -128,10 +130,10 @@ public final class OwareScreen extends BoardGameScreen {
    * @param player
    * @param onBoard
    */
-  protected void drawPiece(final int row, final int col, final int player,
+  protected void drawPiece(BoardGameTable bgt, final int row, final int col, final int player,
 			boolean onBoard, Image cupImage, int yadjust, int lastMovePoint) {
 		try {
-			OwareTable ot = (OwareTable)BoardGameScreen.table;
+			OwareTable ot = (OwareTable)bgt;
 			final int x = off_x + col * sizex + piece_offx;
 			int y = off_y + row * sizey + piece_offy + yadjust;
 			if (y < 0) {
@@ -178,23 +180,23 @@ public final class OwareScreen extends BoardGameScreen {
 		}
   }
 
-  protected void drawTable() {
+  protected void drawTable(BoardGameTable bgt) {
 		try {
 			//#ifdef DLOGGING
 			if ((tableDraws-- > 0) && finestLoggable) {drawItems = true;logger.finest("drawTable BoardGameScreen.actPlayer=" + BoardGameScreen.actPlayer);}
 			//#endif
-			OwareTable ot = (OwareTable)BoardGameScreen.table;
+			OwareTable ot = (OwareTable)bgt;
 
 			int item;
-			for (int i = 0; i < BoardGameScreen.table.nbrRow; ++i) {
-				for (int j = 0; j < BoardGameScreen.table.nbrCol; ++j) {
-					item = BoardGameScreen.table.getItem(i, j);
+			for (int i = 0; i < ot.nbrRow; ++i) {
+				for (int j = 0; j < ot.nbrCol; ++j) {
+					item = ot.getItem(i, j);
 					if (item != 0) {
 						int lastCol = -10;
 						int lastRow = -10;
 						int lastPoint = 10;
 						OwareMove clastMove =
-							(OwareMove)BoardGameScreen.table.getLastMove(item - 1);
+							(OwareMove)ot.getLastMove(item - 1);
 						if (clastMove != null) {
 							lastRow = clastMove.row;
 							lastCol = clastMove.col;
@@ -203,12 +205,12 @@ public final class OwareScreen extends BoardGameScreen {
 						//#ifdef DTEST
 						if (debug) {System.out.println("drawTable item=" + item);}
 						//#endif
-						drawPiece(i, j, item, true, (item == 1) ? piece1Image : piece2Image,
+						drawPiece(bgt, i, j, item, true, (item == 1) ? piece1Image : piece2Image,
 								0, ((i == lastRow) && (j == lastCol)) ? lastPoint : 0);
 					}
 				}
 			}
-			for (int i = 0; i < BoardGameScreen.table.nbrPlayers; ++i) {
+			for (int i = 0; i < ot.nbrPlayers; ++i) {
 				infoLines[i] = " " + Integer.toString(ot.getPoint((byte)i));
 			}
 		} catch (Throwable e) {
@@ -225,37 +227,37 @@ public final class OwareScreen extends BoardGameScreen {
 		}
   }
 
-  public void drawVertInfo() {
+  public void drawVertInfo(BoardGameTable bgt) {
 		try {
 			// two pieces
-			drawPiece(0, BoardGameScreen.table.nbrCol, 1, false,
+			drawPiece(bgt, 0, bgt.nbrCol, 1, false,
 					((BoardGameScreen.actPlayer == 0) ? piece2Image : piece1Image), 0, 0); /* y, x */
 			if (BoardGameScreen.actPlayer == 0) {
-				drawSelectionBox(BoardGameScreen.table.nbrCol, 0, 0);
+				drawSelectionBox(bgt.nbrCol, 0, 0);
 			}
 			// FIX
 			int cadjust = -pieceHeight - piece_offy;
-			drawPiece(BoardGameScreen.table.nbrRow, BoardGameScreen.table.nbrCol,
+			drawPiece(bgt, bgt.nbrRow, bgt.nbrCol,
 					0, false,
 					((BoardGameScreen.actPlayer == 1) ? piece2Image : piece1Image),
 					cadjust, 0); /* y, x */
 			if (BoardGameScreen.actPlayer == 1) {
-				drawSelectionBox(BoardGameScreen.table.nbrCol,
-						BoardGameScreen.table.nbrRow - 1, 0);
+				drawSelectionBox(bgt.nbrCol,
+						bgt.nbrRow - 1, 0);
 			}
 			// numbers
 			screen.setColor(BaseApp.foreground);
 			screen.drawString(infoLines[0],
 					width + vertWidth, off_y + pieceHeight + 1 + piece_offy,
 					Graphics.TOP | Graphics.RIGHT);
-			cadjust = off_y + cadjust + (BoardGameScreen.table.nbrRow * sizey) - 1;
+			cadjust = off_y + cadjust + (bgt.nbrRow * sizey) - 1;
 			screen.drawString(infoLines[1], width + vertWidth,
 					 cadjust, Graphics.BOTTOM | Graphics.RIGHT);
 			// active player screen.
 			// FIX if height problem as we could put the image in this square
 			if (turnImage == null) {
 				screen.drawRect(width + vertWidth - sizex,
-						off_y + BoardGameScreen.getActPlayer() * ((BoardGameScreen.table.nbrRow - 1) * sizey), sizex, sizey);
+						off_y + BoardGameScreen.getActPlayer() * ((bgt.nbrRow - 1) * sizey), sizex, sizey);
 			}
 			cadjust -= (2 * fontHeight) - 2;
 			// skill
@@ -369,9 +371,10 @@ public final class OwareScreen extends BoardGameScreen {
 
 				synchronized (this) {
 					for (int i = 0; i < tables.length; ++i) {
-						BoardGameScreen.table = (OwareTable) tables[i];
+						BoardGameScreen.table = (OwareTable)tables[i];
 						if (i < tables.length - 1) {
 							try {
+								super.wakeup(3);
 								wait(300);
 							}
 							catch (final InterruptedException e) {
@@ -382,7 +385,9 @@ public final class OwareScreen extends BoardGameScreen {
 				}
 				boolean nonPass = false;
 				/* Make current table the simulated move. */
-				BoardGameScreen.table = newTable;
+				synchronized (this) {
+					BoardGameScreen.table = newTable;
+				}
 				BoardGameScreen.rgame.saveLastTable(BoardGameScreen.table,
 						BoardGameScreen.actPlayer, BoardGameScreen.turnNum);
 				//#ifdef DLOGGING
