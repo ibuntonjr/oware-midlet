@@ -50,6 +50,7 @@ import net.eiroca.j2me.game.GameScreen;
 import net.eiroca.j2me.minesweeper.game.MineInfo;
 import net.eiroca.j2me.minesweeper.game.MineSweeperGame;
 import net.sf.yinlight.boardgame.oware.game.BoardGameScreen;
+import net.sf.yinlight.boardgame.oware.game.BoardGameTable;
 import net.sf.yinlight.boardgame.oware.game.BoardGameMove;
 
 //#ifdef DLOGGING
@@ -313,12 +314,12 @@ public final class MineSweeperScreen extends BoardGameScreen {
     }
   }
 
-  protected void drawPiece(final int row, final int col, final int player,
+  protected void drawPiece(final BoardGameTable bgt, final int row, final int col, final int player,
 			boolean onBoard, Image cupImage, int yadjust, int lastMovePoint) {
 		// UNDO MINE
 	}
 
-  protected void drawTable() {
+  protected void drawTable(BoardGameTable bgt) {
 		// UNDO MINE
 	}
 
