@@ -392,10 +392,16 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 			screen.setColor(BaseApp.background);
 			screen.fillRect(0, 0, screenWidth, screenHeight);
 			drawBoard();
-			drawTable();
-			drawSelectionBox(selx, sely, 0);
-			drawPossibleMoves();
-			drawVertInfo();
+			BoardGameTable bgt = null;
+			synchronized(this) {
+				bgt = BoardGameScreen.table;
+			}
+			if (bgt != null) {
+				drawTable(bgt);
+				drawSelectionBox(selx, sely, 0);
+				drawPossibleMoves();
+				drawVertInfo(bgt);
+			}
 			drawMessage();
 			//#ifdef DLOGGING
 			if (traceLoggable) {logger.trace("tick end true");}
@@ -548,7 +554,7 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
    * @param player
    * @param onBoard
    */
-  abstract protected void drawPiece(final int row, final int col, final int player,
+  abstract protected void drawPiece(final BoardGameTable bgt, final int row, final int col, final int player,
 			boolean onBoard, Image cupImage, int yadjust, int lastMovePoint);
 
 	protected void drawPossibleMoves() {
@@ -596,17 +602,17 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 				sizex - 2, sizey - 2);
 	}
 
-  abstract protected void drawTable();
+  abstract protected void drawTable(BoardGameTable bgt);
 
-  public void drawVertInfo() {
+  public void drawVertInfo(BoardGameTable bgt) {
 		try {
 			//#ifdef DLOGGING
 			if (finestLoggable) {logger.finest("drawVertInfo");}
 			//#endif
 			// two pieces
-			drawPiece(0, table.nbrCol, 1, false,
+			drawPiece(bgt, 0, bgt.nbrCol, 1, false,
 				((BoardGameApp.gsFirst == 0) ? piece2Image : piece1Image), 0, 0); /* y, x */
-			drawPiece(table.nbrRow - 1, table.nbrCol, 0, false,
+			drawPiece(bgt, bgt.nbrRow - 1, bgt.nbrCol, 0, false,
 				((BoardGameApp.gsFirst == 1) ? piece2Image : piece1Image),
 					sizey - pieceHeight, 0); /* y, x */
 			// numbers
@@ -615,13 +621,13 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 					width + vertWidth, off_y + cupHeight + 1 + piece_offy,
 					Graphics.TOP | Graphics.RIGHT);
 			screen.drawString(infoLines[1], width + vertWidth,
-					off_y + ((table.nbrRow - 1) * sizey) + cupHeight + 1 + piece_offy,
+					off_y + ((bgt.nbrRow - 1) * sizey) + cupHeight + 1 + piece_offy,
 					Graphics.BOTTOM | Graphics.RIGHT);
 			// active player screen.
 			// FIX if height problem as we could put the image in this square
 			if (turnImage == null) {
 				screen.drawRect(width + vertWidth - sizex,
-						off_y + BoardGameScreen.getActPlayer() * ((table.nbrRow - 1) * sizey), sizex, sizey);
+						off_y + BoardGameScreen.getActPlayer() * ((bgt.nbrRow - 1) * sizey), sizex, sizey);
 			}
 			// skill
 			// Put at middle of height.
@@ -1163,7 +1169,9 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 				e.printStackTrace();
 				throw e;
 			}
-			BoardGameScreen.table = BoardGameScreen.table.getBoardGameTable(b, offset);
+			synchronized (this) {
+				BoardGameScreen.table = BoardGameScreen.table.getBoardGameTable(b, offset);
+			}
 			return offset;
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -1249,7 +1257,9 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 			//#ifdef DLOGGING
 			if (finestLoggable) {logger.finest("undoTable human check BoardGameScreen.actPlayer,BoardGameScreen.turnNum=" + BoardGameScreen.actPlayer + "," + BoardGameScreen.turnNum);}
 			//#endif
-			BoardGameScreen.table = (BoardGameTable)BoardGameScreen.rgame.getTable();
+			synchronized (this) {
+				BoardGameScreen.table = (BoardGameTable)BoardGameScreen.rgame.getTable();
+			}
 			updatePossibleMoves();
 			return true;
 		}
@@ -1312,7 +1322,9 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 				}
 				BoardGameScreen.actPlayer = (byte) (1 - BoardGameScreen.actPlayer);
 			}
-			BoardGameScreen.table = (BoardGameTable)BoardGameScreen.rgame.getTable();
+			synchronized (this) {
+				BoardGameScreen.table = (BoardGameTable)BoardGameScreen.rgame.getTable();
+			}
 			updatePossibleMoves();
 			return true;
 		}
