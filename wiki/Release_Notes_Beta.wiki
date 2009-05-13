@@ -160,6 +160,43 @@
   * Allow ignoring key codes in the JAD file.
   * Put store of board, in it's own method.
 
+=0.1.3 2009-05-04 Beta 1 Version=
+  * More logging.
+  * More comments.
+  * Support repeat (another turn) if seed lands in store.
+  * Allow 9 seeds / hole to start.
+  * Optional starting at the first hole or the next hole.
+  * Optional skip initial hole or sow in it after going around the board.
+  * Optional sow in the store.
+  * Fix messages with a specified delay not being shown.
+  * Ignore some keys to allow screen shots or customization.
+  * Fix highlighting of players store.
+  * Shorten time that message is shown.
+  * Fix Reversi A.I. so that it uses heuristic vs only actual points.
+  * Add target for MIDP 2.0, CLDC 1.1, JSR-75, JSR-85, JSR-135, and JSR-184.
+  * Copy table with game for better A.I.
+  * Fix index out of range for A.I.
+  * Change evaluate to use parameter's point to prevent corruption of score.
+  * Show pass if last move by putting black bar over pieces on the side.
+  * Use pass if there is no computer move.
+  * Allow multiple passes.
+  * Make sure that rPlayer is copied.  End game if pass is >= 2 to make sure that we do not end if pass is > 2.
+  * Fix target to copy resources for English to replace midlet vers and prog vers with actual midlet/prog vers.
+  * Use more more parameters for isGameEnded as it is more accurate.
+
+=0.1.4 2009-05-08 Beta 1 Version=
+  * More logging.
+  * Minor performance improvement in calculating best move.
+  * Wake up after each move to show the pieces flipping.
+  * Fix MIDP 1.0 program failing after splash screen on Sony T637.
+  * Change logging to not write out string version of the table.
+  * Fix skill levels going up by 2 instead of 1.
+  * Build file changes to simplify targets.  
+  * Try to show move and thinking message after move.  Sometimes, for higher levels, this is not shown.
+  * Get value of table synchronized so that we can avoid contention.
+  * Put in small wait to help threads other than turn/A.I. get time.
+  * Add target for MIDP 1.0 reversi for testing on MIDP 1.0.
+
 Issues:
 
 Highlighting of lower player is not the right place for Oware.
