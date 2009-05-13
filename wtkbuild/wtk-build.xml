@@ -151,6 +151,7 @@
 			<property name="no.2.0.jsr135" value="true" />
 			<property name="no.2.0.cldc.1.1.jsr75" value="true" />
 			<property name="no.2.0.cldc.1.1.jsr135" value="true" />
+			<property name="no.2.0.cldc.1.1.jsr75.jsr82.jsr135.jsr184" value="true" />
 			<property name="no.2.0.jsr238" value="true" />
 	</target>
 
