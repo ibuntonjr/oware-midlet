@@ -29,8 +29,8 @@ public class CustomLevelForm extends FeatureForm {
   private final TextField tBomb;
 
   public CustomLevelForm() {
-    super(BaseApp.messages[MineSweeper.MSG_CUSTOMLEVEL]);
-    tBomb = new TextField(BaseApp.messages[MineSweeper.MSG_CL_BOMBS], "", 2, TextField.NUMERIC);
+    super(BaseApp.messages[AppConstants.MSG_CUSTOMLEVEL]);
+    tBomb = new TextField(BaseApp.messages[AppConstants.MSG_CL_BOMBS], "", 2, TextField.NUMERIC);
     append(tBomb);
   }
 
