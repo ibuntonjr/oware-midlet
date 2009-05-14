@@ -230,6 +230,9 @@ abstract public class BoardGameApp extends GameApp {
 			if (first) {
 				bsavedRec = ((BoardGameScreen)game).getSavedGameRecord();
 			}
+			//#ifdef DLOGGING
+//@			logger.info("BaseApp.messages[AppConstants.MSG_BOARDAPP_USERDEF - 1]=" + BaseApp.messages[AppConstants.MSG_BOARDAPP_USERDEF - 1]);
+			//#endif
 			prepGameMenu(bsavedRec.length > 0);
 		} catch (Throwable e) {
 			e.printStackTrace();
