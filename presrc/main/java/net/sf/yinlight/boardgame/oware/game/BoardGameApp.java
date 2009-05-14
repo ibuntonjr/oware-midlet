@@ -84,45 +84,6 @@ abstract public class BoardGameApp extends GameApp {
   public static String GRAPHICS_PRECALCULATE = "boardgame-precalculate";
   public static boolean precalculate = true;
   public static String storeName = "BOARD_GAME_STORE";
-  public static short msgOffset = 0;
-  final public static short MSG_MENU_MAIN_UNDO = (short)(GameApp.MSG_USERDEF + msgOffset++);
-  final public static short MSG_MENU_MAIN_REDO = (short)(GameApp.MSG_USERDEF + msgOffset++);
-  final public static short MSG_MENU_MAIN_ENDGAME = (short)(GameApp.MSG_USERDEF + msgOffset++);
-  final public static short MSG_MENU_MAIN_PAUSE = (short)(GameApp.MSG_USERDEF + msgOffset++);
-  final public static short MSG_MENU_MAIN_TEST_ENDGAME = (short)(GameApp.MSG_USERDEF + msgOffset++);
-  final public static short MSG_MENU_MAIN_TEST = (short)(GameApp.MSG_USERDEF + msgOffset++);
-  final public static short MSG_MENU_MAIN_LOGGING = (short)(GameApp.MSG_USERDEF + msgOffset++);
-  final public static short MSG_MENU_OPTIONS_DEAULT = (short)(GameApp.MSG_USERDEF + msgOffset++);
-  final public static int MSG_GAMEMODE = GameApp.MSG_USERDEF + msgOffset++;
-  final public static int MSG_GAMEMODE1 = GameApp.MSG_USERDEF + msgOffset++;
-  final public static int MSG_GAMEMODE2 = GameApp.MSG_USERDEF + msgOffset++;
-  final public static int MSG_AILEVEL = GameApp.MSG_USERDEF + msgOffset++; //A.I. Difficulty
-  final public static int MSG_AILEVEL1 = GameApp.MSG_USERDEF + msgOffset++;
-  final public static int MSG_AILEVEL2 = GameApp.MSG_USERDEF + msgOffset++;
-	// FIX use messages for numbers
-  final public static int MSG_AILEVEL3 = GameApp.MSG_USERDEF + msgOffset++;
-  final public static int MSG_AILEVEL4 = GameApp.MSG_USERDEF + msgOffset++; // 10
-  final public static int MSG_SKILL_LEVEL = GameApp.MSG_USERDEF + msgOffset++; // 10
-  final public static int MSG_NAMEPLAYER1 = GameApp.MSG_USERDEF + msgOffset++;
-  final public static int MSG_NAMEPLAYER2 = GameApp.MSG_USERDEF + msgOffset++;
-  final public static int MSG_ROW = GameApp.MSG_USERDEF + msgOffset++;
-  final public static int MSG_COL = GameApp.MSG_USERDEF + msgOffset++;
-  final public static int MSG_NBR_PLAYERS = GameApp.MSG_USERDEF + msgOffset++;
-  final public static int MSG_GOODLUCK = GameApp.MSG_USERDEF + msgOffset++;
-  final public static int MSG_THINKING = GameApp.MSG_USERDEF + msgOffset++;
-  final public static int MSG_INVALIDMOVE = GameApp.MSG_USERDEF + msgOffset++;
-  final public static int MSG_EXTRAMOVE = GameApp.MSG_USERDEF + msgOffset++;
-  final public static int MSG_WONCOMPUTER = GameApp.MSG_USERDEF + msgOffset++;
-  final public static int MSG_HUMANWON = GameApp.MSG_USERDEF + msgOffset++;
-  final public static int MSG_PLAYERWON = GameApp.MSG_USERDEF + msgOffset++;
-  final public static int MSG_DRAW = GameApp.MSG_USERDEF + msgOffset++;
-  final public static int MSG_HUMAN = GameApp.MSG_USERDEF + msgOffset++;
-  final public static int MSG_COMPUTER = GameApp.MSG_USERDEF + msgOffset++;
-  final public static int MSG_PASS = GameApp.MSG_USERDEF + msgOffset++;
-  final public static short MSG_SURE_END = (short)(GameApp.MSG_USERDEF + msgOffset++);
-  final public static int MSG_LEVELPREFIX = GameApp.MSG_USERDEF + msgOffset++;
-  final public static int MSG_USERDEF = GameApp.MSG_USERDEF + msgOffset + 2;
-  final public static int MSG_MINE_USERDEF = AppConstants.MSG_REVERSI_USERDEF;
 
   public static int ACTION_OFFSET = 0;
   public static final int GA_UNDO = GameApp.GA_USERDEF + 0;
@@ -219,36 +180,36 @@ abstract public class BoardGameApp extends GameApp {
 		fineLoggable = logger.isLoggable(Level.FINE);
 		finestLoggable = logger.isLoggable(Level.FINEST);
 		traceLoggable = logger.isLoggable(Level.TRACE);
-		logger.info("BoardGameApp.MSG_USERDEF=" + BoardGameApp.MSG_USERDEF);
+		logger.info("AppConstants.MSG_GAMEAPP_USERDEF=" + AppConstants.MSG_GAMEAPP_USERDEF);
 		logger.info("AppConstants.MSG_OWARE_USERDEF=" + AppConstants.MSG_OWARE_USERDEF);
 		logger.info("AppConstants.MSG_REVERSI_USERDEF=" + AppConstants.MSG_REVERSI_USERDEF);
 		//#endif
     BaseApp.menu = new short[][] {
         {
-            GameApp.ME_MAINMENU, GameApp.MSG_MENU_MAIN_CONTINUE, GameApp.GA_CONTINUE, 0
+            GameApp.ME_MAINMENU, AppConstants.MSG_MENU_MAIN_CONTINUE, GameApp.GA_CONTINUE, 0
         }, {
-            GameApp.ME_MAINMENU, GameApp.MSG_MENU_MAIN_NEWGAME, GameApp.GA_NEWGAME, 1
+            GameApp.ME_MAINMENU, AppConstants.MSG_MENU_MAIN_NEWGAME, GameApp.GA_NEWGAME, 1
         }, {
-            GameApp.ME_MAINMENU, BoardGameApp.MSG_MENU_MAIN_UNDO, (short)BoardGameApp.GA_UNDO, 7
+            GameApp.ME_MAINMENU, AppConstants.MSG_MENU_MAIN_UNDO, (short)BoardGameApp.GA_UNDO, 7
         }, {
-            GameApp.ME_MAINMENU, BoardGameApp.MSG_MENU_MAIN_REDO, (short)BoardGameApp.GA_REDO, 8
+            GameApp.ME_MAINMENU, AppConstants.MSG_MENU_MAIN_REDO, (short)BoardGameApp.GA_REDO, 8
         }, {
-            GameApp.ME_MAINMENU, BoardGameApp.MSG_MENU_MAIN_ENDGAME, (short)BoardGameApp.GA_ENDGAME, -1, MSG_SURE_END
+            GameApp.ME_MAINMENU, AppConstants.MSG_MENU_MAIN_ENDGAME, (short)BoardGameApp.GA_ENDGAME, -1, AppConstants.MSG_SURE_END
 	//#ifdef DTEST
         }, {
-            GameApp.ME_MAINMENU, BoardGameApp.MSG_MENU_MAIN_TEST_ENDGAME, (short)BoardGameApp.GA_TEST_ENDGAME, -1
+            GameApp.ME_MAINMENU, AppConstants.MSG_MENU_MAIN_TEST_ENDGAME, (short)BoardGameApp.GA_TEST_ENDGAME, -1
         }, {
-            GameApp.ME_MAINMENU, BoardGameApp.MSG_MENU_MAIN_TEST, (short)BoardGameApp.GA_TEST, 0
+            GameApp.ME_MAINMENU, AppConstants.MSG_MENU_MAIN_TEST, (short)BoardGameApp.GA_TEST, 0
 		//#endif
         }, {
-            GameApp.ME_MAINMENU, GameApp.MSG_MENU_MAIN_OPTIONS, GameApp.GA_OPTIONS, 4
+            GameApp.ME_MAINMENU, AppConstants.MSG_MENU_MAIN_OPTIONS, GameApp.GA_OPTIONS, 4
         }, {
-            GameApp.ME_MAINMENU, GameApp.MSG_MENU_MAIN_HELP, GameApp.GA_HELP, 5
+            GameApp.ME_MAINMENU, AppConstants.MSG_MENU_MAIN_HELP, GameApp.GA_HELP, 5
         }, {
-            GameApp.ME_MAINMENU, GameApp.MSG_MENU_MAIN_ABOUT, GameApp.GA_ABOUT, 6
+            GameApp.ME_MAINMENU, AppConstants.MSG_MENU_MAIN_ABOUT, GameApp.GA_ABOUT, 6
 				//#ifdef DLOGGING
         }, {
-            GameApp.ME_MAINMENU, BoardGameApp.MSG_MENU_MAIN_LOGGING, (short)BoardGameApp.GA_LOGGING, -1
+            GameApp.ME_MAINMENU, AppConstants.MSG_MENU_MAIN_LOGGING, (short)BoardGameApp.GA_LOGGING, -1
 				//#endif
         }
     };
@@ -269,6 +230,9 @@ abstract public class BoardGameApp extends GameApp {
 			if (first) {
 				bsavedRec = ((BoardGameScreen)game).getSavedGameRecord();
 			}
+			//#ifdef DLOGGING
+			logger.info("BaseApp.messages[AppConstants.MSG_BOARDAPP_USERDEF - 1]=" + BaseApp.messages[AppConstants.MSG_BOARDAPP_USERDEF - 1]);
+			//#endif
 			prepGameMenu(bsavedRec.length > 0);
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -293,7 +257,7 @@ abstract public class BoardGameApp extends GameApp {
 		if (finestLoggable) {logger.finest("updGameScreen");}
 		//#endif
 		try {
-			Command cPause = BaseApp.newCommand(BoardGameApp.MSG_MENU_MAIN_PAUSE, Command.STOP, 1, BoardGameApp.GA_PAUSE);
+			Command cPause = BaseApp.newCommand(AppConstants.MSG_MENU_MAIN_PAUSE, Command.STOP, 1, BoardGameApp.GA_PAUSE);
 			bgs.addCommand(cPause);
 			//#ifdef DLOGGING
 			if (finestLoggable) {logger.finest("updGameScreen cPause=" + cPause);}
@@ -324,26 +288,26 @@ abstract public class BoardGameApp extends GameApp {
 
   protected Displayable getOptions() {
 		try {
-			final Form form = new FeatureForm(BaseApp.messages[GameApp.MSG_MENU_MAIN_OPTIONS]);
+			final Form form = new FeatureForm(BaseApp.messages[AppConstants.MSG_MENU_MAIN_OPTIONS]);
 			Command cdefault = new Command(
-					BaseApp.messages[BoardGameApp.MSG_MENU_OPTIONS_DEAULT],
+					BaseApp.messages[AppConstants.MSG_MENU_OPTIONS_DEAULT],
 					Command.SCREEN, 9);
 			form.addCommand(cdefault);
-			opPlayers = Application.createChoiceGroup(BoardGameApp.MSG_GAMEMODE,
+			opPlayers = Application.createChoiceGroup(AppConstants.MSG_GAMEMODE,
 					Choice.EXCLUSIVE, new int[] {
-			BoardGameApp.MSG_GAMEMODE1, BoardGameApp.MSG_GAMEMODE2});
+			AppConstants.MSG_GAMEMODE1, AppConstants.MSG_GAMEMODE2});
 			if (BoardGameApp.gsLevelMsg.length > 0) {
-				opLevel = Application.createChoiceGroup(BoardGameApp.MSG_AILEVEL,
+				opLevel = Application.createChoiceGroup(AppConstants.MSG_AILEVEL,
 						Choice.EXCLUSIVE, BoardGameApp.gsLevelMsg);
 			}
 			opDept = BoardGameApp.createNumRangePD(gsDepth,
-					BoardGameApp.MSG_SKILL_LEVEL);
+					AppConstants.MSG_SKILL_LEVEL);
 			opRow = BoardGameApp.createNumRangePD(gsRow,
-					BoardGameApp.MSG_ROW);
+					AppConstants.MSG_ROW);
 			opCol = BoardGameApp.createNumRangePD(gsCol,
-					BoardGameApp.MSG_COL);
+					AppConstants.MSG_COL);
 			opNbrPlayers = BoardGameApp.createNumRangePD(gsNbrPlayers,
-					BoardGameApp.MSG_NBR_PLAYERS);
+					AppConstants.MSG_NBR_PLAYERS);
 			//#ifdef DLOGGING
 			opLogLevel = new TextField("Logging level",
 							logger.getParent().getLevel().getName(), 20, TextField.ANY);
@@ -382,7 +346,7 @@ abstract public class BoardGameApp extends GameApp {
 	/*
   protected Displayable getTesting() {
 		try {
-			final Form form = new FeatureForm(BaseApp.messages[BoardGameApp.MSG_MENU_MAIN_TEST]);
+			final Form form = new FeatureForm(BaseApp.messages[AppConstants.MSG_MENU_MAIN_TEST]);
 			tstName = new TextField("Test name",
 							"", 80, TextField.ANY);
 			tstRow0 = new TextField("Input row 0 cups/total",
