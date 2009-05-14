@@ -62,10 +62,6 @@ public class MessageHandler implements MessageListener, StoreObserver {
       connection.setMessageListener(this);
     }
     catch (final IOException ioe) {
-			ioe.printStackTrace();
-			//#ifdef DLOGGING
-			logger.severe("init io error", ioe);
-			//#endif
       throw new MessageHandlerException(MessageHandlerException.ERR_OPENCONNECTION);
     }
   }
@@ -76,10 +72,6 @@ public class MessageHandler implements MessageListener, StoreObserver {
       connection.close();
     }
     catch (final IOException ioe) {
-			ioe.printStackTrace();
-			//#ifdef DLOGGING
-			logger.severe("done io error", ioe);
-			//#endif
       throw new MessageHandlerException(MessageHandlerException.ERR_CLOSECONNECTION);
     }
   }
@@ -156,16 +148,8 @@ public class MessageHandler implements MessageListener, StoreObserver {
       }
     }
     catch (final IOException ioe) {
-			ioe.printStackTrace();
-			//#ifdef DLOGGING
-			logger.severe("receive io error", ioe);
-			//#endif
     }
     catch (final StoreException sme) {
-			sme.printStackTrace();
-			//#ifdef DLOGGING
-			logger.severe("receive store error", sme);
-			//#endif
     }
   }
 
@@ -176,17 +160,10 @@ public class MessageHandler implements MessageListener, StoreObserver {
       address = addressBookStore.getByNumber(number, false);
     }
     catch (final StoreException e) {
-			e.printStackTrace();
-			//#ifdef DLOGGING
-			logger.severe("addressName store error", e);
-			//#endif
     }
     if (address != null) {
       number = address.name;
     }
-		//#ifdef DLOGGING
-		if (finestLoggable) {logger.finest("addressName number=" + number);}
-		//#endif
     return number;
   }
 
