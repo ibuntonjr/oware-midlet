@@ -301,7 +301,7 @@ public final class ReversiScreen extends BoardGameScreen {
 			tables = BoardGameScreen.rgame.animatedTurn(BoardGameScreen.table, BoardGameScreen.actPlayer, move, newTable);
 			boolean goodMove = (tables != null);
 			if (!goodMove) {
-				setMessage(BaseApp.messages[BoardGameApp.MSG_INVALIDMOVE], 60);
+				setMessage(BaseApp.messages[AppConstants.MSG_INVALIDMOVE], 60);
 				//#ifdef DLOGGING
 //@				if (finestLoggable) {logger.finest("processMove No valid move BoardGameScreen.actPlayer,=isHuman[BoardGameScreen.actPlayer])" + BoardGameScreen.actPlayer + "," + isHuman[BoardGameScreen.actPlayer]);}
 				//#endif
@@ -363,13 +363,13 @@ public final class ReversiScreen extends BoardGameScreen {
 									message = Reversi.playerNames[BoardGameScreen.actPlayer];
 								}
 								else {
-									message = BaseApp.messages[BoardGameApp.MSG_HUMAN];
+									message = BaseApp.messages[AppConstants.MSG_HUMAN];
 								}
 							}
 							else {
-								message = BaseApp.messages[BoardGameApp.MSG_COMPUTER];
+								message = BaseApp.messages[AppConstants.MSG_COMPUTER];
 							}
-							setMessage(message + BoardGameApp.MSG_PASS, 61);
+							setMessage(message + AppConstants.MSG_PASS, 61);
 							BoardGameScreen.table.setPassNum(BoardGameScreen.table.getPassNum() + 1);
 							// just to be sure
 							gMiniMax.clearPrecalculatedMoves();
