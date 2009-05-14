@@ -52,6 +52,7 @@ import net.sf.yinlight.boardgame.oware.game.ui.MinimaxTimerTask;
 import net.sf.yinlight.boardgame.oware.game.LimitedMinMax;
 import net.sf.yinlight.boardgame.oware.game.BoardGameApp;
 import com.substanceofcode.rssreader.presentation.FeatureMgr;
+import net.sf.yinlight.boardgame.oware.midlet.AppConstants;
 
 //#ifdef DLOGGING
 //@import net.sf.jlogmicro.util.logging.Logger;
@@ -372,7 +373,7 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 					(byte)(1 - BoardGameScreen.actPlayer), BoardGameScreen.turnNum);
 			updateSkillInfo();
 			updatePossibleMoves();
-			setMessage(BaseApp.messages[BoardGameApp.MSG_GOODLUCK]);
+			setMessage(BaseApp.messages[AppConstants.MSG_GOODLUCK]);
 			//#ifdef DLOGGING
 //@			if (finestLoggable) {logger.finest("isHuman[0],isHuman[1]=" + isHuman[0] + "," + isHuman[1]);}
 			//#endif
@@ -877,7 +878,7 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 
   public void updateSkillInfo() {
     if (!BoardGameScreen.twoplayer) {
-      infoLines[BoardGameScreen.table.nbrPlayers] = BaseApp.messages[BoardGameApp.MSG_LEVELPREFIX + BoardGameApp.gsLevel] + BoardGameApp.gsDepth[BoardGameApp.PD_CURR];
+      infoLines[BoardGameScreen.table.nbrPlayers] = BaseApp.messages[AppConstants.MSG_LEVELPREFIX + BoardGameApp.gsLevel] + BoardGameApp.gsDepth[BoardGameApp.PD_CURR];
     }
     else {
       infoLines[BoardGameScreen.table.nbrPlayers] = null;
@@ -887,7 +888,7 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
   protected BoardGameMove computerTurn(final TwoPlayerGame tpg, final BoardGameMove prevMove) {
     BoardGameMove move = (BoardGameMove) gMiniMax.precalculatedBestMove(prevMove);
     if (move == null) {
-      setMessage(BaseApp.messages[BoardGameApp.MSG_THINKING]);
+      setMessage(BaseApp.messages[AppConstants.MSG_THINKING]);
 			super.wakeup(3);
 			Thread.currentThread().yield();
       gMiniMax.cancel(false);
@@ -1013,17 +1014,17 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 			if (!BoardGameScreen.twoplayer &&
 					((firstWin && (BoardGameApp.gsFirst != 0)) ||
 					 (!firstWin && (BoardGameApp.gsFirst == 0)))) {
-				endMessage = BaseApp.messages[BoardGameApp.MSG_WONCOMPUTER];
+				endMessage = BaseApp.messages[AppConstants.MSG_WONCOMPUTER];
 			}
 			else if (result == TwoPlayerGame.DRAW) {
-				endMessage = BaseApp.messages[BoardGameApp.MSG_DRAW];
+				endMessage = BaseApp.messages[AppConstants.MSG_DRAW];
 			}
 			else {
 				if (BoardGameScreen.twoplayer) {
-					endMessage = BoardGameApp.playerNames[winner] + BaseApp.messages[BoardGameApp.MSG_PLAYERWON];
+					endMessage = BoardGameApp.playerNames[winner] + BaseApp.messages[AppConstants.MSG_PLAYERWON];
 				}
 				else {
-					endMessage = BaseApp.messages[BoardGameApp.MSG_HUMANWON];
+					endMessage = BaseApp.messages[AppConstants.MSG_HUMANWON];
 				}
 			}
 			endMessage += BoardGameScreen.NL + BoardGameApp.playerNames[0] + BoardGameScreen.SEP + firstNum + BoardGameScreen.NL + BoardGameApp.playerNames[1] + BoardGameScreen.SEP + secondNum;
