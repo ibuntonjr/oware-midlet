@@ -1,5 +1,7 @@
 /**
-	FIX reduce code for getImage
+ * FIX reduce code for getImage
+ * TODO use create choice e.g. GameUISettings
+ * TODO use effects for reversi.
  * Copyright (C) 2006-2008 eIrOcA (eNrIcO Croce & sImOnA Burzio)
  * Copyright (C) 2002 Eugene Morozov (xonixboy@hotmail.com)
  *
@@ -95,6 +97,7 @@ import javax.microedition.rms.RecordStoreException;
 import javax.microedition.rms.InvalidRecordIDException;
 import net.eiroca.j2me.game.GameApp;
 import net.eiroca.j2me.rms.Settings;
+import net.sf.yinlight.boardgame.oware.midlet.AppConstants;
 import com.substanceofcode.rssreader.presentation.FeatureForm;
 import com.substanceofcode.rssreader.presentation.FeatureList;
 import com.substanceofcode.rssreader.presentation.FeatureMgr;
@@ -104,6 +107,8 @@ import jmunit.framework.cldc10.TestSuite;
 //#endif
 //#ifdef DLOGGING
 import net.sf.jlogmicro.util.logging.Logger;
+import net.sf.jlogmicro.util.logging.LogManager;
+import net.sf.jlogmicro.util.logging.FormHandler;
 import net.sf.jlogmicro.util.logging.Level;
 //#endif
 
@@ -129,10 +134,10 @@ implements CommandListener
   public static final char LF = '\r';
 
   //#ifdef DLOGGING
-  private Logger logger = Logger.getLogger("BaseApp");
-  private boolean fineLoggable = logger.isLoggable(Level.FINE);
-  private boolean finestLoggable = logger.isLoggable(Level.FINEST);
-  private boolean traceLoggable = logger.isLoggable(Level.TRACE);
+  private Logger logger;
+  private boolean fineLoggable;
+  private boolean finestLoggable;
+  private boolean traceLoggable;
   //#endif
 
   /*
@@ -1409,7 +1414,7 @@ implements CommandListener
 			//#endif
       s.removeAllElements();
 			//#ifdef DTEST
-			for (int i = 0; i < GameApp.MSG_USERDEF * 10; i++) {
+			for (int i = 0; i < AppConstants.MSG_GAMEAPP_USERDEF * 10; i++) {
           s.addElement("No file found line " + i);
 			}
 			//#endif
@@ -1970,6 +1975,20 @@ implements CommandListener
 	//#ifdef DLARGEMEM
 	//#ifdef DJMTEST
   public BaseApp() {
+			//#ifdef DLOGGING
+			LogManager logManager = LogManager.getLogManager();
+			logManager.readConfiguration(this);
+			logger = Logger.getLogger("BaseApp");
+			for (Enumeration eHandlers = logger.getParent().getHandlers().elements();
+					eHandlers.hasMoreElements();) {
+				Object ohandler = eHandlers.nextElement();
+				if (ohandler instanceof FormHandler) {
+					Form oform = (Form)((FormHandler)ohandler).getView();
+					logger.finest("form=" + oform);
+				}
+			}
+			logger = Logger.getLogger("BaseApp");
+			//#endif
 	}
 	//#endif
 	//#endif
@@ -1989,6 +2008,20 @@ implements CommandListener
     Device.init();
     BaseApp.midlet = this;
     BaseApp.display = Display.getDisplay(this);
+		//#ifdef DLOGGING
+		LogManager logManager = LogManager.getLogManager();
+		logManager.readConfiguration(this);
+		logger = Logger.getLogger("BaseApp");
+		for (Enumeration eHandlers = logger.getParent().getHandlers().elements();
+				eHandlers.hasMoreElements();) {
+			Object ohandler = eHandlers.nextElement();
+			if (ohandler instanceof FormHandler) {
+				Form oform = (Form)((FormHandler)ohandler).getView();
+				logger.finest("form=" + oform);
+			}
+		}
+		logger = Logger.getLogger("BaseApp");
+		//#endif
   }
 
   public void commandAction(final Command cmd, final Item i) {
