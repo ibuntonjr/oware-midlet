@@ -23,6 +23,7 @@ import net.eiroca.j2me.minesweeper.MineSweeper;
 import javax.microedition.lcdui.TextField;
 import net.eiroca.j2me.app.BaseApp;
 import com.substanceofcode.rssreader.presentation.FeatureForm;
+import net.sf.yinlight.boardgame.oware.midlet.AppConstants;
 
 public class CustomLevelForm extends FeatureForm {
 
