@@ -17,8 +17,6 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-// Expand to define logging define
-@DLOGDEF@
 package net.eiroca.j2me.sm.data;
 
 import net.eiroca.j2me.sm.util.Store;
@@ -26,21 +24,10 @@ import net.eiroca.j2me.sm.util.StoreException;
 import net.eiroca.j2me.sm.util.StoreFilterByID;
 import net.eiroca.j2me.sm.util.StoreObserver;
 
-//#ifdef DLOGGING
-import net.sf.jlogmicro.util.logging.Logger;
-import net.sf.jlogmicro.util.logging.Level;
-//#endif
-
 /**
  * Implementation of the <code>AddressStore</code> interface.
  */
 public final class AddressStore extends Store {
-
-	//#ifdef DLOGGING
-	private Logger logger = Logger.getLogger("AddressStore");
-	private boolean fineLoggable = logger.isLoggable(Level.FINE);
-	private boolean finestLoggable = logger.isLoggable(Level.FINEST);
-	//#endif
 
   /**
    * Creates new <code>AddressStoreImpl</code> instance. The additional string parameter allows us to create different AddressStores (for example different address books).
@@ -50,17 +37,11 @@ public final class AddressStore extends Store {
   }
 
   public void store(final Address address) throws StoreException {
-		//#ifdef DLOGGING
-		if (finestLoggable) {logger.finest("store address.id,address.name=" + address.id + "," + address.name);}
-		//#endif
     replaceFirst(new StoreFilterByID(address.id), address.serialize());
     notifyAction(StoreObserver.ADD, address);
   }
 
   public Address remove(final long id) throws StoreException {
-		//#ifdef DLOGGING
-		if (finestLoggable) {logger.finest("remove id=" + id);}
-		//#endif
     final Address address = getById(id);
     removeFirst(new StoreFilterByID(id));
     notifyAction(StoreObserver.DEL, address);
@@ -68,18 +49,12 @@ public final class AddressStore extends Store {
   }
 
   public Address getById(final long id) throws StoreException {
-		//#ifdef DLOGGING
-		if (finestLoggable) {logger.finest("getById id=" + id);}
-		//#endif
     final byte[] res = findFirst(new StoreFilterByID(id));
     if (res == null) { throw new MessageHandlerException(MessageHandlerException.ERR_NOADDRESS); }
     return new Address(res);
   }
 
   public Address getByNumber(final String number, final boolean fails) throws StoreException {
-		//#ifdef DLOGGING
-		if (finestLoggable) {logger.finest("getByNumber number,fails=" + number + "," + fails);}
-		//#endif
     final byte[] res = findFirst(new AddressFilterByNumber(number));
     if (res == null) {
       if (fails) { throw new MessageHandlerException(MessageHandlerException.ERR_NOADDRESS); }
