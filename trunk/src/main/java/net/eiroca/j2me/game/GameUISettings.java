@@ -26,7 +26,7 @@ import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Gauge;
 import net.eiroca.j2me.app.BaseApp;
 import com.substanceofcode.rssreader.presentation.FeatureForm;
-
+import net.sf.yinlight.boardgame.oware.midlet.AppConstants;
 
 /**
 	* Game UI settings such as vibrate, audio, backlight, 
@@ -38,21 +38,21 @@ public class GameUISettings extends FeatureForm {
   public static Gauge stVolume = null;
 
   public GameUISettings(final GameApp owner, final int gmFeature) {
-    super(BaseApp.messages[GameApp.MSG_MENU_MAIN_SETTINGS]);
+    super(BaseApp.messages[AppConstants.MSG_MENU_MAIN_SETTINGS]);
     if ((gmFeature & GameApp.FT_AUDIO) != 0) {
-      GameUISettings.stVolume = new Gauge(BaseApp.messages[GameApp.MSG_MENU_SETTINGS_VOLUME], true, 5, 0);
+      GameUISettings.stVolume = new Gauge(BaseApp.messages[AppConstants.MSG_MENU_SETTINGS_VOLUME], true, 5, 0);
       append(GameUISettings.stVolume);
     }
     if ((gmFeature & GameApp.FT_VIBRATE) != 0) {
-      GameUISettings.stVibrate = new ChoiceGroup(BaseApp.messages[GameApp.MSG_MENU_SETTINGS_VIBRATE], Choice.EXCLUSIVE);
-      GameUISettings.stVibrate.append(BaseApp.messages[GameApp.MSG_LABEL_YES], null);
-      GameUISettings.stVibrate.append(BaseApp.messages[GameApp.MSG_LABEL_NO], null);
+      GameUISettings.stVibrate = new ChoiceGroup(BaseApp.messages[AppConstants.MSG_MENU_SETTINGS_VIBRATE], Choice.EXCLUSIVE);
+      GameUISettings.stVibrate.append(BaseApp.messages[AppConstants.MSG_LABEL_YES], null);
+      GameUISettings.stVibrate.append(BaseApp.messages[AppConstants.MSG_LABEL_NO], null);
       append(GameUISettings.stVibrate);
     }
     if ((gmFeature & GameApp.FT_LIGHT) != 0) {
-      GameUISettings.stBackLight = new ChoiceGroup(BaseApp.messages[GameApp.MSG_MENU_SETTINGS_BACKLIGHT], Choice.EXCLUSIVE);
-      GameUISettings.stBackLight.append(BaseApp.messages[GameApp.MSG_LABEL_YES], null);
-      GameUISettings.stBackLight.append(BaseApp.messages[GameApp.MSG_LABEL_NO], null);
+      GameUISettings.stBackLight = new ChoiceGroup(BaseApp.messages[AppConstants.MSG_MENU_SETTINGS_BACKLIGHT], Choice.EXCLUSIVE);
+      GameUISettings.stBackLight.append(BaseApp.messages[AppConstants.MSG_LABEL_YES], null);
+      GameUISettings.stBackLight.append(BaseApp.messages[AppConstants.MSG_LABEL_NO], null);
       append(GameUISettings.stBackLight);
     }
     BaseApp.setup(this, BaseApp.cBACK, BaseApp.cOK);
