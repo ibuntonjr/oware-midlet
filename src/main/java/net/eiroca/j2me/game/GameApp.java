@@ -48,6 +48,7 @@ import net.eiroca.j2me.app.Application;
 import net.eiroca.j2me.app.BaseApp;
 import net.eiroca.j2me.app.SplashScreen;
 import com.substanceofcode.rssreader.presentation.FeatureForm;
+import net.sf.yinlight.boardgame.oware.midlet.AppConstants;
 
 
 //#ifdef DLOGGING
@@ -67,30 +68,6 @@ import com.substanceofcode.rssreader.presentation.FeatureForm;
 public abstract class GameApp extends Application {
 
   public static final int ME_MAINMENU = 0;
-
-  public final static int MSG_LABEL_OK = 0;
-  public final static int MSG_LABEL_BACK = 1;
-  public final static int MSG_LABEL_EXIT = 2;
-  public final static int MSG_LABEL_YES = 3;
-  public final static int MSG_LABEL_NO = 4;
-  public final static int MSG_TEXT_GAMEOVER_01 = 5;
-  public final static int MSG_TEXT_GAMEOVER_02 = 6;
-  public final static int MSG_TEXT_GAMEOVER_03 = 7;
-  public final static int MSG_TEXT_HIGHSCORE_01 = 8;
-  public final static int MSG_TEXT_HIGHSCORE_02 = 9;
-  public final static int MSG_TEXT_HIGHSCORE_03 = 10;
-  public final static int MSG_TEXT_HIGHSCORE_04 = 11;
-  public final static int MSG_MENU_MAIN_CONTINUE = 12;
-  public final static int MSG_MENU_MAIN_NEWGAME = 13;
-  public final static int MSG_MENU_MAIN_HIGHSCORE = 14;
-  public final static int MSG_MENU_MAIN_SETTINGS = 15;
-  public final static int MSG_MENU_MAIN_OPTIONS = 16;
-  public final static int MSG_MENU_MAIN_HELP = 17;
-  public final static int MSG_MENU_MAIN_ABOUT = 18;
-  public final static int MSG_MENU_SETTINGS_VOLUME = 19;
-  public final static int MSG_MENU_SETTINGS_VIBRATE = 20;
-  public final static int MSG_MENU_SETTINGS_BACKLIGHT = 21;
-  public final static int MSG_USERDEF = 22;
 
   public static final int GA_NONE = 0;
   public static final int GA_STARTUP = 1;
@@ -182,11 +159,14 @@ public abstract class GameApp extends Application {
 					BaseApp.icons[i] = null;
 				}
 			}
+			//#ifdef DLOGGING
+//@			logger.info("BaseApp.messages[AppConstants.MSG_GAMEAPP_USERDEF - 1]=" + BaseApp.messages[AppConstants.MSG_GAMEAPP_USERDEF - 1]);
+			//#endif
 			GameApp.highscore = new ScoreManager(GameApp.RMS_HIGHSCORE, GameApp.hsName, GameApp.hsMaxLevel, GameApp.hsMaxScore, true);
 			GameApp.game = getGameScreen();
-			BaseApp.cOK = BaseApp.newCommand(GameApp.MSG_LABEL_OK, Command.OK, 30, BaseApp.AC_NONE);
-			BaseApp.cBACK = BaseApp.newCommand(GameApp.MSG_LABEL_BACK, Command.BACK, 20, BaseApp.AC_BACK);
-			BaseApp.cEXIT = BaseApp.newCommand(GameApp.MSG_LABEL_EXIT, Command.EXIT, 10, BaseApp.AC_EXIT);
+			BaseApp.cOK = BaseApp.newCommand(AppConstants.MSG_LABEL_OK, Command.OK, 30, BaseApp.AC_NONE);
+			BaseApp.cBACK = BaseApp.newCommand(AppConstants.MSG_LABEL_BACK, Command.BACK, 20, BaseApp.AC_BACK);
+			BaseApp.cEXIT = BaseApp.newCommand(AppConstants.MSG_LABEL_EXIT, Command.EXIT, 10, BaseApp.AC_EXIT);
 			gameMenu = getGameMenu();
 			processGameAction(GameApp.GA_STARTUP);
 		} catch (Throwable e) {
@@ -417,19 +397,19 @@ public abstract class GameApp extends Application {
       if ((score > 0) && (GameApp.highscore.isHighScore(GameApp.hsLevel, GameApp.game.score))) {
         gameNewHighScore = getNewHighScore();
         final StringBuffer buf = new StringBuffer(80);
-        buf.append(BaseApp.messages[GameApp.MSG_TEXT_HIGHSCORE_03]).append(GameApp.game.score.getScore()).append(BaseApp.CR);
+        buf.append(BaseApp.messages[AppConstants.MSG_TEXT_HIGHSCORE_03]).append(GameApp.game.score.getScore()).append(BaseApp.CR);
         tScore.setLabel(buf.toString());
         tName.setString(GameApp.game.score.name);
         BaseApp.setDisplay(gameNewHighScore);
       }
       else {
         final String[] msg = new String[3];
-        msg[0] = BaseApp.messages[GameApp.MSG_TEXT_GAMEOVER_01];
+        msg[0] = BaseApp.messages[AppConstants.MSG_TEXT_GAMEOVER_01];
         if (score > 0) {
-          msg[1] = BaseApp.messages[GameApp.MSG_TEXT_GAMEOVER_02] + score;
+          msg[1] = BaseApp.messages[AppConstants.MSG_TEXT_GAMEOVER_02] + score;
         }
         if (hs != null) {
-          msg[2] = BaseApp.messages[GameApp.MSG_TEXT_GAMEOVER_03] + hs.getScore();
+          msg[2] = BaseApp.messages[AppConstants.MSG_TEXT_GAMEOVER_03] + hs.getScore();
         }
         GameApp.flashBacklight(1000);
         BaseApp.setDisplay(new GameUIMessage(msg, gameMenu));
@@ -459,7 +439,7 @@ public abstract class GameApp extends Application {
 		//#ifdef DLOGGING
 //@		if (finestLoggable) {logger.finest("doAbout isActive()=" + isActive());}
 		//#endif
-    final Displayable d = BaseApp.getTextForm(GameApp.MSG_MENU_MAIN_ABOUT, GameApp.RES_ABOUT);
+    final Displayable d = BaseApp.getTextForm(AppConstants.MSG_MENU_MAIN_ABOUT, GameApp.RES_ABOUT);
     BaseApp.show(null, d, true);
   }
 
@@ -470,7 +450,7 @@ public abstract class GameApp extends Application {
 		//#ifdef DLOGGING
 //@		if (finestLoggable) {logger.finest("doHelp");}
 		//#endif
-    final Displayable d = BaseApp.getTextForm(GameApp.MSG_MENU_MAIN_HELP, GameApp.RES_HELP);
+    final Displayable d = BaseApp.getTextForm(AppConstants.MSG_MENU_MAIN_HELP, GameApp.RES_HELP);
     BaseApp.show(null, d, true);
   }
 
@@ -549,10 +529,10 @@ public abstract class GameApp extends Application {
 		//#ifdef DLOGGING
 //@		if (finestLoggable) {logger.finest("getHighScore");}
 		//#endif
-    final Form form = new FeatureForm(BaseApp.messages[GameApp.MSG_MENU_MAIN_HIGHSCORE]);
+    final Form form = new FeatureForm(BaseApp.messages[AppConstants.MSG_MENU_MAIN_HIGHSCORE]);
     final Vector scores = GameApp.highscore.getList(GameApp.hsLevel);
     if (scores.size() == 0) {
-      form.append(BaseApp.messages[GameApp.MSG_TEXT_HIGHSCORE_01]);
+      form.append(BaseApp.messages[AppConstants.MSG_TEXT_HIGHSCORE_01]);
     }
     else {
       Score s;
@@ -575,9 +555,9 @@ public abstract class GameApp extends Application {
 		//#ifdef DLOGGING
 //@		if (finestLoggable) {logger.finest("getNewHighScore");}
 		//#endif
-    final Form form = new FeatureForm(BaseApp.messages[GameApp.MSG_TEXT_HIGHSCORE_02]);
-    tScore = new StringItem(BaseApp.messages[GameApp.MSG_TEXT_HIGHSCORE_03], null);
-    tName = new TextField(BaseApp.messages[GameApp.MSG_TEXT_HIGHSCORE_04], "", 8,
+    final Form form = new FeatureForm(BaseApp.messages[AppConstants.MSG_TEXT_HIGHSCORE_02]);
+    tScore = new StringItem(BaseApp.messages[AppConstants.MSG_TEXT_HIGHSCORE_03], null);
+    tName = new TextField(BaseApp.messages[AppConstants.MSG_TEXT_HIGHSCORE_04], "", 8,
 		//#ifdef DMIDP20
 				TextField.INITIAL_CAPS_SENTENCE);
 		//#else
