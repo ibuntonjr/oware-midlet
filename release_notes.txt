@@ -203,6 +203,13 @@
 + Put in small wait to help threads other than turn/A.I. get time.
 + Add target for MIDP 1.0 reversi for testing on MIDP 1.0.
 
+0.1.5 2009-05-08 Alpha 1 Version
++ More logging.
++ Change messages to go into AppConstants to better share.
++ Add in secure SMS code and share messages with the others.
++ Put in JSR-120 SMS code.
++ Fix logging for all midlets.
+
 Issues:
 
 Minesweeper does not work at all.
