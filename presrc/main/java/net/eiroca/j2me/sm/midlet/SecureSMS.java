@@ -20,10 +20,13 @@
  /**
    * This was first changed on 2009-05-13
    */
+// Expand to define JSR-120 test define
+@DJSR120@
 // Expand to define JMUnit test define
 @DJMTESTDEF@
 // Expand to define logging define
 @DLOGDEF@
+//#ifdef DJSR120
 package net.eiroca.j2me.sm.midlet;
 
 import javax.microedition.lcdui.Alert;
@@ -52,6 +55,7 @@ import net.eiroca.j2me.sm.util.Store;
 import net.eiroca.j2me.sm.util.StoreException;
 import net.eiroca.j2me.sm.util.StoreObserver;
 import net.eiroca.j2me.util.CipherDES;
+import net.sf.yinlight.boardgame.oware.midlet.AppConstants;
 
 //#ifdef DLOGGING
 import net.sf.jlogmicro.util.logging.Logger;
@@ -62,64 +66,6 @@ import net.sf.jlogmicro.util.presentation.RecStoreLoggerForm;
 //#endif
 
 public class SecureSMS extends Application implements StoreObserver {
-
-  public static final int MSG_SECUREMESSENGER = 0;
-  public static final int MSG_OK = 1;
-  public static final int MSG_SAVE = 2;
-  public static final int MSG_SEND = 3;
-  public static final int MSG_REPLY = 4;
-  public static final int MSG_DELETE = 5;
-  public static final int MSG_ADD = 6;
-  public static final int MSG_CANCEL = 7;
-  public static final int MSG_EXIT = 8;
-  public static final int MSG_INBOX = 9;
-  public static final int MSG_SENDNEW = 10;
-  public static final int MSG_SENTITEMS = 11;
-  public static final int MSG_ADDRESSBOOK = 12;
-  public static final int MSG_MESSAGE = 13;
-  public static final int MSG_ADDRESS = 14;
-  public static final int MSG_NEWADDRESS = 15;
-  public static final int MSG_NEWMESSAGE = 16;
-  public static final int MSG_TEXT = 17;
-  public static final int MSG_TO = 18;
-  public static final int MSG_FROM = 19;
-  public static final int MSG_NUMBER = 20;
-  public static final int MSG_NAME = 21;
-  public static final int MSG_KEY = 22;
-  public static final int MSG_MESSAGESENT = 23;
-  public static final int MSG_MESSAGEHASNOTBEENSENT = 24;
-  public static final int MSG_MESSAGEDELETED = 25;
-  public static final int MSG_MESSAGEHASNOTBEENDELETED = 26;
-  public static final int MSG_MESSAGERECEIVED = 27;
-  public static final int MSG_ADDRESSSAVED = 28;
-  public static final int MSG_ADDRESSHASNOTBEENSAVED = 29;
-  public static final int MSG_ADDRESSDELETED = 30;
-  public static final int MSG_ADDRESSHASNOTBEENDELETED = 31;
-  public static final int MSG_ERROR = 32;
-  public static final int MSG_INFO = 33;
-  public static final int MSG_MESSAGESTOREERROR = 34;
-  public static final int MSG_ADDRESSSTOREERROR = 35;
-  public static final int MSG_CANNOTSTART = 36;
-  public static final int MSG_BACK = 37;
-  public static final int MSG_MENUABOUT = 38;
-  public static final int MSG_CHANGEPIN = 39;
-  public static final int MSG_INSERTPINTEXT = 40;
-  public static final int MSG_PIN = 41;
-  public static final int MSG_WRONGPIN = 42;
-  public static final int MSG_INSERTPIN = 43;
-  public static final int MSG_INVALINDPIN = 44;
-  public static final int MSG_CLEANUP = 45;
-  public static final int MSG_CLEANUP1 = 46;
-  public static final int MSG_CLEANUP2 = 47;
-  public static final int MSG_CLEANUP3 = 48;
-  public static final int MSG_CONFIRM = 49;
-  public static final int MSG_ARESURE = 50;
-  public static final int MSG_YES = 51;
-  public static final int MSG_NO = 52;
-  public static final int MSG_NUMPREFIX = 53;
-  public static final int MSG_INVALID = 54;
-  public static final int MSG_MESSAGEIVALID = 55;
-  public static final int MSG_ADDRESSBOOKEMPTY = 56;
 
   public static final int ME_MAINMENU = 0;
   public static final int ME_CLEANUP = 1;
@@ -199,6 +145,12 @@ public class SecureSMS extends Application implements StoreObserver {
 
   short[][] menuCleanUp;
 
+	//#ifdef DLOGGING
+  private boolean fineLoggable;
+  private boolean finestLoggable;
+  private boolean traceLoggable;
+	private Logger logger;
+	//#endif
   public SecureSMS() {
 		//#ifdef DJMTEST
     super("SecureSMS Games Suite");
@@ -206,49 +158,49 @@ public class SecureSMS extends Application implements StoreObserver {
     super();
 		//#endif
 		//#ifdef DLOGGING
-		logger = Logger.getLogger("Reversi");
+		logger = Logger.getLogger("SecureSMS");
 		fineLoggable = logger.isLoggable(Level.FINE);
 		finestLoggable = logger.isLoggable(Level.FINEST);
 		traceLoggable = logger.isLoggable(Level.TRACE);
 		//#endif
     BaseApp.messages = BaseApp.readStrings("messages.txt");
-    BaseApp.cOK = BaseApp.newCommand(SecureSMS.MSG_OK, Command.OK, 30);
-    BaseApp.cBACK = BaseApp.newCommand(SecureSMS.MSG_BACK, Command.BACK, 20, BaseApp.AC_BACK);
-    BaseApp.cEXIT = BaseApp.newCommand(SecureSMS.MSG_EXIT, Command.EXIT, 10, BaseApp.AC_EXIT);
-    SecureSMS.cADRADD = BaseApp.newCommand(SecureSMS.MSG_ADD, Command.OK, 2, SecureSMS.AC_ADDRESSBOOKADD);
-    SecureSMS.cADRDEL = BaseApp.newCommand(SecureSMS.MSG_DELETE, Command.OK, 2, SecureSMS.AC_ADDRESSBOOKDEL);
-    SecureSMS.cADRSAV = BaseApp.newCommand(SecureSMS.MSG_SAVE, Command.OK, 2, SecureSMS.AC_ADDRESSBOOKSAV);
-    SecureSMS.cINBOXDEL = BaseApp.newCommand(SecureSMS.MSG_DELETE, Command.OK, 2, SecureSMS.AC_INBOXDELETE);
-    SecureSMS.cINBOXREPLY = BaseApp.newCommand(SecureSMS.MSG_REPLY, Command.OK, 2, SecureSMS.AC_INBOXREPLY);
-    SecureSMS.cSENTDEL = BaseApp.newCommand(SecureSMS.MSG_DELETE, Command.OK, 2, SecureSMS.AC_SENTDELETE);
-    SecureSMS.cSENDNEW = BaseApp.newCommand(SecureSMS.MSG_SEND, Command.OK, 2, SecureSMS.AC_SENDNEW);
-    SecureSMS.cPINSAV = BaseApp.newCommand(SecureSMS.MSG_SAVE, Command.OK, 2, SecureSMS.AC_PINSAVE);
-    SecureSMS.cPINDEL = BaseApp.newCommand(SecureSMS.MSG_DELETE, Command.OK, 2, SecureSMS.AC_PINDELETE);
-    SecureSMS.cPINOK = BaseApp.newCommand(SecureSMS.MSG_OK, Command.OK, 2, SecureSMS.AC_PINOK);
-    SecureSMS.cYES = BaseApp.newCommand(SecureSMS.MSG_YES, Command.OK, 2, SecureSMS.AC_YES);
-    SecureSMS.cNO = BaseApp.newCommand(SecureSMS.MSG_NO, Command.BACK, 1, SecureSMS.AC_NO);
-    SecureSMS.cINVALID = BaseApp.newCommand(SecureSMS.MSG_INVALID, Command.OK, 1, SecureSMS.AC_INVALID);
+    BaseApp.cOK = BaseApp.newCommand(AppConstants.MSG_LABEL_OK, Command.OK, 30,  BaseApp.AC_NONE);
+    BaseApp.cBACK = BaseApp.newCommand(AppConstants.MSG_LABEL_BACK, Command.BACK, 20, BaseApp.AC_BACK);
+    BaseApp.cEXIT = BaseApp.newCommand(AppConstants.MSG_LABEL_EXIT, Command.EXIT, 10, BaseApp.AC_EXIT);
+    SecureSMS.cADRADD = BaseApp.newCommand(AppConstants.MSG_ADD, Command.OK, 2, SecureSMS.AC_ADDRESSBOOKADD);
+    SecureSMS.cADRDEL = BaseApp.newCommand(AppConstants.MSG_DELETE, Command.OK, 2, SecureSMS.AC_ADDRESSBOOKDEL);
+    SecureSMS.cADRSAV = BaseApp.newCommand(AppConstants.MSG_SAVE, Command.OK, 2, SecureSMS.AC_ADDRESSBOOKSAV);
+    SecureSMS.cINBOXDEL = BaseApp.newCommand(AppConstants.MSG_DELETE, Command.OK, 2, SecureSMS.AC_INBOXDELETE);
+    SecureSMS.cINBOXREPLY = BaseApp.newCommand(AppConstants.MSG_REPLY, Command.OK, 2, SecureSMS.AC_INBOXREPLY);
+    SecureSMS.cSENTDEL = BaseApp.newCommand(AppConstants.MSG_DELETE, Command.OK, 2, SecureSMS.AC_SENTDELETE);
+    SecureSMS.cSENDNEW = BaseApp.newCommand(AppConstants.MSG_SEND, Command.OK, 2, SecureSMS.AC_SENDNEW);
+    SecureSMS.cPINSAV = BaseApp.newCommand(AppConstants.MSG_SAVE, Command.OK, 2, SecureSMS.AC_PINSAVE);
+    SecureSMS.cPINDEL = BaseApp.newCommand(AppConstants.MSG_DELETE, Command.OK, 2, SecureSMS.AC_PINDELETE);
+    SecureSMS.cPINOK = BaseApp.newCommand(AppConstants.MSG_LABEL_OK, Command.OK, 2, SecureSMS.AC_PINOK);
+    SecureSMS.cYES = BaseApp.newCommand(AppConstants.MSG_LABEL_YES, Command.OK, 2, SecureSMS.AC_YES);
+    SecureSMS.cNO = BaseApp.newCommand(AppConstants.MSG_LABEL_NO, Command.BACK, 1, SecureSMS.AC_NO);
+    SecureSMS.cINVALID = BaseApp.newCommand(AppConstants.MSG_INVALID, Command.OK, 1, SecureSMS.AC_INVALID);
     BaseApp.menu = new short[][] {
         {
-            SecureSMS.ME_MAINMENU, SecureSMS.MSG_INBOX, SecureSMS.AC_SHOWINBOX, -1
+            SecureSMS.ME_MAINMENU, (short)AppConstants.MSG_INBOX, SecureSMS.AC_SHOWINBOX, -1
         }, {
-            SecureSMS.ME_MAINMENU, SecureSMS.MSG_SENDNEW, SecureSMS.AC_SHOWSENDNEW, -1
+            SecureSMS.ME_MAINMENU, (short)AppConstants.MSG_SENDNEW, SecureSMS.AC_SHOWSENDNEW, -1
         }, {
-            SecureSMS.ME_MAINMENU, SecureSMS.MSG_SENTITEMS, SecureSMS.AC_SHOWSENTITEMS, -1
+            SecureSMS.ME_MAINMENU, (short)AppConstants.MSG_SENTITEMS, SecureSMS.AC_SHOWSENTITEMS, -1
         }, {
-            SecureSMS.ME_MAINMENU, SecureSMS.MSG_ADDRESSBOOK, SecureSMS.AC_SHOWADDRESSBOOK, -1
+            SecureSMS.ME_MAINMENU, (short)AppConstants.MSG_ADDRESSBOOK, SecureSMS.AC_SHOWADDRESSBOOK, -1
         }, {
-            SecureSMS.ME_MAINMENU, SecureSMS.MSG_CHANGEPIN, SecureSMS.AC_SHOWPINCHANGE, -1
+            SecureSMS.ME_MAINMENU, (short)AppConstants.MSG_CHANGEPIN, SecureSMS.AC_SHOWPINCHANGE, -1
         }, {
-            SecureSMS.ME_MAINMENU, SecureSMS.MSG_CLEANUP, SecureSMS.AC_CLEANUP, -1
+            SecureSMS.ME_MAINMENU, (short)AppConstants.MSG_CLEANUP, SecureSMS.AC_CLEANUP, -1
         }, {
-            SecureSMS.ME_MAINMENU, SecureSMS.MSG_MENUABOUT, SecureSMS.AC_SHOWABOUT, -1
+            SecureSMS.ME_MAINMENU, (short)AppConstants.MSG_MENU_MAIN_ABOUT, SecureSMS.AC_SHOWABOUT, -1
         }, {
-            SecureSMS.ME_CLEANUP, SecureSMS.MSG_CLEANUP1, SecureSMS.AC_CLEANUP1, -1
+            SecureSMS.ME_CLEANUP, (short)AppConstants.MSG_CLEANUP1, SecureSMS.AC_CLEANUP1, -1
         }, {
-            SecureSMS.ME_CLEANUP, SecureSMS.MSG_CLEANUP2, SecureSMS.AC_CLEANUP2, -1
+            SecureSMS.ME_CLEANUP, (short)AppConstants.MSG_CLEANUP2, SecureSMS.AC_CLEANUP2, -1
         }, {
-            SecureSMS.ME_CLEANUP, SecureSMS.MSG_CLEANUP3, SecureSMS.AC_CLEANUP3, -1
+            SecureSMS.ME_CLEANUP, (short)AppConstants.MSG_CLEANUP3, SecureSMS.AC_CLEANUP3, -1
         }
     };
     Settings.load();
@@ -258,8 +210,15 @@ public class SecureSMS extends Application implements StoreObserver {
    * Start the MIDlet.
    */
   public void init() {
-    super.init();
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("init");}
+		//#endif
     try {
+			super.init();
+			//#ifdef DLOGGING
+			logger.info("BaseApp.messages[AppConstants.MSG_SECURESMS_NAME]=" + BaseApp.messages[AppConstants.MSG_SECURESMS_NAME]);
+			logger.info("BaseApp.messages[AppConstants.MSG_SECURESMS_USERDEF - 1]=" + BaseApp.messages[AppConstants.MSG_SECURESMS_USERDEF - 1]);
+			//#endif
       // Initialize everything
       // Initialize the address book and two message stores
       addressBook = new AddressStore(SecureSMS.ADDRESS_BOOK_STORE_NAME);
@@ -275,10 +234,10 @@ public class SecureSMS extends Application implements StoreObserver {
       handler.init();
       inbox.registerObserver(this);
       addressBook.registerObserver(handler);
-      scMenu = Application.getMenu(BaseApp.messages[SecureSMS.MSG_SECUREMESSENGER], SecureSMS.ME_MAINMENU, -1, BaseApp.cEXIT);
+      scMenu = Application.getMenu(BaseApp.messages[AppConstants.MSG_SECURESMS_NAME], SecureSMS.ME_MAINMENU, -1, BaseApp.cEXIT);
       final String pin = Settings.get(SecureSMS.STS_PIN);
       if (pin != null) {
-        scInsertPIN = new InsertPINScreen(SecureSMS.MSG_INSERTPIN);
+        scInsertPIN = new InsertPINScreen(AppConstants.MSG_INSERTPIN);
         BaseApp.setDisplay(scInsertPIN);
       }
       else {
@@ -318,20 +277,20 @@ public class SecureSMS extends Application implements StoreObserver {
       return true;
     }
     nextAction = action;
-    int errMsg = SecureSMS.MSG_MESSAGESTOREERROR;
+    int errMsg = AppConstants.MSG_MESSAGESTOREERROR;
     Displayable back = scMenu;
     boolean processed = true;
     try {
       long id;
       switch (action) {
         case AC_SHOWINBOX:
-          scInbox = new MessageListScreen(SecureSMS.MSG_INBOX, SecureSMS.cINBOXDEL, SecureSMS.cINBOXREPLY, SecureSMS.cINVALID);
+          scInbox = new MessageListScreen(AppConstants.MSG_INBOX, SecureSMS.cINBOXDEL, SecureSMS.cINBOXREPLY, SecureSMS.cINVALID);
           BaseApp.registerList(scInbox, SecureSMS.AC_INBOXVIEW);
           scInbox.updateMessageList(this, inbox);
           BaseApp.show(null, scInbox, true);
           break;
         case AC_SHOWSENDNEW:
-          errMsg = SecureSMS.MSG_ADDRESSBOOKEMPTY;
+          errMsg = AppConstants.MSG_ADDRESSBOOKEMPTY;
           back = scMenu;
           message = new SecureMessage(null, null, "", 0);
           scSendNew = new SendNewScreen();
@@ -344,7 +303,7 @@ public class SecureSMS extends Application implements StoreObserver {
           }
           break;
         case AC_SHOWSENTITEMS:
-          scSentItems = new MessageListScreen(SecureSMS.MSG_SENTITEMS, SecureSMS.cSENTDEL, null, null);
+          scSentItems = new MessageListScreen(AppConstants.MSG_SENTITEMS, SecureSMS.cSENTDEL, null, null);
           BaseApp.registerList(scSentItems, SecureSMS.AC_SENTVIEW);
           scSentItems.updateMessageList(this, sentItems);
           BaseApp.show(null, scSentItems, true);
@@ -356,65 +315,65 @@ public class SecureSMS extends Application implements StoreObserver {
           BaseApp.show(null, scAddressBook, true);
           break;
         case AC_SHOWABOUT:
-          BaseApp.show(null, BaseApp.getTextForm(SecureSMS.MSG_MENUABOUT, "about.txt"), true);
+          BaseApp.show(null, BaseApp.getTextForm(AppConstants.MSG_MENU_MAIN_ABOUT, "about.txt"), true);
           break;
         case AC_SENDNEW:
-          errMsg = SecureSMS.MSG_MESSAGEHASNOTBEENSENT;
+          errMsg = AppConstants.MSG_MESSAGEHASNOTBEENSENT;
           back = scSendNew;
           id = scSendNew.getSelectedAddressId();
           message.number = addressBook.getById(id).number;
           message.text = scSendNew.getMessageText();
           handler.send(message);
-          BaseApp.showAlert(SecureSMS.MSG_INFO, SecureSMS.MSG_MESSAGESENT, null, AlertType.INFO, scMenu, Alert.FOREVER);
+          BaseApp.showAlert(AppConstants.MSG_INFO, AppConstants.MSG_MESSAGESENT, null, AlertType.INFO, scMenu, Alert.FOREVER);
           break;
         case AC_ADDRESSBOOKEDT:
-          errMsg = SecureSMS.MSG_ADDRESSSTOREERROR;
+          errMsg = AppConstants.MSG_ADDRESSSTOREERROR;
           back = scAddressBook;
           id = scAddressBook.getSelectedAddressId();
           address = addressBook.getById(id);
-          scAddress = new AddressScreen(SecureSMS.MSG_ADDRESS, false);
+          scAddress = new AddressScreen(AppConstants.MSG_ADDRESS, false);
           scAddress.fromAddress(address);
           BaseApp.show(null, scAddress, false);
           break;
         case AC_ADDRESSBOOKADD:
-          errMsg = SecureSMS.MSG_ADDRESSSTOREERROR;
+          errMsg = AppConstants.MSG_ADDRESSSTOREERROR;
           back = scAddressBook;
           address = new Address("", "", "");
-          scAddress = new AddressScreen(SecureSMS.MSG_NEWADDRESS, true);
+          scAddress = new AddressScreen(AppConstants.MSG_NEWADDRESS, true);
           scAddress.fromAddress(address);
           BaseApp.show(null, scAddress, false);
           break;
         case AC_ADDRESSBOOKDEL:
-          errMsg = SecureSMS.MSG_ADDRESSSTOREERROR;
+          errMsg = AppConstants.MSG_ADDRESSSTOREERROR;
           back = scAddressBook;
           id = scAddressBook.getSelectedAddressId();
           addressBook.remove(id);
           scAddressBook.updateAddressList(addressBook);
-          BaseApp.showAlert(SecureSMS.MSG_INFO, SecureSMS.MSG_ADDRESSDELETED, null, AlertType.INFO, scAddressBook, Alert.FOREVER);
+          BaseApp.showAlert(AppConstants.MSG_INFO, AppConstants.MSG_ADDRESSDELETED, null, AlertType.INFO, scAddressBook, Alert.FOREVER);
           break;
         case AC_ADDRESSBOOKSAV:
-          errMsg = SecureSMS.MSG_ADDRESSSTOREERROR;
+          errMsg = AppConstants.MSG_ADDRESSSTOREERROR;
           back = scAddressBook;
-          scAddress.toAddress(address, BaseApp.messages[SecureSMS.MSG_NUMPREFIX]);
+          scAddress.toAddress(address, BaseApp.messages[AppConstants.MSG_NUMPREFIX]);
           addressBook.store(address);
           scAddressBook.updateAddressList(addressBook);
-          BaseApp.showAlert(SecureSMS.MSG_INFO, SecureSMS.MSG_ADDRESSSAVED, null, AlertType.INFO, scAddressBook, Alert.FOREVER);
+          BaseApp.showAlert(AppConstants.MSG_INFO, AppConstants.MSG_ADDRESSSAVED, null, AlertType.INFO, scAddressBook, Alert.FOREVER);
           break;
         case AC_INBOXVIEW:
           back = scInbox;
           id = scInbox.getSelectedMessageDate();
           message = inbox.getById(id);
-          scMessage = new MessageScreen(SecureSMS.MSG_MESSAGE, SecureSMS.MSG_FROM, SecureSMS.MSG_TEXT, SecureSMS.cINBOXREPLY, SecureSMS.cINBOXDEL);
+          scMessage = new MessageScreen(AppConstants.MSG_MESSAGE, AppConstants.MSG_FROM, AppConstants.MSG_TEXT, SecureSMS.cINBOXREPLY, SecureSMS.cINBOXDEL);
           scMessage.updateMessage(this, message);
           BaseApp.show(null, scMessage, false);
           break;
         case AC_INBOXDELETE:
-          errMsg = SecureSMS.MSG_MESSAGEHASNOTBEENDELETED;
+          errMsg = AppConstants.MSG_MESSAGEHASNOTBEENDELETED;
           back = scInbox;
           id = scInbox.getSelectedMessageDate();
           inbox.remove(id);
           scInbox.updateMessageList(this, inbox);
-          BaseApp.showAlert(SecureSMS.MSG_INFO, SecureSMS.MSG_MESSAGEDELETED, null, AlertType.INFO, scInbox, Alert.FOREVER);
+          BaseApp.showAlert(AppConstants.MSG_INFO, AppConstants.MSG_MESSAGEDELETED, null, AlertType.INFO, scInbox, Alert.FOREVER);
           break;
         case AC_INVALID:
           back = scInbox;
@@ -423,7 +382,7 @@ public class SecureSMS extends Application implements StoreObserver {
           SecureMessage message = inbox.remove(id);
           unknown.store(new UnknownMessage(message));
           scInbox.updateMessageList(this, inbox);
-          BaseApp.showAlert(SecureSMS.MSG_INFO, SecureSMS.MSG_MESSAGEIVALID, null, AlertType.INFO, scInbox, Alert.FOREVER);
+          BaseApp.showAlert(AppConstants.MSG_INFO, AppConstants.MSG_MESSAGEIVALID, null, AlertType.INFO, scInbox, Alert.FOREVER);
           break;
         case AC_INBOXREPLY:
           back = scInbox;
@@ -437,27 +396,27 @@ public class SecureSMS extends Application implements StoreObserver {
           back = scSentItems;
           id = scSentItems.getSelectedMessageDate();
           message = sentItems.getById(id);
-          scMessage = new MessageScreen(SecureSMS.MSG_MESSAGE, SecureSMS.MSG_TO, SecureSMS.MSG_TEXT, SecureSMS.cSENTDEL, null);
+          scMessage = new MessageScreen(AppConstants.MSG_MESSAGE, AppConstants.MSG_TO, AppConstants.MSG_TEXT, SecureSMS.cSENTDEL, null);
           scMessage.updateMessage(this, message);
           BaseApp.show(null, scMessage, false);
           break;
         case AC_SENTDELETE:
-          errMsg = SecureSMS.MSG_MESSAGEHASNOTBEENDELETED;
+          errMsg = AppConstants.MSG_MESSAGEHASNOTBEENDELETED;
           back = scSentItems;
           id = scSentItems.getSelectedMessageDate();
           sentItems.remove(id);
           scSentItems.updateMessageList(this, sentItems);
-          BaseApp.showAlert(SecureSMS.MSG_INFO, SecureSMS.MSG_MESSAGEDELETED, null, AlertType.INFO, scSentItems, Alert.FOREVER);
+          BaseApp.showAlert(AppConstants.MSG_INFO, AppConstants.MSG_MESSAGEDELETED, null, AlertType.INFO, scSentItems, Alert.FOREVER);
           break;
         case AC_SHOWPINCHANGE:
-          scPINChange = new PINChangeScreen(SecureSMS.MSG_CHANGEPIN);
+          scPINChange = new PINChangeScreen(AppConstants.MSG_CHANGEPIN);
           scPINChange.setPIN(Settings.get(SecureSMS.STS_PIN));
           BaseApp.show(null, scPINChange, true);
           break;
         case AC_PINSAVE:
           final String newPIN = scPINChange.getPIN();
           if (newPIN == null) {
-            BaseApp.showAlert(SecureSMS.MSG_ERROR, SecureSMS.MSG_WRONGPIN, null, AlertType.ERROR, scPINChange, Alert.FOREVER);
+            BaseApp.showAlert(AppConstants.MSG_ERROR, AppConstants.MSG_WRONGPIN, null, AlertType.ERROR, scPINChange, Alert.FOREVER);
           }
           else {
             Settings.put(SecureSMS.STS_PIN, newPIN);
@@ -478,11 +437,11 @@ public class SecureSMS extends Application implements StoreObserver {
             BaseApp.show(null, scMenu, true);
           }
           else {
-            scInsertPIN.err.setText(BaseApp.messages[SecureSMS.MSG_INVALINDPIN]);
+            scInsertPIN.err.setText(BaseApp.messages[AppConstants.MSG_INVALINDPIN]);
           }
           break;
         case AC_CLEANUP:
-          scMenuCleanUp = Application.getMenu(BaseApp.messages[SecureSMS.MSG_CLEANUP], SecureSMS.ME_CLEANUP, -1, BaseApp.cBACK);
+          scMenuCleanUp = Application.getMenu(BaseApp.messages[AppConstants.MSG_CLEANUP], SecureSMS.ME_CLEANUP, -1, BaseApp.cBACK);
           BaseApp.show(null, scMenuCleanUp, true);
           break;
         case AC_CLEANUP1:
@@ -492,7 +451,7 @@ public class SecureSMS extends Application implements StoreObserver {
             BaseApp.back(null, scMenu, false);
           }
           else {
-            confirm(SecureSMS.MSG_CONFIRM, SecureSMS.MSG_ARESURE, SecureSMS.cYES, SecureSMS.cNO);
+            confirm(AppConstants.MSG_CONFIRM, AppConstants.MSG_ARESURE, SecureSMS.cYES, SecureSMS.cNO);
           }
           break;
         case AC_CLEANUP2:
@@ -501,7 +460,7 @@ public class SecureSMS extends Application implements StoreObserver {
             BaseApp.back(null, scMenu, false);
           }
           else {
-            confirm(SecureSMS.MSG_CONFIRM, SecureSMS.MSG_ARESURE, SecureSMS.cYES, SecureSMS.cNO);
+            confirm(AppConstants.MSG_CONFIRM, AppConstants.MSG_ARESURE, SecureSMS.cYES, SecureSMS.cNO);
           }
           break;
         case AC_CLEANUP3:
@@ -510,7 +469,7 @@ public class SecureSMS extends Application implements StoreObserver {
             BaseApp.back(null, scMenu, false);
           }
           else {
-            confirm(SecureSMS.MSG_CONFIRM, SecureSMS.MSG_ARESURE, SecureSMS.cYES, SecureSMS.cNO);
+            confirm(AppConstants.MSG_CONFIRM, AppConstants.MSG_ARESURE, SecureSMS.cYES, SecureSMS.cNO);
           }
           break;
         default:
@@ -521,7 +480,7 @@ public class SecureSMS extends Application implements StoreObserver {
     catch (final Throwable th) {
       th.printStackTrace();
       // set the alert type and next displayable and show the alert
-      BaseApp.showAlert(SecureSMS.MSG_ERROR, errMsg, null, AlertType.ERROR, back, Alert.FOREVER);
+      BaseApp.showAlert(AppConstants.MSG_ERROR, errMsg, null, AlertType.ERROR, back, Alert.FOREVER);
     }
     return processed;
   }
@@ -541,7 +500,7 @@ public class SecureSMS extends Application implements StoreObserver {
         // Show the alert
         // Left the alertNext as is. In case of overlapping Alerts the
         // screen to be shown next remains correct.
-        BaseApp.showAlert(SecureSMS.MSG_INFO, SecureSMS.MSG_MESSAGERECEIVED, null, AlertType.INFO, null, Alert.FOREVER);
+        BaseApp.showAlert(AppConstants.MSG_INFO, AppConstants.MSG_MESSAGERECEIVED, null, AlertType.INFO, null, Alert.FOREVER);
       }
       catch (final Throwable th) {
         // Ignored
@@ -550,3 +509,4 @@ public class SecureSMS extends Application implements StoreObserver {
   }
 
 }
+//#endif
