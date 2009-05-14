@@ -71,27 +71,6 @@ public class MineSweeper extends BoardGameApp {
   public static String RES_BOMB = "mine_bomb.wav";
   public static String RES_CLOCK = "mine_waktu.wav";
 
-  public static final int MSG_MENU_OPTIONS_LEVEL = BoardGameApp.MSG_MINE_USERDEF + 0;
-
-  public static final int MSG_TEXT_LEVEL_01 = BoardGameApp.MSG_MINE_USERDEF + 1;
-  public static final int MSG_TEXT_LEVEL_02 = BoardGameApp.MSG_MINE_USERDEF + 2;
-  public static final int MSG_TEXT_LEVEL_03 = BoardGameApp.MSG_MINE_USERDEF + 3;
-  public static final int MSG_TEXT_LEVEL_04 = BoardGameApp.MSG_MINE_USERDEF + 4;
-
-  public static final int MSG_NAME = BoardGameApp.MSG_MINE_USERDEF + 5;
-
-  public static final int MSG_CUSTOMLEVEL = BoardGameApp.MSG_MINE_USERDEF + 6;
-  public static final int MSG_CL_HEIGTH = BoardGameApp.MSG_MINE_USERDEF + 7;
-  public static final int MSG_CL_WIDTH = BoardGameApp.MSG_MINE_USERDEF + 8;
-  public static final int MSG_CL_BOMBS = BoardGameApp.MSG_MINE_USERDEF + 9;
-  public static final int MSG_CL_ERR_HEIGHT = BoardGameApp.MSG_MINE_USERDEF + 10;
-  public static final int MSG_CL_ERR_WIDTH = BoardGameApp.MSG_MINE_USERDEF + 11;
-  public static final int MSG_CL_ERR_BOMBS = BoardGameApp.MSG_MINE_USERDEF + 12;
-  public static final int MSG_CL_ERR_FRM = BoardGameApp.MSG_MINE_USERDEF + 13;
-  public static final int MSG_CL_ERR_TO = BoardGameApp.MSG_MINE_USERDEF + 14;
-
-  public static final int MSG_HS_LEVEL = BoardGameApp.MSG_MINE_USERDEF + 15;
-
   public static int usLevelInit = 0;
   public static int usLevel = 1;
   public static int usLevelLimit = -4;
@@ -132,19 +111,19 @@ public class MineSweeper extends BoardGameApp {
 
     BaseApp.menu = new short[][] {
         {
-            GameApp.ME_MAINMENU, GameApp.MSG_MENU_MAIN_CONTINUE, GameApp.GA_CONTINUE, 0
+            GameApp.ME_MAINMENU, AppConstants.MSG_MENU_MAIN_CONTINUE, GameApp.GA_CONTINUE, 0
         }, {
-            GameApp.ME_MAINMENU, GameApp.MSG_MENU_MAIN_NEWGAME, GameApp.GA_NEWGAME, 1
+            GameApp.ME_MAINMENU, AppConstants.MSG_MENU_MAIN_NEWGAME, GameApp.GA_NEWGAME, 1
         }, {
-            GameApp.ME_MAINMENU, GameApp.MSG_MENU_MAIN_HIGHSCORE, GameApp.GA_HIGHSCORE, 2
+            GameApp.ME_MAINMENU, AppConstants.MSG_MENU_MAIN_HIGHSCORE, GameApp.GA_HIGHSCORE, 2
         }, {
-            GameApp.ME_MAINMENU, GameApp.MSG_MENU_MAIN_OPTIONS, GameApp.GA_OPTIONS, 3
+            GameApp.ME_MAINMENU, AppConstants.MSG_MENU_MAIN_OPTIONS, GameApp.GA_OPTIONS, 3
         }, {
-            GameApp.ME_MAINMENU, GameApp.MSG_MENU_MAIN_SETTINGS, GameApp.GA_SETTINGS, 4
+            GameApp.ME_MAINMENU, AppConstants.MSG_MENU_MAIN_SETTINGS, GameApp.GA_SETTINGS, 4
         }, {
-            GameApp.ME_MAINMENU, GameApp.MSG_MENU_MAIN_HELP, GameApp.GA_HELP, 5
+            GameApp.ME_MAINMENU, AppConstants.MSG_MENU_MAIN_HELP, GameApp.GA_HELP, 5
         }, {
-            GameApp.ME_MAINMENU, GameApp.MSG_MENU_MAIN_ABOUT, GameApp.GA_ABOUT, 6
+            GameApp.ME_MAINMENU, AppConstants.MSG_MENU_MAIN_ABOUT, GameApp.GA_ABOUT, 6
         }
     };
     GameApp.hsName = "MineSweeper";
@@ -180,9 +159,9 @@ public class MineSweeper extends BoardGameApp {
   protected Displayable getOptions() {
 		final Form form = (Form)super.getOptions();
 		if (MineSweeper.usLevelLimit < 0) {
-			opDifficulty = new ChoiceGroup(BaseApp.messages[MineSweeper.MSG_MENU_OPTIONS_LEVEL], Choice.EXCLUSIVE);
+			opDifficulty = new ChoiceGroup(BaseApp.messages[AppConstants.MSG_MENU_OPTIONS_LEVEL], Choice.EXCLUSIVE);
 			for (int i = 0; i < 4; i++) {
-				opDifficulty.append(BaseApp.messages[MineSweeper.MSG_TEXT_LEVEL_01 + i], null);
+				opDifficulty.append(BaseApp.messages[AppConstants.MSG_TEXT_LEVEL_01 + i], null);
 			}
 			form.append(opDifficulty);
 		}
@@ -232,7 +211,7 @@ public class MineSweeper extends BoardGameApp {
   }
 
   public Alert makeAlert(final String err, final int min, final int max) {
-    return new Alert(BaseApp.messages[MineSweeper.MSG_CUSTOMLEVEL], err + BaseApp.messages[MineSweeper.MSG_CL_ERR_FRM] + min + BaseApp.messages[MineSweeper.MSG_CL_ERR_TO] + max, iError,
+    return new Alert(BaseApp.messages[AppConstants.MSG_CUSTOMLEVEL], err + BaseApp.messages[AppConstants.MSG_CL_ERR_FRM] + min + BaseApp.messages[AppConstants.MSG_CL_ERR_TO] + max, iError,
         AlertType.ERROR);
   }
 
@@ -245,11 +224,11 @@ public class MineSweeper extends BoardGameApp {
         boolean ok = true;
         if (ok && ((MineSweeper.height < MineSweeperGame.MINE_MIN_SIZE) || (MineSweeper.height > MineSweeperGame.MINE_MAX_SIZE))) {
           ok = false;
-          BaseApp.show(makeAlert(BaseApp.messages[MineSweeper.MSG_CL_ERR_HEIGHT], MineSweeperGame.MINE_MIN_SIZE, MineSweeperGame.MINE_MAX_SIZE), gameCustomLevel, false);
+          BaseApp.show(makeAlert(BaseApp.messages[AppConstants.MSG_CL_ERR_HEIGHT], MineSweeperGame.MINE_MIN_SIZE, MineSweeperGame.MINE_MAX_SIZE), gameCustomLevel, false);
         }
         if (ok && ((MineSweeper.width < MineSweeperGame.MINE_MIN_SIZE) || (MineSweeper.width > MineSweeperGame.MINE_MAX_SIZE))) {
           ok = false;
-          BaseApp.show(makeAlert(BaseApp.messages[MineSweeper.MSG_CL_ERR_WIDTH], MineSweeperGame.MINE_MIN_SIZE, MineSweeperGame.MINE_MAX_SIZE), gameCustomLevel, false);
+          BaseApp.show(makeAlert(BaseApp.messages[AppConstants.MSG_CL_ERR_WIDTH], MineSweeperGame.MINE_MIN_SIZE, MineSweeperGame.MINE_MAX_SIZE), gameCustomLevel, false);
         }
         int max = (MineSweeper.height - 1) * (MineSweeper.width - 1);
         if (max > MineSweeperGame.MAX_BOMB) {
@@ -257,7 +236,7 @@ public class MineSweeper extends BoardGameApp {
         }
         if (ok && ((MineSweeper.bomb < MineSweeperGame.MIN_BOMB) || (MineSweeper.bomb > max))) {
           ok = false;
-          BaseApp.show(makeAlert(BaseApp.messages[MineSweeper.MSG_CL_ERR_BOMBS], MineSweeperGame.MIN_BOMB, max), gameCustomLevel, false);
+          BaseApp.show(makeAlert(BaseApp.messages[AppConstants.MSG_CL_ERR_BOMBS], MineSweeperGame.MIN_BOMB, max), gameCustomLevel, false);
         }
         if (ok) {
 					super.doApplyOptions();
@@ -271,7 +250,7 @@ public class MineSweeper extends BoardGameApp {
   }
 
   protected Displayable getHighScore() {
-    final Form form = new FeatureForm(BaseApp.messages[GameApp.MSG_MENU_MAIN_HIGHSCORE]);
+    final Form form = new FeatureForm(BaseApp.messages[AppConstants.MSG_MENU_MAIN_HIGHSCORE]);
 		//#ifdef DMIDP20
     final Font f = Font.getFont(Font.STYLE_BOLD);
 		//#else
@@ -280,13 +259,13 @@ public class MineSweeper extends BoardGameApp {
 		//#endif
     for (int l = 0; l < GameApp.hsMaxLevel; l++) {
       final Vector scores = GameApp.highscore.getList(l);
-      final StringItem txt = new StringItem(BaseApp.messages[MineSweeper.MSG_HS_LEVEL] + BaseApp.messages[MineSweeper.MSG_TEXT_LEVEL_01 + l] + "\n", null);
+      final StringItem txt = new StringItem(BaseApp.messages[AppConstants.MSG_HS_LEVEL] + BaseApp.messages[AppConstants.MSG_TEXT_LEVEL_01 + l] + "\n", null);
 			//#ifdef DMIDP20
       txt.setFont(f);
 			//#endif
       form.append(txt);
       if (scores.size() == 0) {
-        form.append(BaseApp.messages[GameApp.MSG_TEXT_HIGHSCORE_01]);
+        form.append(BaseApp.messages[AppConstants.MSG_TEXT_HIGHSCORE_01]);
         form.append("\n");
       }
       else {
