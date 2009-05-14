@@ -32,7 +32,9 @@
 	<property name="dist.midp20.large" value="${target}/dist/midp20_large" />
 	<property name="dist.midp20.cldc11" value="${target}/dist/midp20_cldc11" />
 	<property name="dist.midp20.jsr75" value="${target}/dist/midp20_jsr75" />
+	<property name="dist.midp20.jsr120" value="${target}/dist/midp20_jsr120" />
 	<property name="dist.midp20.jsr135" value="${target}/dist/midp20_jsr135" />
+	<property name="dist.midp20.cldc11.jsr120" value="${target}/dist/midp20_cldc11_jsr120" />
 	<property name="dist.midp20.cldc11.jsr135" value="${target}/dist/midp20_cldc11_jsr135" />
 	<property name="dist.midp20.large.jsr135" value="${target}/dist/midp20_large_jsr135" />
 	<property name="dist.midp20.cldc11.jsr75" value="${target}/dist/midp20_cldc11_jsr75" />
@@ -49,7 +51,9 @@
 	<property name="build.midp20.large" value="${target}/build/midp20_large" />
 	<property name="build.midp20.cldc11" value="${target}/build/midp20_cldc11" />
 	<property name="build.midp20.jsr75" value="${target}/build/midp20_jsr75" />
+	<property name="build.midp20.jsr120" value="${target}/build/midp20_jsr120" />
 	<property name="build.midp20.jsr135" value="${target}/build/midp20_jsr135" />
+	<property name="build.midp20.cldc11.jsr120" value="${target}/build/midp20_cldc11_jsr120" />
 	<property name="build.midp20.cldc11.jsr135" value="${target}/build/midp20_cldc11_jsr135" />
 	<property name="build.midp20.large.jsr135" value="${target}/build/midp20_large_jsr135" />
 	<property name="build.midp20.cldc11.jsr75" value="${target}/build/midp20_cldc11_jsr75" />
@@ -199,6 +203,7 @@
 		<!-- anything in the code. -->
 		<property name="IGNOREKEYS" value="0000" />
 		<property name="DJSR82" value="DNOJSR82" />
+		<property name="DJSR120" value="DNOJSR120" />
 		<property name="DJSR135" value="DNOJSR135" />
 		<property name="DJSR184" value="DNOJSR184" />
 		<property name="log.subdir" value="jlogmicro" />
@@ -245,6 +250,7 @@
 			<filter token="DITUNESDEF" value="//#define ${DITUNESDEF}" />
 			<filter token="DJSR75" value="//#define ${DJSR75}" />
 			<filter token="DJSR82" value="//#define ${DJSR82}" />
+			<filter token="DJSR120" value="//#define ${DJSR120}" />
 			<filter token="DJSR135" value="//#define ${DJSR135}" />
 			<filter token="DJSR184" value="//#define ${DJSR184}" />
 			<filter token="DJSR238" value="//#define ${DJSR238}" />
@@ -332,6 +338,7 @@
 	    <echo message="DFEATUREFORMIMPORTDEF=${DFEATUREFORMIMPORTDEF}" />
 	    <echo message="DJSR75=${DJSR75}" />
 	    <echo message="DJSR82=${DJSR82}" />
+	    <echo message="DJSR120=${DJSR120}" />
 	    <echo message="DJSR135=${DJSR135}" />
 	    <echo message="DJSR184=${DJSR184}" />
 	    <echo message="DJSR238=${DJSR238}" />
@@ -362,7 +369,7 @@
 		<!-- Copy unpreprocessed source to compiled src dir -->
 		<delete dir="${tmppreprocess}" />
 		<mkdir dir="${tmppreprocess}" />
-		<property name="preprocess.defines" value="DEBUG=WARN,${DMIDPVERS},${DCLDCVERS},${DITUNESDEF},${DMEMSIZEDEF},${DJSR75},${DJSR82},${DJSR135},${DJSR184},${DJSR238},${DTESTDEF},${DJMTESTDEF},${DLOGDEF},${DTESTUIDEF},${DCOMPATDEF},${DFEATUREFORMDEF}" />
+		<property name="preprocess.defines" value="DEBUG=WARN,${DMIDPVERS},${DCLDCVERS},${DITUNESDEF},${DMEMSIZEDEF},${DJSR75},${DJSR82},${DJSR120},${DJSR135},${DJSR184},${DJSR238},${DTESTDEF},${DJMTESTDEF},${DLOGDEF},${DTESTUIDEF},${DCOMPATDEF},${DFEATUREFORMDEF}" />
 		<echo message="preprocess.defines=${preprocess.defines}." />
 		<wtkpreprocess srcdir="${presrc}" destdir="${tmppreprocess}" encoding="${wtk.encoding}" symbols="${preprocess.defines}" if="presrc" />
 		<echo message="Preprocess util pre src if set ${presrc.util.src}." />
@@ -620,6 +627,8 @@
 	</target>
 
 	<target name="copy.res" if="need.res" depends="prepare" >
+		<echo message="to.res.dir=${to.res.dir}" />
+		<echo message="icon.dir=${icon.dir}" />
 		<property name="res.excludes" value="bogus" />
 		<echo message="res.excludes=${res.excludes}" />
 		<delete dir="${to.res.dir}" />
@@ -1036,6 +1045,15 @@
 		</antcall>
 	</target>
 
+	<!-- Compile using WTK with MIDP-2.0 and JSR-120 and test -->
+	<target name="compile.2.0.jsr120" >
+		<antcall target="compile" >
+			<param name="wtk.properties" value="wtk2.0jsr120.properties${wtk.template}" />
+			<param name="no.staging" value="true" />
+			<param name="no.release" value="true" />
+		</antcall>
+	</target>
+
 	<!-- Compile using WTK with MIDP-2.0 and JSR-135 and test -->
 	<target name="compile.2.0.jsr135" >
 		<antcall target="compile" >
@@ -1058,6 +1076,15 @@
 	<target name="compile.2.0.cldc1.1.jsr135" >
 		<antcall target="compile" >
 			<param name="wtk.properties" value="wtk2.0cldc1.1.jsr135.properties${wtk.template}" />
+			<param name="no.staging" value="true" />
+			<param name="no.release" value="true" />
+		</antcall>
+	</target>
+
+	<!-- Compile using WTK with MIDP-2.0, CLDC 1.1 and JSR-120 and test -->
+	<target name="compile.2.0.cldc1.1.jsr120" >
+		<antcall target="compile" >
+			<param name="wtk.properties" value="wtk2.0cldc1.1.jsr120.properties${wtk.template}" />
 			<param name="no.staging" value="true" />
 			<param name="no.release" value="true" />
 		</antcall>
