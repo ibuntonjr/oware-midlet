@@ -66,6 +66,7 @@ import net.sf.yinlight.boardgame.oware.game.BoardGameApp;
 import net.sf.yinlight.boardgame.oware.game.BoardGameScreen;
 import com.substanceofcode.rssreader.presentation.FeatureForm;
 import com.substanceofcode.rssreader.presentation.FeatureMgr;
+import net.sf.yinlight.boardgame.oware.midlet.AppConstants;
 
 
 //#ifdef DLOGGING
@@ -138,8 +139,8 @@ public class OwareMIDlet extends BoardGameApp {
 		traceLoggable = logger.isLoggable(Level.TRACE);
 		//#endif
 		BoardGameApp.storeName = "OWARE_GAME_STORE";
-		BoardGameApp.gsLevelMsg = new int[] { BoardGameApp.MSG_AILEVEL1,
-			BoardGameApp.MSG_AILEVEL2, BoardGameApp.MSG_AILEVEL3};
+		BoardGameApp.gsLevelMsg = new int[] { AppConstants.MSG_AILEVEL1,
+			AppConstants.MSG_AILEVEL2, AppConstants.MSG_AILEVEL3};
 		BoardGameApp.gsSquareImages = new String[0];
 		BoardGameApp.gsPiece1Images =
 			new String[] {"oware_icon12.png", "oware_icon14.png", "oware_icon16.png",
@@ -176,6 +177,8 @@ public class OwareMIDlet extends BoardGameApp {
 			super.init();
 			//#ifdef DLOGGING
 			logger.info("BoardGameApp.precalculate=" + BoardGameApp.precalculate);
+			logger.info("BaseApp.messages[AppConstants.MSG_OWARE_NAME]=" + BaseApp.messages[AppConstants.MSG_OWARE_NAME]);
+			logger.info("BaseApp.messages[AppConstants.MSG_OWARE_USERDEF - 1]=" + BaseApp.messages[AppConstants.MSG_OWARE_USERDEF - 1]);
 			//#endif
 			// UNDO Fix pre calculate
 			if (BoardGameApp.precalculate) {
@@ -185,7 +188,7 @@ public class OwareMIDlet extends BoardGameApp {
 				BoardGameApp.precalculate = false;
 			}
 			BoardGameApp.playerNames = new String[] {
-					BaseApp.messages[BoardGameApp.MSG_NAMEPLAYER1], BaseApp.messages[BoardGameApp.MSG_NAMEPLAYER2]};
+					BaseApp.messages[AppConstants.MSG_NAMEPLAYER1], BaseApp.messages[AppConstants.MSG_NAMEPLAYER2]};
 		} catch (Throwable e) {
 			e.printStackTrace();
 			//#ifdef DLOGGING
