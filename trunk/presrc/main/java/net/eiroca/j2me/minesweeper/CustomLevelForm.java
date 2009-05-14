@@ -23,14 +23,15 @@ import net.eiroca.j2me.minesweeper.MineSweeper;
 import javax.microedition.lcdui.TextField;
 import net.eiroca.j2me.app.BaseApp;
 import com.substanceofcode.rssreader.presentation.FeatureForm;
+import net.sf.yinlight.boardgame.oware.midlet.AppConstants;
 
 public class CustomLevelForm extends FeatureForm {
 
   private final TextField tBomb;
 
   public CustomLevelForm() {
-    super(BaseApp.messages[MineSweeper.MSG_CUSTOMLEVEL]);
-    tBomb = new TextField(BaseApp.messages[MineSweeper.MSG_CL_BOMBS], "", 2, TextField.NUMERIC);
+    super(BaseApp.messages[AppConstants.MSG_CUSTOMLEVEL]);
+    tBomb = new TextField(BaseApp.messages[AppConstants.MSG_CL_BOMBS], "", 2, TextField.NUMERIC);
     append(tBomb);
   }
 
