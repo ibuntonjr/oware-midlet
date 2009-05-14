@@ -1,0 +1,22 @@
+wtk.midp.version = 2.0
+wtk.cldc.version = 1.1
+wtk.optionalpda.enabled = false
+wtk.wma.enabled = true
+wtk.wma.version = 1.1
+wtk.mmapi.enabled  = false
+wtk.miapi.enabled  = false
+debug = debug
+DMIDPVERS = DMIDP20
+#Don't allow Itunes to save performance and memory
+DITUNESDEF = DNOITUNES
+DJSR75 = DNOJSR75
+DJSR120 = DJSR120
+DMEMSIZEDEF = DREGULARMEM
+#1.1 kills us.
+DCLDCVERS = DCLDCV11
+JMIDPVERS = MIDP-2.0 
+JCLDCVERS = CLDC-1.1
+file.prefix = midp20_cldc11_jsr120_
+bin = ${target}/bin20cldc11jsr120
+MIDLETVERS = ${MIDLETVERSROOT}
+SUFFIXVERS =  2.0-cldc1.1-jsr120
