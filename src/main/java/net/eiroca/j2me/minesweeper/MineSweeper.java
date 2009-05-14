@@ -290,6 +290,10 @@ public class MineSweeper extends BoardGameApp {
 		//#endif
 		try {
 			super.init();
+			//#ifdef DLOGGING
+//@			logger.info("BaseApp.messages[AppConstants.MSG_MINE_NAME]=" + BaseApp.messages[AppConstants.MSG_MINE_NAME]);
+//@			logger.info("BaseApp.messages[AppConstants.MSG_MINE_USERDEF - 1]=" + BaseApp.messages[AppConstants.MSG_MINE_USERDEF - 1]);
+			//#endif
 			BoardGameApp.playerNames = new String[] {
 					BaseApp.messages[AppConstants.MSG_UPPER],
 					BaseApp.messages[AppConstants.MSG_LOWER]};
