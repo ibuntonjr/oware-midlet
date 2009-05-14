@@ -52,6 +52,7 @@ import net.eiroca.j2me.minesweeper.game.MineSweeperGame;
 import net.sf.yinlight.boardgame.oware.game.BoardGameScreen;
 import net.sf.yinlight.boardgame.oware.game.BoardGameTable;
 import net.sf.yinlight.boardgame.oware.game.BoardGameMove;
+import net.sf.yinlight.boardgame.oware.midlet.AppConstants;
 
 //#ifdef DLOGGING
 //@import net.sf.jlogmicro.util.logging.Logger;
@@ -100,7 +101,7 @@ public final class MineSweeperScreen extends BoardGameScreen {
   //#endif
 
   public MineSweeperScreen(final GameApp midlet) {
-		super(midlet, false, true, MineSweeper.MSG_NAME);
+		super(midlet, false, true, AppConstants.MSG_MINE_NAME);
 		//#ifdef DMIDP20
     try {
 			//#ifdef DLOGGING
