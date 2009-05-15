@@ -17,17 +17,36 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+/**
+ * Modification started 2009-05-13.
+ */
+// Expand to define JSR-120 define
+@DJSR120@
+// Expand to define J2ME define
+@DJ2MEDEF@
+// Expand to define J2SE define
+@DJ2SEDEF@
+// Expand to define logging define
+@DLOGDEF@
+//#ifdef DJSR120
 package net.eiroca.j2me.sm.util;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Enumeration;
 import java.util.Vector;
+//#ifdef DJ2ME
 import javax.microedition.rms.RecordComparator;
 import javax.microedition.rms.RecordEnumeration;
 import javax.microedition.rms.RecordFilter;
 import javax.microedition.rms.RecordStore;
 import javax.microedition.rms.RecordStoreException;
 import net.eiroca.j2me.app.BaseApp;
+
+//#ifdef DLOGGING
+import net.sf.jlogmicro.util.logging.Logger;
+import net.sf.jlogmicro.util.logging.Level;
+//#endif
+//#endif
 
 /**
  * This is the superclass for all storage implementations.
@@ -36,7 +55,16 @@ public class Store {
 
   private static final String MESSAGE_ENCODING = "UTF-8";
 
+	//#ifdef DJ2ME
   public static RecordComparator naturalOrder = new StoreComparatorByID();
+
+  //#ifdef DLOGGING
+  private Logger logger = Logger.getLogger("Store");
+  private boolean fineLoggable = logger.isLoggable(Level.FINE);
+  private boolean finestLoggable = logger.isLoggable(Level.FINEST);
+  private boolean traceLoggable = logger.isLoggable(Level.TRACE);
+  //#endif
+	//#endif
 
   public static String decodeData(final byte[] data) {
     String msg;
@@ -60,25 +88,35 @@ public class Store {
     return data;
   }
 
+	//#ifdef DJ2ME
   public static final long getID(final byte[] serializedMessage) {
     return BaseApp.encodeBytesToLong(serializedMessage, 0);
   }
+	//#endif
 
   private final Vector observers = new Vector();
   protected final String name;
+	//#ifdef DJ2ME
   protected RecordStore recordStore;
+	//#endif
 
   public Store(final String storeName) throws StoreException {
     name = storeName;
+		//#ifdef DJ2ME
     try {
       // Get the RecordStore instance for the given name, create the underlying
       // RDS store if needed.
       recordStore = RecordStore.openRecordStore(name, true);
     }
     catch (final RecordStoreException rse) {
+			rse.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("Store error", rse);
+			//#endif
       // Rethrow the exception
       throw new StoreException(StoreException.ERR_STOREOPEN);
     }
+		//#endif
 
   }
 
@@ -102,6 +140,7 @@ public class Store {
     }
   }
 
+	//#ifdef DJ2ME
   public long[] listIds(final RecordComparator c) throws StoreException {
     // Request the enumeration
     RecordEnumeration enm = null;
@@ -120,6 +159,10 @@ public class Store {
       return ids;
     }
     catch (final RecordStoreException rse) {
+			rse.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("listIds error", rse);
+			//#endif
       // Notify the caller
       throw new StoreException(StoreException.ERR_STORELISTIDS);
     }
@@ -141,6 +184,10 @@ public class Store {
       }
     }
     catch (final RecordStoreException rse) {
+			rse.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("findFirst error", rse);
+			//#endif
       throw new StoreException(StoreException.ERR_STOREFIND);
     }
     finally {
@@ -211,7 +258,13 @@ public class Store {
       recordStore = RecordStore.openRecordStore(name, true);
     }
     catch (final RecordStoreException e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("cleanup error", e);
+			//#endif
     }
   }
+	//#endif
 
 }
+//#endif
