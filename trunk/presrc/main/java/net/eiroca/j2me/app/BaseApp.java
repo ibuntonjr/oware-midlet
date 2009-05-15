@@ -45,6 +45,10 @@
  */
 // Expand to define MIDP define
 @DMIDPVERS@
+// Expand to define J2ME define
+@DJ2MEDEF@
+// Expand to define J2SE define
+@DJ2SEDEF@
 // Expand to define test define
 @DTESTDEF@
 // Expand to define JMUnit test define
@@ -70,6 +74,7 @@ import java.util.Random;
 import java.util.Stack;
 import java.util.TimeZone;
 import java.util.Vector;
+//#ifdef DJ2ME
 import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
@@ -112,11 +117,14 @@ import net.sf.jlogmicro.util.logging.FormHandler;
 import net.sf.jlogmicro.util.logging.Level;
 //#endif
 
+//#endif
+
 /**
   * Perform application tasks, standard commands.  Store messages, menus, and
 	* icons
   */
 public abstract class BaseApp
+//#ifdef DJ2ME
 //#ifdef DJMTEST
 extends TestSuite
 //#else
@@ -126,8 +134,10 @@ implements CommandListener
 //#ifdef DMIDP20
 , ItemCommandListener
 //#endif
+//#endif
 {
 
+	//#ifdef DJ2ME
   public static final String NL = "\r\n";
   public static final String sCR = "\n";
   public static final char CR = '\n';
@@ -167,6 +177,7 @@ implements CommandListener
   public static final int INT_LENGTH = 4;
   private final static char[] charTab = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".toCharArray();
 
+	//#endif
   /**
    * Encodes int to byte array using the given offset.
    *
@@ -223,6 +234,7 @@ implements CommandListener
         | ((bytes[bytesOffset++] & 0xffL) << 24) | ((bytes[bytesOffset++] & 0xffL) << 16) | ((bytes[bytesOffset++] & 0xffL) << 8) | (bytes[bytesOffset] & 0xffL);
   }
 
+	//#ifdef DJ2ME
   /**
    * Encodes the bytes to the Hex String. Used for the key conversion in the UI.
    *
@@ -2196,6 +2208,7 @@ implements CommandListener
     }
     return found;
   }
+	//#endif
 	//#endif
 
 }
