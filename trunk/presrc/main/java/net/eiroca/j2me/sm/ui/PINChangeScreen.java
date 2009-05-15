@@ -15,6 +15,16 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+/**
+ * Modification started 2009-05-13.
+ */
+// Expand to define JSR-120 test define
+@DJSR120@
+// Expand to define JMUnit test define
+@DJMTESTDEF@
+// Expand to define logging define
+@DLOGDEF@
+//#ifdef DJSR120
 package net.eiroca.j2me.sm.ui;
 
 import net.eiroca.j2me.sm.midlet.SecureSMS;
@@ -60,3 +70,4 @@ public class PINChangeScreen extends Form {
   }
 
 }
+//#endif
