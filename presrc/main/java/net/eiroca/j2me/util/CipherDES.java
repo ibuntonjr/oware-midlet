@@ -42,6 +42,11 @@
  * Modification started 2009-05-13.
  */
 
+// Expand to define JSR-120 define
+@DJSR120@
+// Expand to define logging define
+@DLOGDEF@
+//#ifdef DJSR120
 package net.eiroca.j2me.util;
 
 import net.eiroca.j2me.app.BaseApp;
@@ -358,3 +363,4 @@ public class CipherDES {
   }
 
 }
+//#endif
