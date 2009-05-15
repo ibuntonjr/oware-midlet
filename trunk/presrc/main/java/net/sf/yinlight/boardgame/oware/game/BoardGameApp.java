@@ -58,9 +58,11 @@ import net.eiroca.j2me.app.BaseApp;
 import net.eiroca.j2me.game.GameApp;
 import net.eiroca.j2me.game.GameScreen;
 import net.eiroca.j2me.game.tpg.GameMinMax;
+/* future
 //#ifdef DTEST
 import net.sf.yinlight.boardgame.oware.game.OwareTable;
 //#endif
+*/
 import net.sf.yinlight.boardgame.oware.game.BoardGameScreen;
 import com.substanceofcode.rssreader.presentation.FeatureForm;
 import net.eiroca.j2me.rms.Settings;
@@ -115,10 +117,12 @@ abstract public class BoardGameApp extends GameApp {
 	//#ifdef DLOGGING
   protected TextField opLogLevel;
 	//#endif
+  /* future
 	//#ifdef DTEST
   public static final int MAX_STR_ROW = OwareTable.NBR_COL + 3;
   protected Displayable gameTest = null;
 	//#endif
+	*/
 
   public static String BOARD_GAME_PLAYER = "board-game-player";
   public static String BOARD_GAME_FIRST = "board-game-first";
@@ -550,6 +554,7 @@ abstract public class BoardGameApp extends GameApp {
 				}
 			}
 			//#endif
+			/* future
 			//#ifdef DTEST
 			else if (d == gameTest) {
 				if (c == BaseApp.cOK) {
@@ -559,6 +564,7 @@ abstract public class BoardGameApp extends GameApp {
 				}
 			}
 			//#endif
+			*/
 			else {
 					super.commandAction(c, d);
 			}
