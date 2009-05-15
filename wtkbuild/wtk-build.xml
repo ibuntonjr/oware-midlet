@@ -64,6 +64,7 @@
 	<property name="build.midp20.cldc11.jsr75.jsr82.jsr135.jsr184" value="${target}/build/midp20_cldc11_jsr75_jsr82_jsr135_jsr184" />
 	<property name="build.midp20.jsr75.jsr238" value="${target}/build/midp20_jsr75.jsr238" />
 	<property name="classes" value="${target}/classes" />
+	<property name="j2se.classes" value="${target}/j2se.classes" />
 	<property name="tmppreprocess" value="${target}/tmppreprocess" />
 	<property name="tmpconcat" value="${target}/tmpconcat" />
 	<property name="util.tmppreprocess" value="${target}/util.tmppreprocess" />
@@ -161,7 +162,7 @@
 
 	<target name="prepare.games" depends="prepare.no.large" >
 			<property name="Testsuite-concat.jad" value="" />
-			<property name="src.excludes" value="**/testsuite/**,testsuite/**" />
+			<property name="src.excludes" value="**/testsuite/**,testsuite/**,**/j2se/*" />
 			<property name="res.excludes" value="**/testsuite*,testsuite*" />
 	</target>
 
@@ -171,10 +172,11 @@
 			<property name="MIDLETDESC" value="Reversi Game" />
 			<property name="Reversi-concat.nbr" value="1" />
 			<property name="Oware-concat.jad" value="" />
+			<property name="SecureSMS-concat.jad" value="" />
 			<property name="Minesweeper-concat.jad" value="" />
 			<property name="Testsuite-concat.jad" value="" />
-			<property name="src.excludes" value="**/testsuite/**,**/minesweeper/**,**/Oware*,**/Mine*,testsuite/**,minesweeper/**,Oware*,Mine*" />
-			<property name="res.excludes" value="**/oware*,**/mine*,**/testsuite*,oware*,mine*,testsuite*" />
+			<property name="src.excludes" value="**/testsuite/**,**/minesweeper/**,**/Oware*,**/Mine*,testsuite/**,minesweeper/**,Oware*,Mine*,**/j2se/*,**/sm/*" />
+			<property name="res.excludes" value="**/oware*,**/mine*,**/testsuite*,oware*,mine*,testsuite*,**/sm/*" />
 	</target>
 
 	<target name="prepare.testsuite" depends="prepare.large" >
@@ -185,9 +187,22 @@
 			<property name="Oware-concat.jad" value="" />
 			<property name="Minesweeper-concat.jad" value="" />
 			<property name="Reversi-concat.jad" value="" />
-			<property name="src.excludes" value="**/reversi/**,**/minesweeper/**,**/Oware*,**/Reversi*,**/Mine*,reversi/**,minesweeper/**,Oware*,Mine*" />
-			<property name="res.excludes" value="**/oware*,**/mine*,**/reversi*,oware*,mine*,reversi*" />
+			<property name="SecureSMS-concat.jad" value="" />
+			<property name="src.excludes" value="**/reversi/**,**/minesweeper/**,**/Oware*,**/Reversi*,**/Mine*,reversi/**,minesweeper/**,Oware*,Mine*,**/j2se/*" />
+			<property name="res.excludes" value="**/oware*,**/mine*,**/reversi*,oware*,mine*,reversi,**/sm/**" />
 	</target>
+
+	<target name="prepare.j2se" >
+			<property name="DJSR120" value="DJSR120" />
+			<property name="DJ2MEDEF" value="DNOJ2ME" />
+			<property name="DJ2SEDEF" value="DJ2SE" />
+			<property name="src.includes" value="**/MakeSMFile.java,**/BaseApp.java,**/Store.java,**/StoreObserver.java,**/StoreException.java,**/CipherDES.java,**/Address.java,**/MessageHandlerException.java" />
+			<property name="src.excludes" value="**/com/*,**/sf/yinlight/boardgame/**" />
+			<property name="jar.src.includes" value="bogus" />
+			<property name="jar.src.excludes" value="**/*.java" />
+			<property name="wtk.properties" value="wtk2.0.properties${wtk.template}" />
+	</target>
+
 
 	<!-- prepare the target folder -->
 	<target name="prepare" depends="test.prepare,release.prepare" >
@@ -202,10 +217,13 @@
 		<!-- Use an invalid value.  The extra 0's mean that it will not match -->
 		<!-- anything in the code. -->
 		<property name="IGNOREKEYS" value="0000" />
+		<property name="DJ2MEDEF" value="DJ2ME" />
+		<property name="DJ2SEDEF" value="DNOJ2SE" />
 		<property name="DJSR82" value="DNOJSR82" />
 		<property name="DJSR120" value="DNOJSR120" />
 		<property name="DJSR135" value="DNOJSR135" />
 		<property name="DJSR184" value="DNOJSR184" />
+		<property name="DJSR238" value="DNOJSR238" />
 		<property name="log.subdir" value="jlogmicro" />
 		<property name="GRAPHICS" value="true" />
 		<property name="PRECALCULATE" value="false" />
@@ -215,8 +233,10 @@
 		<property name="Reversi-concat.nbr" value="2" />
 		<property name="Minesweeper-concat.jad" value="Minesweeper-concat.jad" />
 		<property name="Minesweeper-concat.nbr" value="3" />
+		<property name="SecureSMS-concat.jad" value="SecureSMS-concat.jad" />
+		<property name="SecureSMS--concat.nbr" value="4" />
 		<property name="Testsuite-concat.jad" value="Testsuite-concat.jad" />
-		<property name="Testsuite-concat.nbr" value="4" />
+		<property name="Testsuite-concat.nbr" value="5" />
 		<!-- undo
 		<property name="language.file" value="messages_en_US.xml" />
 		<xmlproperty file="${msg.dir}/${language.file}" collapseAttributes="true" />
@@ -248,6 +268,8 @@
 			<filter token="DFEATUREFORMDEF" value="//#define ${DFEATUREFORMDEF}" />
 			<filter token="DMEMSIZEDEF" value="//#define ${DMEMSIZEDEF}" />
 			<filter token="DITUNESDEF" value="//#define ${DITUNESDEF}" />
+			<filter token="DJ2MEDEF" value="//#define ${DJ2MEDEF}" />
+			<filter token="DJ2SEDEF" value="//#define ${DJ2SEDEF}" />
 			<filter token="DJSR75" value="//#define ${DJSR75}" />
 			<filter token="DJSR82" value="//#define ${DJSR82}" />
 			<filter token="DJSR120" value="//#define ${DJSR120}" />
@@ -336,6 +358,8 @@
 	    <echo message="DMEMSIZEDEF=${DMEMSIZEDEF}" />
 	    <echo message="DFEATUREFORMDEF=${DFEATUREFORMDEF}" />
 	    <echo message="DFEATUREFORMIMPORTDEF=${DFEATUREFORMIMPORTDEF}" />
+	    <echo message="DJ2MEDEF=${DJ2MEDEF}" />
+	    <echo message="DJ2SEDEF=${DJ2SEDEF}" />
 	    <echo message="DJSR75=${DJSR75}" />
 	    <echo message="DJSR82=${DJSR82}" />
 	    <echo message="DJSR120=${DJSR120}" />
@@ -369,7 +393,7 @@
 		<!-- Copy unpreprocessed source to compiled src dir -->
 		<delete dir="${tmppreprocess}" />
 		<mkdir dir="${tmppreprocess}" />
-		<property name="preprocess.defines" value="DEBUG=WARN,${DMIDPVERS},${DCLDCVERS},${DITUNESDEF},${DMEMSIZEDEF},${DJSR75},${DJSR82},${DJSR120},${DJSR135},${DJSR184},${DJSR238},${DTESTDEF},${DJMTESTDEF},${DLOGDEF},${DTESTUIDEF},${DCOMPATDEF},${DFEATUREFORMDEF}" />
+		<property name="preprocess.defines" value="DEBUG=WARN,${DMIDPVERS},${DCLDCVERS},${DITUNESDEF},${DMEMSIZEDEF},${DJ2MEDEF},${DJ2SEDEF}${DJSR75},${DJSR82},${DJSR120},${DJSR135},${DJSR184},${DJSR238},${DTESTDEF},${DJMTESTDEF},${DLOGDEF},${DTESTUIDEF},${DCOMPATDEF},${DFEATUREFORMDEF}" />
 		<echo message="preprocess.defines=${preprocess.defines}." />
 		<wtkpreprocess srcdir="${presrc}" destdir="${tmppreprocess}" encoding="${wtk.encoding}" symbols="${preprocess.defines}" if="presrc" />
 		<echo message="Preprocess util pre src if set ${presrc.util.src}." />
@@ -382,10 +406,12 @@
 		<wtkpreprocess srcdir="${compat.presrc}" destdir="${tmppreprocess}" encoding="${wtk.encoding}" symbols="${preprocess.defines}" if="compat.presrc" />
 		<echo message="Preprocess jar src if set ${jar.presrc}." />
 		<wtkpreprocess srcdir="${jar.presrc}" destdir="${tmppreprocess}" encoding="${wtk.encoding}" symbols="${preprocess.defines}" if="jar.presrc" />
-		<property name="src.excludes" value="bogus" />
+		<property name="src.includes" value="**/*.java" />
+		<echo message="src.includes=${src.includes}" />
+		<property name="src.excludes" value="**/j2se/*" />
 		<echo message="src.excludes=${src.excludes}" />
 		<copy todir="${comp.src}" overwrite="true" >
-			<fileset dir="${tmppreprocess}" includes="**/*.java" excludes="${src.excludes}" />
+			<fileset dir="${tmppreprocess}" includes="${src.includes}" excludes="${src.excludes}" />
 			<filterset refid="defile.filter" />
 		</copy>
 		<delete>
@@ -485,10 +511,11 @@
 	<!-- Copy preprocessed src to unprocessed source to allow the -->
 	<!-- src to be checked in or compiled with Netbeans -->
 	<target name="copy.comp.src" depends="prepare" if="unproc.src" >
+		<echo message="src.includes=${src.includes}" />
 		<copy todir="${src}" overwrite="true" >
 			<!-- remove compatibility classes as these are kept in compatsrc -->
 			<!-- remove testui classes as these are kept in testui -->
-			<fileset dir="${comp.src}" includes="**/*.java" />
+			<fileset dir="${comp.src}" includes="${src.includes}" />
 		</copy>
 		<antcall target="delete.test.src" >
 			<param name="dsrc" value="${src}" />
@@ -506,10 +533,16 @@
 	</target>
 
 	<target name="copy.unproc.comp" depends="prepare" if="unproc.src" >
+		<property name="src.includes" value="**/*.java" />
+		<echo message="src.includes=${src.includes}" />
+		<property name="src.excludes" value="**/j2se/*" />
 		<echo message="src.excludes=${src.excludes}" />
 		<copy todir="${comp.src}" overwrite="true" >
-			<fileset dir="${unproc.src}" includes="**/*.java" excludes="${src.excludes}" />
+			<fileset dir="${unproc.src}" includes="${src.includes}" excludes="${src.excludes}" />
 		</copy>
+		<delete>
+			<fileset dir="${comp.src}" includes="${src.excludes}" />
+		</delete>
 	</target>
 
 	<target name="copy.util.comp" depends="prepare" if="util.src" >
@@ -537,6 +570,21 @@
 		<pathelement location="lib/JLogMicro.jar" />
 	</path>
 
+	<target name="finish.preprocess" depends="prepare">
+		<delete dir="${comp.src}" />
+		<mkdir dir="${comp.src}" />
+		<antcall target="copy.unproc.comp" />
+		<antcall target="copy.util.comp" />
+		<antcall target="preprocess" />
+		<antcall target="display.props" />
+
+		<echo message="add.jars=${add.jars}" />
+		<antcall target="add.jars" />
+		<antcall target="copy.jar.src" />
+		<antcall target="wtk.src.copy" />
+		<antcall target="display.props" />
+	</target>
+
 	<target name="compile" depends="prepare">
 
 		<!-- Copy a JAD file from the WTK's demo applications.
@@ -545,19 +593,8 @@
 
 		<!-- Delete directory to compile so that we start fresh for cases -->
 		<!-- when we delete a file. -->
-		<delete dir="${comp.src}" />
-		<mkdir dir="${comp.src}" />
-		<antcall target="copy.unproc.comp" />
-		<antcall target="copy.util.comp" />
-		<antcall target="preprocess" />
 		<!-- Compile everything, but don't preverify (yet). -->
-		<antcall target="display.props" />
-
-		<echo message="add.jars=${add.jars}" />
-		<antcall target="add.jars" />
-		<antcall target="copy.jar.src" />
-		<antcall target="wtk.src.copy" />
-		<antcall target="display.props" />
+		<antcall target="finish.preprocess" />
 		<wtkbuild srcdir="${comp.src}" destdir="${classes}" preverify="false" >
 		<!--
 			<classpath>
@@ -569,6 +606,38 @@
 		<wtkbuild srcdir="${comp.src}:${util.comp.src}" destdir="${classes}" preverify="false" />
 		-->
 
+	</target>
+
+	<target name="compile.j2se" depends="prepare.j2se,prepare">
+
+		<!-- Copy a JAD file from the WTK's demo applications.
+             Caution: Ant only copies this the first time. Also
+             make a directory to compile into. -->
+
+		<!-- Delete directory to compile so that we start fresh for cases -->
+		<!-- when we delete a file. -->
+		<!-- Compile everything, but don't preverify (yet). -->
+		<delete dir="${j2se.classes}" />
+		<mkdir dir="${j2se.classes}" />
+		<antcall target="finish.preprocess" />
+		<delete dir="${test.comp.src}" />
+		<mkdir dir="${test.comp.src}" />
+		<copy todir="${test.comp.src}" >
+			<fileset dir="../presrc/test/java" includes="${src.includes}" excludes="${src.excludes}" />
+		</copy>
+		<antcall target="display.props" />
+		<javac destdir="${j2se.classes}" >
+			<src path="${comp.src}" />
+			<src path="${test.comp.src}" />
+		</javac>
+	</target>
+
+	<target name="test.j2se" depends="compile.j2se" >
+		<java classpath="${j2se.classes}" classname="net.sf.yinlight.j2se.sm.util.MakeSMFile" >
+			<sysproperty key="input" value="${input}" />
+			<sysproperty key="output" value="${output}" />
+			<sysproperty key="skey" value="${skey}" />
+		</java>
 	</target>
 
 	<target name="build.testdata" depends="prepare" >
@@ -595,8 +664,12 @@
 	</target>
 
 	<target name="copy.jar.src" if="copy.jar.src" >
+		<property name="jar.src.includes" value="**/*.java" />
+		<echo message="jar.src.includes=${jar.src.includes}" />
+		<property name="jar.src.excludes" value="**/*MIDlet*,**/j2se/*" />
+		<echo message="jar.src.excludes=${jar.src.excludes}" />
 		<copy todir="${comp.src}" >
-			<fileset dir="${jarsrc}" excludes="**/*MIDlet*" />
+			<fileset dir="${jarsrc}" includes="${jar.src.includes}" excludes="${jar.src.excludes}" />
 		</copy>
 	</target>
 
@@ -751,6 +824,10 @@
 		<antcall target="cat.to.midlet" >
 			<param name="concat.jad" value="${Minesweeper-concat.jad}" />
 			<param name="concat.nbr" value="${Minesweeper-concat.nbr}" />
+		</antcall>
+		<antcall target="cat.to.midlet" >
+			<param name="concat.jad" value="${SecureSMS-concat.jad}" />
+			<param name="concat.nbr" value="${SecureSMS-concat.nbr}" />
 		</antcall>
 		<antcall target="cat.to.midlet" >
 			<param name="concat.jad" value="${Testsuite-concat.jad}" />
@@ -1008,6 +1085,10 @@
 		</antcall>
 	</target>
 
+	<target name="compile.1.0.reversi" depends="prepare.reversi" >
+		<antcall target="compile.1.0" />
+	</target>
+
 	<!-- Compile using WTK with MIDP-2.0 and test -->
 	<target name="compile.2.0">
 		<antcall target="compile" >
@@ -1015,6 +1096,10 @@
 			<param name="no.staging" value="true" />
 			<param name="no.release" value="true" />
 		</antcall>
+	</target>
+
+	<target name="compile.2.0.reversi" depends="prepare.reversi" >
+		<antcall target="compile.2.0" />
 	</target>
 
 	<!-- Compile using WTK with MIDP-2.0 and no graphics and test -->
@@ -1642,7 +1727,7 @@
 			<param name="no.2.0.cldc.1.1.largemem" value="true" />
 			<param name="no.2.0.cldc.1.1.jsr75.jsr82.jsr184.largemem" value="true" />
 			<param name="no.2.0.cldc.1.1.jsr75.jsr82.jsr135.jsr184.largemem" value="true" />
-			<param name="src.excludes" value="**/testsuite/**,testsuite/**" />
+			<param name="src.excludes" value="**/testsuite/**,testsuite/**,**/j2se/*" />
 			<param name="res.excludes" value="**/testsuite*,testsuite*" />
 			<param name="Testsuite-concat.jad" value="" />
 		</antcall>
