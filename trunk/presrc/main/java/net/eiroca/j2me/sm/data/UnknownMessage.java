@@ -18,6 +18,13 @@
 /**
  * Modification started 2009-05-13.
  */
+// Expand to define JSR-120 test define
+@DJSR120@
+// Expand to define JMUnit test define
+@DJMTESTDEF@
+// Expand to define logging define
+@DLOGDEF@
+//#ifdef DJSR120
 package net.eiroca.j2me.sm.data;
 
 import java.io.ByteArrayOutputStream;
@@ -62,3 +69,4 @@ public class UnknownMessage {
   }
 
 }
+//#endif
