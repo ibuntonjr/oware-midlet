@@ -77,6 +77,8 @@ public final class ReversiScreen extends BoardGameScreen {
           500, -240, 85, 69, 69, 85, -240, 500
       }
   };
+  private static final int[][] turnHeurMatrix = new int [heurMatrix[0].length][heurMatrix[0].length];
+  private static final int[][] calcHeurMatrix = new int [heurMatrix[0].length][heurMatrix[0].length];
   private final int pnums[] = new int[2];
 
   //#ifdef DLOGGING
@@ -90,6 +92,14 @@ public final class ReversiScreen extends BoardGameScreen {
     super(midlet, false, true, AppConstants.MSG_REVERSI_NAME);
     BoardGameScreen.rgame = new ReversiGame(ReversiScreen.heurMatrix, 10, 18, true);
 		gMiniMax = new LimitedMinMax(); // FIX
+		for (int i = 0; i < heurMatrix[0].length; i++) {
+			System.arraycopy(heurMatrix[i], 0, turnHeurMatrix[i], 0,
+					heurMatrix[0].length);
+		}
+		for (int i = 0; i < heurMatrix[0].length; i++) {
+			System.arraycopy(heurMatrix[i], 0, calcHeurMatrix[i], 0,
+					heurMatrix[0].length);
+		}
   }
 
   public void init() {
@@ -256,7 +266,7 @@ public final class ReversiScreen extends BoardGameScreen {
 			}
       ReversiMove computerMove = (ReversiMove)computerTurn(
 					new ReversiGame((ReversiGame)BoardGameScreen.rgame,
-						(ReversiTable)BoardGameScreen.table), move);
+						turnHeurMatrix, (ReversiTable)BoardGameScreen.table), move);
       if (computerMove == null) {
 				computerMove = (ReversiMove)((ReversiTable)BoardGameScreen.table).getEmptyMove();
 				computerMove.row = ((ReversiTable)BoardGameScreen.table).nbrRow;
@@ -309,8 +319,9 @@ public final class ReversiScreen extends BoardGameScreen {
 			}
 			else {
 				if (startForeThinking) {
-					mtt.setStartGame(gMiniMax, (BoardGame)(new ReversiGame(
-								(ReversiGame)BoardGameScreen.rgame)),
+					mtt.setStartGame(gMiniMax, new ReversiGame(
+								(ReversiGame)BoardGameScreen.rgame, calcHeurMatrix,
+								(ReversiTable)tables[tables.length - 1]),
 								tables[tables.length - 1], getActSkill(), getActPlayer());
 					timer.schedule(mtt, 0);
 					//#ifdef DLOGGING
