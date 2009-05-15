@@ -20,6 +20,11 @@
 /**
  * Modification started 2009-05-13.
  */
+// Expand to define JSR-120 define
+@DJSR120@
+// Expand to define logging define
+@DLOGDEF@
+//#ifdef DJSR120
 package net.eiroca.j2me.sm.data;
 
 import java.io.IOException;
@@ -32,6 +37,11 @@ import net.eiroca.j2me.sm.util.Store;
 import net.eiroca.j2me.sm.util.StoreException;
 import net.eiroca.j2me.sm.util.StoreObserver;
 import net.eiroca.j2me.util.CipherDES;
+
+//#ifdef DLOGGING
+import net.sf.jlogmicro.util.logging.Logger;
+import net.sf.jlogmicro.util.logging.Level;
+//#endif
 
 /**
  * Implementation of the MessageHandler. This implementation is Nokia Series 60 specific, but may be compatible with other phones supporting WMA.
@@ -48,6 +58,13 @@ public class MessageHandler implements MessageListener, StoreObserver {
   public AddressStore addressBookStore;
   public UnknownStore unknownStore;
 
+  //#ifdef DLOGGING
+  private Logger logger = Logger.getLogger("MessageHandler");
+  private boolean fineLoggable = logger.isLoggable(Level.FINE);
+  private boolean finestLoggable = logger.isLoggable(Level.FINEST);
+  private boolean traceLoggable = logger.isLoggable(Level.TRACE);
+  //#endif
+
   /**
    * The constructor made the package-visible for security reasons
    */
@@ -57,21 +74,42 @@ public class MessageHandler implements MessageListener, StoreObserver {
 
   public void init() throws StoreException {
     final String connectionString = "sms://:" + MessageHandler.port;
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("init connectionString=" + connectionString);}
+		//#endif
     try {
       connection = (MessageConnection) Connector.open(connectionString);
       connection.setMessageListener(this);
     }
     catch (final IOException ioe) {
+			ioe.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("init error", ioe);
+			//#endif
+      throw new MessageHandlerException(MessageHandlerException.ERR_OPENCONNECTION);
+		}
+    catch (final Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("init error", e);
+			//#endif
       throw new MessageHandlerException(MessageHandlerException.ERR_OPENCONNECTION);
     }
   }
 
   public void done() throws StoreException {
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("done");}
+		//#endif
     try {
       connection.setMessageListener(null);
       connection.close();
     }
     catch (final IOException ioe) {
+			ioe.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("done error", ioe);
+			//#endif
       throw new MessageHandlerException(MessageHandlerException.ERR_CLOSECONNECTION);
     }
   }
@@ -82,6 +120,9 @@ public class MessageHandler implements MessageListener, StoreObserver {
     // Encode the message using the key
     byte[] key = null;
     final Address address = addressBookStore.getByNumber(msg.number, false);
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("send msg.number,address=" + msg.number + "," + address);}
+		//#endif
     if (address != null) {
       key = address.getKeyData();
     }
@@ -109,11 +150,15 @@ public class MessageHandler implements MessageListener, StoreObserver {
       outboxStore.store(msg);
     }
     else {
+			new Exception("send error").printStackTrace();
       throw new MessageHandlerException(MessageHandlerException.ERR_SENDMESSAGE);
     }
   }
 
   public synchronized void addMessage(final Long aDate, final Address address, byte[] data) throws StoreException {
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("addMessage address.id,address.name,data.length=" + address.id + "," + address.name + "," + data.length);}
+		//#endif
     final byte[] key = address.getKeyData();
     data = chiper.decode(data, key);
     // data = PackerHelper.decompress(data);
@@ -129,28 +174,59 @@ public class MessageHandler implements MessageListener, StoreObserver {
       // Note: use fixed factory class name as we know for sure
       // which factory should be used.
       final Message wmaMessage = connection.receive();
+			//#ifdef DLOGGING
+			if (finestLoggable) {logger.finest("receive wmaMessage=" + wmaMessage + "," + ((wmaMessage != null) ? "null" : wmaMessage.getClass().getName()));}
+			//#endif
       if (!(wmaMessage instanceof BinaryMessage)) {
         // It is safe to skip non-binary message, return.
         return;
       }
       // WMA address is in format "sms://<number>:<port>", so parse it here to remove prefix and port number
       final String wmaAddress = wmaMessage.getAddress();
-      final String number = wmaAddress.substring(6, wmaAddress.indexOf(":", 6));
+			//#ifdef DLOGGING
+			if (finestLoggable) {logger.finest("receive wmaAddress=" + wmaAddress);}
+			//#endif
+			// With Sun WTK tests, the ':' may  not appear.
+      final int colon2 = wmaAddress.indexOf(":", 6);
+      final String number = wmaAddress.substring(6, (colon2 < 0) ? wmaAddress.length() : colon2);
+			//#ifdef DLOGGING
+			if (finestLoggable) {logger.finest("receive number=" + number);}
+			//#endif
       Address address = addressBookStore.getByNumber(number, false);
       if (address == null) {
+				//#ifdef DLOGGING
+				if (finestLoggable) {logger.finest("receive Unkwnon address=null");}
+				//#endif
         address = new Address("Unkwnon", number, "");
         addressBookStore.store(address);
         final UnknownMessage mes = new UnknownMessage(number, ((BinaryMessage) wmaMessage).getPayloadData());
         unknownStore.store(mes);
       }
       else {
+				//#ifdef DLOGGING
+				if (finestLoggable) {logger.finest("receive address.id,address.name=" + address.id + "," + address.name);}
+				//#endif
         addMessage(null, address, ((BinaryMessage) wmaMessage).getPayloadData());
       }
     }
     catch (final IOException ioe) {
+			ioe.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("receive error", ioe);
+			//#endif
     }
     catch (final StoreException sme) {
+			sme.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("receive error", sme);
+			//#endif
     }
+    catch (final Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("receive error", e);
+			//#endif
+		}
   }
 
   public String addressName(final SecureMessage message) {
@@ -160,6 +236,10 @@ public class MessageHandler implements MessageListener, StoreObserver {
       address = addressBookStore.getByNumber(number, false);
     }
     catch (final StoreException e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("addressName error", e);
+			//#endif
     }
     if (address != null) {
       number = address.name;
@@ -188,3 +268,4 @@ public class MessageHandler implements MessageListener, StoreObserver {
   }
 
 }
+//#endif
