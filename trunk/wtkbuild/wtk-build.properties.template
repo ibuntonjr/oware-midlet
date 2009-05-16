@@ -1,9 +1,9 @@
-windows.drive = C:
-#windows.drive = 
-windows.ext = .exe
-#windows.ext = 
-opt.tools = ${windows.drive}/opt/tools
-#opt.tools = /home/irvbopt/opt/tools
+#windows.drive = C:
+windows.drive = 
+#windows.ext = .exe
+windows.ext = 
+#opt.tools = ${windows.drive}/opt/tools
+opt.tools = /home/irvbopt/opt/tools
 #antenna.home = C:/mostdownloads/j2me/sourceforge/antenna
 #antenna.home = ${ext.drive}/mostdownloads/j2me/sourceforge/antenna
 #antenna.home = C:/mostdownloads/j2me/sourceforge/antenna
@@ -15,7 +15,7 @@ antenna.jar = antenna-bin-1.1.0-beta.jar
 #antcontrib.home = ${ext.drive}/mostdownloads/gnu/sourceforge/ant-contrib/ant-contrib
 #antcontrib.home = C:/mostdownloads/gnu/sourceforge/ant-contrib/ant-contrib
 antcontrib.home = ${opt.tools}/ant-contrib/ant-contrib
-wtk.wme.home = C:\\PROGRA~1\\IBM\\WEME\\571\\PalmOS50\\Tools
+#wtk.wme.home = C:\\PROGRA~1\\IBM\\WEME\\571\\PalmOS50\\Tools
 #For phoneMe Windows
 #phoneme.home = ${ext.drive}/mostdownloads/j2me/phoneme.dev.java.net__downloads_page.html/bin/win32_x86_javacall_mvm
 phoneme.home = C:/mostdownloads/j2me/phoneme.dev.java.net__downloads_page.html/bin/win32_x86_javacall_mvm
@@ -56,12 +56,12 @@ cat.cmd = cat${windows.ext}
 #svnant.home = C:/mostdownloads/gnu/sourceforge/antxtras/svn4ant_1.1-build68_bin_withdeps
 #svn.home = C:\\PROGRA~1\\TORTOI~1
 #rim.home = C:\\Program Files\\Research In Motion\\BlackBerry JDE 4.2.1
-rim.home = C:\\PROGRA~1\\RESEAR~1\\BLACKB~1.1
+#rim.home = C:\\PROGRA~1\\RESEAR~1\\BLACKB~1.1
 svn.pgm = svn${windows.ext}
 #wtk.home = C:/opt/WTK2.5.1
 #wtk.home = ${opt.tools}/WTK2.5.2_01
-#wtk.home = ${windows.drive}/opt/WTK2.5.2
-wtk.home = ${opt.tools}/WTK2.5.2_01
+wtk.home = ${windows.drive}/opt/WTK2.5.2
+#wtk.home = ${opt.tools}/WTK2.5.2_01
 sony.wtk.home = ${opt.tools}/SonyEricsson/JavaME_SDK_CLDC/WTK2
 sony.wtk.apps.home = ${sony.wtk.home}/apps
 netbeans.home = ${opt.tools}/NETBEA~1.5
@@ -85,11 +85,11 @@ midlet.home = ${wtk.workspace.proj}/apps/${project.name}
 prc.creater = OURI
 prc.longname = Oware/Reversi
 MIDLETURL_ROOT = http://oware-midlet.googlecode.com/files
-MIDLETVERSROOT = 0.1.4
+MIDLETVERSROOT = 0.1.5
 separator = /
 #Need vers with '_' to allow uploading to sites that get confused by to
 #many '.'
-FMIDLETVERSROOT = 0_1_4
+FMIDLETVERSROOT = 0_1_5
 #Location of manifest source
 manifestsrc = ../manifestsrc
 #? src = src
@@ -97,6 +97,7 @@ manifestsrc = ../manifestsrc
 #Compile source dir generted by non-preprocessed source and generted source
 #(if needed)
 comp.src = ${target}/oware-midlet/src/main/java
+test.comp.src = ${target}/oware-midlet/src/test/java
 #util.comp.src = ../../libJ2ME/target/mobilesuite/src
 #comp.src = released/src
 presrc = ../presrc/main/java
