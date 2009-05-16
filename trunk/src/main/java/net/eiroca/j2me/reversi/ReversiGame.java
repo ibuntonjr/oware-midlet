@@ -86,8 +86,9 @@ public final class ReversiGame extends BoardGame {
 		this.rPlayer = rg.rPlayer;
   }
 
-  public ReversiGame(final ReversiGame rg, final ReversiTable rt) {
-		this(rg);
+  public ReversiGame(final ReversiGame rg, final int[][] heurMatrix,
+			final ReversiTable rt) {
+		this(heurMatrix, rg.libertyPenalty, rg.sBonus, rg.squareErase);
 		this.rTable = rt;
 	}
 
