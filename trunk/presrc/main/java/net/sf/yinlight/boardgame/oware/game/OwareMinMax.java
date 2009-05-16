@@ -48,7 +48,6 @@ public final class OwareMinMax extends GameMinMax {
 	static private int gheuristic = 0;
 	Thread cthread = Thread.currentThread();
 
-
 	//#ifdef DLOGGING
 	private Logger logger = Logger.getLogger("OwareMinMax");
 	private boolean finerLoggable = logger.isLoggable(Level.FINER);
@@ -126,12 +125,6 @@ public final class OwareMinMax extends GameMinMax {
 					//#endif
 
 					cthread.yield();
-					synchronized(this) {
-						try {
-							wait(1L);
-						} catch (InterruptedException e) {
-						}
-					}
 					OwareMove tmpmove = alphabetaPly( depth - 1, testTable,
 							(byte) (1 - player), g, heuristic, bestmax, bestmin);
 					if (tmpmove == null) {
