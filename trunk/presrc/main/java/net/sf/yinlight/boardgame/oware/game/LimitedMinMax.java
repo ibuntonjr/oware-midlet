@@ -131,12 +131,6 @@ public class LimitedMinMax extends GameMinMax {
 						kMove = null;
 					}
 					cthread.yield();
-					synchronized(this) {
-						try {
-							wait(1L);
-						} catch (InterruptedException e) {
-						}
-					}
 					actMove = minimax(depth - 1, newState, (byte) (1 - player), tpg, alphabeta, -maxPoint, order, kill, kMove);
 					if (actMove == null) { return null; }
 					actPoint = -actMove.getPoint();
