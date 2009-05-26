@@ -24,6 +24,9 @@
  * This was modified no later than 2009-05-26 by Irving Bunton, Jr
  */
 
+// Expand to define DJSR82 define
+@DJSR82@
+//#ifdef DJSR82
 package org.mega.gasp.bluetooth.miniplatform.bombergasp;
 
 import javax.microedition.midlet.*;
@@ -34,6 +37,8 @@ import javax.microedition.lcdui.game.GameCanvas;
 
 import net.eiroca.j2me.app.BaseApp;
 import net.eiroca.j2me.app.Application;
+import com.substanceofcode.rssreader.presentation.FeatureList;
+import net.sf.yinlight.boardgame.oware.midlet.AppConstants;
 
 /**
  *
@@ -47,7 +52,7 @@ import net.eiroca.j2me.app.Application;
  *et faire une classe fille Game avec des methodes plus caracteristiques du jeu. A voir !!!!!!
  *
  */
-public class App extends Application implements CommandListener, org.mega.gasp.bluetooth.miniplatform.App{
+public class App extends Application implements org.mega.gasp.bluetooth.miniplatform.App{
     
     protected Client gc;
     private Server gs;
@@ -56,13 +61,11 @@ public class App extends Application implements CommandListener, org.mega.gasp.b
     private int maxA = 4;
     public static Display display;
     
-    private final Command EXIT_CMD = new Command("Exit",Command.EXIT,2);
-    private final Command OK_CMD = new Command("OK",Command.SCREEN,1);
     protected SendData dataflu;
     private static String [] demos = { "Serveur", "Client"};
-    private List mainMenu = new List("Client ou Serveur?", List.IMPLICIT,demos, null) ;
-    private List chooseClientDevices = new List("Choix des clients",List.MULTIPLE);
-    private List chooseServer = new List("Choix du serveur",List.IMPLICIT);
+    private List mainMenu = new FeatureList("Client ou Serveur?", List.IMPLICIT,demos, null) ;
+    private List chooseClientDevices = new FeatureList("Choix des clients",List.MULTIPLE);
+    private List chooseServer = new FeatureList("Choix du serveur",List.IMPLICIT);
     
     private boolean isServer;
     private boolean isServerReady;
@@ -79,29 +82,34 @@ public class App extends Application implements CommandListener, org.mega.gasp.b
     // protected SendData dataflu;
     
     public App(){
+		//#ifdef DJMTEST
+    super("Bomber Games Suite");
+		//#else
+    super();
+		//#endif
         isServerReady = false; //is the vector of actorSessions instanciated
         
         ct = new CustomTypes();
         
+		BaseApp.cEXIT = BaseApp.newCommand(AppConstants.MSG_LABEL_EXIT, Command.EXIT, 2, BaseApp.AC_EXIT);
+		BaseApp.cOK = BaseApp.newCommand(AppConstants.MSG_LABEL_OK, Command.OK, 30,  BaseApp.AC_NONE);
         /* choice between client and server - first screen*/
-        mainMenu.addCommand(EXIT_CMD);
-        mainMenu.addCommand(OK_CMD);
-        mainMenu.setCommandListener(this);
+		BaseApp.setup(mainMenu, BaseApp.cOK, BaseApp.cEXIT);
         
         /* choose the client devices - second screen server side*/
-        chooseClientDevices.addCommand(EXIT_CMD);
-        chooseClientDevices.addCommand(OK_CMD);
-        chooseClientDevices.setCommandListener(this);
+		BaseApp.setup(chooseClientDevices, BaseApp.cOK, BaseApp.cEXIT);
         
         /* choose the server - second screen client side */
-        chooseServer.addCommand(EXIT_CMD);
-        chooseServer.addCommand(OK_CMD);
-        chooseServer.setCommandListener(this);
+		BaseApp.setup(chooseServer, BaseApp.cOK, BaseApp.cEXIT);
         
         mode = 0; //choix S/C
     }
     
-    public void startApp(){
+    /**
+     * Application initialization
+     */
+    protected void init() {
+		super.init();
         singleton=this;
         show();
     }
@@ -116,16 +124,17 @@ public class App extends Application implements CommandListener, org.mega.gasp.b
         }
     }
     
-    public void pauseApp() {
+    protected void pause() {
         if(Display.getDisplay(this).getCurrent() == gameCanvas){
             //gameCanvas.pause();
         }
     }
     
-    public void destroyApp(boolean unconditional) throws MIDletStateChangeException{
+    public void done() {
         if(Display.getDisplay(this).getCurrent() == gameCanvas){
             //gameCanvas.stop();
         }
+		super.done();
     }
     
     public int getMinA(){
@@ -149,13 +158,16 @@ public class App extends Application implements CommandListener, org.mega.gasp.b
         
         switch(mode) {
             case 0 : //1st screen
-                display.setCurrent(mainMenu);
+                // TODO remove display.setCurrent(mainMenu);
+				BaseApp.show(null, mainMenu, false);
                 break;
             case 1 : //2nd screen server side
-                display.setCurrent(chooseClientDevices);
+                // TODO remove display.setCurrent(chooseClientDevices);
+				BaseApp.show(null, chooseClientDevices, false);
                 break;
             case 2: //2nd screen client side
-                display.setCurrent(chooseServer);
+                // TODO remove display.setCurrent(chooseServer);
+				BaseApp.show(null, chooseServer, false);
                 break;
             default :
                 break;
@@ -175,8 +187,9 @@ public class App extends Application implements CommandListener, org.mega.gasp.b
         return sAI;
     }
     
-    public void commandAction(Command c, Displayable d){
-        if (c == EXIT_CMD) {
+    // Implementation of the command listener interface
+    public boolean handleAction(int action, final Displayable d, final Command cmd) {
+        if (cmd == BaseApp.cEXIT) {
             try {
                 destroyApp(true);
             } catch (MIDletStateChangeException e) {
@@ -184,9 +197,10 @@ public class App extends Application implements CommandListener, org.mega.gasp.b
                 e.printStackTrace();
             }
             notifyDestroyed();
-            return;
+            return true;
         }
-        if (c == OK_CMD && mode == 0) // client or server
+		Command c = cmd;
+        if (c == BaseApp.cOK && mode == 0) // client or server
         {
             switch(mainMenu.getSelectedIndex()) {
                 
@@ -225,7 +239,7 @@ public class App extends Application implements CommandListener, org.mega.gasp.b
             c = null;
         }
         
-        if (c == OK_CMD && mode == 1) //choose client devices
+        if (c == BaseApp.cOK && mode == 1) //choose client devices
         {
             int size = chooseClientDevices.size();
             int i;
@@ -238,12 +252,13 @@ public class App extends Application implements CommandListener, org.mega.gasp.b
             gc.setMode(2);
             gc.startApp();
         }
-        if (c == OK_CMD && mode == 2) //choose server
+        if (c == BaseApp.cOK && mode == 2) //choose server
         {
             int indexServer = chooseServer.getSelectedIndex();
             gc.deviceSelected(indexServer);
             c = null;
         }
+		return true;
     }
     
     //	--------------Switching Canvases -----------------------------------
@@ -269,3 +284,4 @@ public class App extends Application implements CommandListener, org.mega.gasp.b
         notifyDestroyed();
     }
 }
+//#endif
