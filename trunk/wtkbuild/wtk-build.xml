@@ -20,6 +20,7 @@
 	<echo message="res=${res}" />
 	<property name="DEBUG" value="DEBUG" />
 	<property name="target" value="../target" />
+	<property name="build.lib" value="../target/blib" />
 	<property name="tmpres" value="${target}/tmpres" />
 	<property name="tmpcat" value="${target}/tmpcat" />
 	<property name="webtestdata" value="${target}/webtestdata" />
@@ -174,9 +175,10 @@
 			<property name="Oware-concat.jad" value="" />
 			<property name="SecureSMS-concat.jad" value="" />
 			<property name="Minesweeper-concat.jad" value="" />
+			<property name="Bomber-concat.jad" value="" />
 			<property name="Testsuite-concat.jad" value="" />
-			<property name="src.excludes" value="**/testsuite/**,**/minesweeper/**,**/Oware*,**/Mine*,testsuite/**,minesweeper/**,Oware*,Mine*,**/j2se/*,**/sm/*" />
-			<property name="res.excludes" value="**/oware*,**/mine*,**/testsuite*,oware*,mine*,testsuite*,**/sm/*" />
+			<property name="src.excludes" value="**/testsuite/**,**/minesweeper/**,**/Oware*,**/Mine*,testsuite/**,minesweeper/**,Oware*,Mine*,**/j2se/*,**/sm/*,**/bombergasp/**" />
+			<property name="res.excludes" value="**/oware*,**/mine*,**/testsuite*,oware*,mine*,testsuite*,**/sm/*,**/bomber**" />
 	</target>
 
 	<target name="prepare.testsuite" depends="prepare.large" >
@@ -188,8 +190,87 @@
 			<property name="Minesweeper-concat.jad" value="" />
 			<property name="Reversi-concat.jad" value="" />
 			<property name="SecureSMS-concat.jad" value="" />
-			<property name="src.excludes" value="**/reversi/**,**/minesweeper/**,**/Oware*,**/Reversi*,**/Mine*,reversi/**,minesweeper/**,Oware*,Mine*,**/j2se/*" />
-			<property name="res.excludes" value="**/oware*,**/mine*,**/reversi*,oware*,mine*,reversi,**/sm/**" />
+			<property name="Bomber-concat.jad" value="" />
+			<property name="src.excludes" value="**/reversi/**,**/minesweeper/**,**/Oware*,**/Reversi*,**/Mine*,reversi/**,minesweeper/**,Oware*,Mine*,**/j2se/*,**/bombergasp/**" />
+			<property name="res.excludes" value="**/oware*,**/mine*,**/reversi*,oware*,mine*,reversi,**/sm/**,**/bombergasp*" />
+	</target>
+
+	<target name="prepare.midp1.0" >
+			<property name="wtk.midp.version" value="1.0" />
+			<property name="DMIDPVERS" value="DMIDP10" />
+			<property name="JMIDPVERS" value="MIDP-1.0" />
+			<property name="file.prefix.midp1.0" value="midp10_" />
+			<property name="bin.midp1.0" value="midp10" />
+			<property name="SUFFIXVERS.midp1.0" value="midp1.0" />
+	</target>
+
+	<target name="prepare.midp2.0" >
+			<property name="wtk.midp.version" value="2.0" />
+			<property name="DMIDPVERS" value="DMIDP20" />
+			<property name="JMIDPVERS" value="MIDP-2.0" />
+			<property name="file.prefix.midp2.0" value="midp20_" />
+			<property name="bin.midp2.0" value="midp20" />
+			<property name="SUFFIXVERS.midp2.0" value="midp2.0" />
+	</target>
+
+	<target name="prepare.cldc1.0" >
+			<property name="wtk.cldc.version" value="1.0" />
+			<property name="DCLDCVERS" value="DCLDCV10" />
+			<property name="JCLDCVERS" value="CLDC-1.0" />
+			<property name="file.prefix.cldc1.0" value="cldc10_" />
+			<property name="bin.cldc1.0" value="cldc11" />
+			<property name="SUFFIXVERS.cldc1.0" value="-cldc1.0" />
+	</target>
+
+	<target name="prepare.cldc1.1" >
+			<property name="wtk.cldc.version" value="1.1" />
+			<property name="DCLDCVERS" value="DCLDCV11" />
+			<property name="JCLDCVERS" value="CLDC-1.1" />
+			<property name="file.prefix.cldc1.1" value="cldc11_" />
+			<property name="bin.cldc1.1" value="cldc11" />
+			<property name="SUFFIXVERS.cldc1.1" value="-cldc1.1" />
+	</target>
+
+	<target name="prepare.jsr75" >
+			<property name="wtk.optionalpda.enabled" value="true" />
+			<property name="DJSR75" value="DJSR75" />
+			<property name="file.prefix.jsr75" value="jsr75_" />
+			<property name="bin.jsr75" value="jsr75" />
+			<property name="SUFFIXVERS.jsr75" value="-jsr75" />
+	</target>
+
+	<target name="prepare.jsr82" >
+			<property name="lib.classpath" value="GASPBT.jar" />
+			<property name="wtk.bluetooth.enabled" value="true" />
+			<property name="DJSR82" value="DJSR82" />
+			<property name="file.prefix.jsr82" value="jsr82_" />
+			<property name="bin.jsr82" value="jsr82" />
+			<property name="SUFFIXVERS.jsr82" value="-jsr82" />
+	</target>
+
+	<target name="prepare.jsr120" >
+			<property name="wtk.wma.enabled" value="true" />
+			<property name="wtk.wma.version" value="1.1" />
+			<property name="DJSR120" value="DJSR120" />
+			<property name="file.prefix.jsr120" value="jsr120_" />
+			<property name="bin.jsr120" value="jsr120" />
+			<property name="SUFFIXVERS.jsr120" value="-jsr120" />
+	</target>
+
+	<target name="prepare.jsr135" >
+			<property name="wtk.mmapi.enabled" value="true" />
+			<property name="DJSR135" value="DJSR135" />
+			<property name="file.prefix.jsr135" value="jsr135_" />
+			<property name="bin.jsr135" value="jsr135" />
+			<property name="SUFFIXVERS.jsr135" value="-jsr135" />
+	</target>
+
+	<target name="prepare.jsr184" >
+			<property name="wtk.java3d.enabled" value="true" />
+			<property name="DJSR184" value="DJSR184" />
+			<property name="file.prefix.jsr184" value="jsr184_" />
+			<property name="bin.jsr184" value="jsr184" />
+			<property name="SUFFIXVERS.jsr184" value="-jsr184" />
 	</target>
 
 	<target name="prepare.j2se" >
@@ -214,6 +295,28 @@
 		<property name="propdir" value="${basedir}" />
 		<property file="${basedir}/${wtk.properties}" />
 		<property name="PERMISSIONS" value="" />
+		<property name="DMEMSIZEDEF" value="DREGULARMEM" />
+		<property name="DJSR75" value="DNOJSR75" />
+		<property name="DJSR82" value="DNOJSR82" />
+		<property name="DJSR120" value="DNOJSR120" />
+		<property name="DJSR135" value="DNOJSR135" />
+		<property name="DJSR184" value="DNOJSR184" />
+		<property name="wtk.optionalpda.enabled" value="false" />
+		<property name="wtk.bluetooth.enabled" value="false" />
+		<property name="wtk.wma.enabled" value="false" />
+		<property name="wtk.mmapi.enabled" value="false" />
+		<property name="wtk.java3d.enabled" value="false" />
+		<property name="file.prefix.midp1.0" value="" />
+		<property name="file.prefix.midp2.0" value="" />
+		<property name="file.prefix.cldc1.0" value="" />
+		<property name="file.prefix.cldc1.1" value="" />
+		<property name="file.prefix.jsr75" value="" />
+		<property name="file.prefix.jsr82" value="" />
+		<property name="file.prefix.jsr120" value="" />
+		<property name="file.prefix.jsr135" value="" />
+		<property name="file.prefix.jsr184" value="" />
+		<property name="file.prefix" value="${file.prefix.midp1.0}${file.prefix.midp2.0}${file.prefix.cldc1.0}${file.prefix.cldc1.1}${file.prefix.jsr75}${file.prefix.jsr82}${file.prefix.jsr120}${file.prefix.jsr135}${file.prefix.jsr184}" />
+		<property name="SUFFIXVERS" value="${SUFFIXVERS.midp1.0}${SUFFIXVERS.midp2.0}${SUFFIXVERS.cldc1.0}${SUFFIXVERS.cldc1.1}${SUFFIXVERS.jsr75}${SUFFIXVERS.jsr82}${SUFFIXVERS.jsr120}${SUFFIXVERS.jsr135}${SUFFIXVERS.jsr184}" />
 		<!-- Use an invalid value.  The extra 0's mean that it will not match -->
 		<!-- anything in the code. -->
 		<property name="IGNOREKEYS" value="0000" />
@@ -233,10 +336,12 @@
 		<property name="Reversi-concat.nbr" value="2" />
 		<property name="Minesweeper-concat.jad" value="Minesweeper-concat.jad" />
 		<property name="Minesweeper-concat.nbr" value="3" />
+		<property name="Bomber-concat.jad" value="Bomber-concat.jad" />
+		<property name="Bomber-concat.nbr" value="4" />
 		<property name="SecureSMS-concat.jad" value="SecureSMS-concat.jad" />
-		<property name="SecureSMS--concat.nbr" value="4" />
+		<property name="SecureSMS--concat.nbr" value="5" />
 		<property name="Testsuite-concat.jad" value="Testsuite-concat.jad" />
-		<property name="Testsuite-concat.nbr" value="5" />
+		<property name="Testsuite-concat.nbr" value="6" />
 		<!-- undo
 		<property name="language.file" value="messages_en_US.xml" />
 		<xmlproperty file="${msg.dir}/${language.file}" collapseAttributes="true" />
@@ -393,7 +498,7 @@
 		<!-- Copy unpreprocessed source to compiled src dir -->
 		<delete dir="${tmppreprocess}" />
 		<mkdir dir="${tmppreprocess}" />
-		<property name="preprocess.defines" value="DEBUG=WARN,${DMIDPVERS},${DCLDCVERS},${DITUNESDEF},${DMEMSIZEDEF},${DJ2MEDEF},${DJ2SEDEF}${DJSR75},${DJSR82},${DJSR120},${DJSR135},${DJSR184},${DJSR238},${DTESTDEF},${DJMTESTDEF},${DLOGDEF},${DTESTUIDEF},${DCOMPATDEF},${DFEATUREFORMDEF}" />
+		<property name="preprocess.defines" value="DEBUG=WARN,${DMIDPVERS},${DCLDCVERS},${DMEMSIZEDEF},${DJ2MEDEF},${DJ2SEDEF}${DJSR75},${DJSR82},${DJSR120},${DJSR135},${DJSR184},${DJSR238},${DTESTDEF},${DJMTESTDEF},${DLOGDEF},${DTESTUIDEF},${DCOMPATDEF},${DFEATUREFORMDEF}" />
 		<echo message="preprocess.defines=${preprocess.defines}." />
 		<wtkpreprocess srcdir="${presrc}" destdir="${tmppreprocess}" encoding="${wtk.encoding}" symbols="${preprocess.defines}" if="presrc" />
 		<echo message="Preprocess util pre src if set ${presrc.util.src}." />
@@ -595,7 +700,18 @@
 		<!-- when we delete a file. -->
 		<!-- Compile everything, but don't preverify (yet). -->
 		<antcall target="finish.preprocess" />
-		<wtkbuild srcdir="${comp.src}" destdir="${classes}" preverify="false" >
+		<delete dir="${build.lib}" />
+		<copy todir="${build.lib}" >
+			<fileset dir="../lib" />
+		</copy>
+		<wtkbuild srcdir="${comp.src}" destdir="${classes}" preverify="false" unless="lib.classpath" >
+		<!--
+			<classpath>
+				<path refid="logging.lib" />
+			</classpath>
+			-->
+		</wtkbuild>
+		<wtkbuild srcdir="${comp.src}" destdir="${classes}" classpath="${build.lib}/${lib.classpath}" preverify="false" if="lib.classpath" >
 		<!--
 			<classpath>
 				<path refid="logging.lib" />
@@ -824,6 +940,10 @@
 		<antcall target="cat.to.midlet" >
 			<param name="concat.jad" value="${Minesweeper-concat.jad}" />
 			<param name="concat.nbr" value="${Minesweeper-concat.nbr}" />
+		</antcall>
+		<antcall target="cat.to.midlet" >
+			<param name="concat.jad" value="${Bomber-concat.jad}" />
+			<param name="concat.nbr" value="${Bomber-concat.nbr}" />
 		</antcall>
 		<antcall target="cat.to.midlet" >
 			<param name="concat.jad" value="${SecureSMS-concat.jad}" />
@@ -1161,6 +1281,14 @@
 	<target name="compile.2.0.cldc1.1.jsr135" >
 		<antcall target="compile" >
 			<param name="wtk.properties" value="wtk2.0cldc1.1.jsr135.properties${wtk.template}" />
+			<param name="no.staging" value="true" />
+			<param name="no.release" value="true" />
+		</antcall>
+	</target>
+
+	<target name="compile.2.0.cldc1.1.jsr75.jsr82.jsr120.jsr135.jsr184" depends="prepare.midp2.0,prepare.cldc1.1,prepare.jsr75,prepare.jsr82,prepare.jsr120,prepare.jsr135,prepare.jsr184" >
+		<antcall target="compile" >
+			<param name="wtk.properties" value="boguswtk2.0cldc1.1.jsr135.properties${wtk.template}" />
 			<param name="no.staging" value="true" />
 			<param name="no.release" value="true" />
 		</antcall>
