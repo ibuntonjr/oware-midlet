@@ -40,11 +40,12 @@ import net.eiroca.j2me.sm.data.SecureMessage;
 import net.eiroca.j2me.sm.data.SecureMessageStore;
 import net.eiroca.j2me.sm.util.Store;
 import net.eiroca.j2me.sm.util.StoreException;
+import com.substanceofcode.rssreader.presentation.FeatureList;
 
 /**
  * The message store screen.
  */
-public class MessageListScreen extends List {
+public class MessageListScreen extends FeatureList {
 
   protected long[] messageDates;
   private final Command del;
@@ -85,13 +86,13 @@ public class MessageListScreen extends List {
     final long date = getSelectedMessageDate();
     // Remove the DELETE command
     if (del != null) {
-      removeCommand(del);
+      super.removeCommand(del);
     }
     if (reply != null) {
-      removeCommand(reply);
+      super.removeCommand(reply);
     }
     if (invalid != null) {
-      removeCommand(invalid);
+      super.removeCommand(invalid);
     }
     // Delete all messages to avoid synchronization problems
     deleteAll();
@@ -119,13 +120,13 @@ public class MessageListScreen extends List {
       }
       // Add the DELETE command if at least one message has been found
       if (del != null) {
-        addCommand(del);
+        super.addCommand(del);
       }
       if (reply != null) {
-        addCommand(reply);
+        super.addCommand(reply);
       }
       if (invalid != null) {
-        addCommand(invalid);
+        super.addCommand(invalid);
       }
     }
   }
