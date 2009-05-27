@@ -20,11 +20,20 @@
  *
  * Author: Sebire - Negre
  */
+/**
+ * This was modified no later than 2009-05-26 by Irving Bunton, Jr
+ */
+
+// Expand to define DJSR82 define
+@DJSR82@
+//#ifdef DJSR82
 package org.mega.gasp.bluetooth.miniplatform.bombergasp;
 
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.Graphics;
+
+import net.eiroca.j2me.app.BaseApp;
 
 /**
  *
@@ -64,12 +73,12 @@ public class Avatar {
         Images=new Image[8*5-3];
         try {
             for(int i=0;i<8;i++){
-                Images[8*0+i]= Image.createImage("/Images/Bomberman/Down"+(i+1)+".gif");
-                Images[8*1+i]= Image.createImage("/Images/Bomberman/Up"+(i+1)+".gif");
-                Images[8*2+i]= Image.createImage("/Images/Bomberman/Right"+(i+1)+".gif");
-                Images[8*3+i]= Image.createImage("/Images/Bomberman/Left"+(i+1)+".gif");
+                Images[8*0+i]= BaseApp.createImage("/Images/Bomberman/bomber_Down"+(i+1)+".png");
+                Images[8*1+i]= BaseApp.createImage("/Images/Bomberman/bomber_Up"+(i+1)+".png");
+                Images[8*2+i]= BaseApp.createImage("/Images/Bomberman/bomber_Right"+(i+1)+".png");
+                Images[8*3+i]= BaseApp.createImage("/Images/Bomberman/bomber_Left"+(i+1)+".png");
                 if(i<4)
-                    Images[8*4+i]= Image.createImage("/Images/Bomberman/Die"+(i+1)+".gif");
+                    Images[8*4+i]= BaseApp.createImage("/Images/Bomberman/bomber_Die"+(i+1)+".png");
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -268,5 +277,4 @@ public class Avatar {
         step=0;
     }
 }
-
-
+//#endif
