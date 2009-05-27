@@ -20,6 +20,13 @@
  *
  * Author: Sebire - Negre
  */
+/**
+ * This was modified no later than 2009-05-26 by Irving Bunton, Jr
+ */
+
+// Expand to define DJSR82 define
+@DJSR82@
+//#ifdef DJSR82
 package org.mega.gasp.bluetooth.miniplatform.bombergasp;
 
 /**
@@ -126,3 +133,4 @@ public class Update {
 
 
 }
+//#endif
