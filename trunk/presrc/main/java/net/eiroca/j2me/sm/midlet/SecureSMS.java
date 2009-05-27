@@ -18,7 +18,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
  /**
-   * This was first changed on 2009-05-13
+   * This was first changed on 2009-05-13 by Irving Bunton, Jr
    */
 // Expand to define JSR-120 test define
 @DJSR120@
