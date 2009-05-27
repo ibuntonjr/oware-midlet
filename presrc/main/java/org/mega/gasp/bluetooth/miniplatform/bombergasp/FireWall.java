@@ -20,10 +20,19 @@
  *
  * Author: Sebire - Negre
  */
+/**
+ * This was modified no later than 2009-05-26 by Irving Bunton, Jr
+ */
+
+// Expand to define DJSR82 define
+@DJSR82@
+//#ifdef DJSR82
 package org.mega.gasp.bluetooth.miniplatform.bombergasp;
 
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
+
+import net.eiroca.j2me.app.BaseApp;
 
 /**
  *
@@ -44,7 +53,7 @@ public class FireWall {
         Images=new Image[5];
         try {
             for(int i=0;i<5;i++){
-                Images[i]= Image.createImage("/Images/LevelUrban/FireWall/FireWall"+(i+1)+".gif");
+                Images[i]= BaseApp.createImage("/Images/LevelUrban/FireWall/bomber_FireWall"+(i+1)+".png");
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -58,3 +67,4 @@ public class FireWall {
             Map.delFireWall(this);
     }
 }
+//#endif
