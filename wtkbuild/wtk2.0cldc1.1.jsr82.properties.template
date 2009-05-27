@@ -1,0 +1,26 @@
+wtk.midp.version = 2.0
+wtk.cldc.version = 1.1
+wtk.optionalpda.enabled = false
+wtk.mmapi.enabled  = false
+wtk.java3d.enabled = false
+wtk.bluetooth.enabled = true
+wtk.miapi.enabled  = false
+debug = debug
+lib.classpath = GASPBT.jar
+DMIDPVERS = DMIDP20
+#Don't allow Itunes to save performance and memory
+DITUNESDEF = DNOITUNES
+DJSR75 = DNOJSR75
+DJSR82 = DJSR82
+DJSR135 = DNOJSR135
+DJSR184 = DNOJSR184
+DJSR238 = DNOJSR238
+DMEMSIZEDEF = DLARGEMEM
+#1.1 kills us.
+DCLDCVERS = DCLDCV10
+JMIDPVERS = MIDP-2.0 
+JCLDCVERS = CLDC-1.1
+file.prefix = midp20_cldc11jsr82
+bin = ${target}/bin20cldc11jsr82
+MIDLETVERS = ${MIDLETVERSROOT}
+SUFFIXVERS =  2.0-1.1-jsr82
