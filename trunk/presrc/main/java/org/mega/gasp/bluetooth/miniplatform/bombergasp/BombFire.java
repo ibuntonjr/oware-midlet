@@ -20,11 +20,20 @@
  *
  * Author: Sebire - Negre
  */
+/**
+ * This was modified no later than 2009-05-26 by Irving Bunton, Jr
+ */
+
+// Expand to define DJSR82 define
+@DJSR82@
+//#ifdef DJSR82
 package org.mega.gasp.bluetooth.miniplatform.bombergasp;
 
 import java.util.Vector;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
+
+import net.eiroca.j2me.app.BaseApp;
 
 
 /**
@@ -50,19 +59,19 @@ public class BombFire {
         fireimages=new Image[37];
         try {
             for(int i=0;i<4;i++){
-                fireimages[i]=Image.createImage("/Images/Fire/Up"+(i+1)+".gif");
-                fireimages[4+i]=Image.createImage("/Images/Fire/UpExt"+(i+1)+".gif");
+                fireimages[i]=BaseApp.createImage("/Images/Fire/bomber_Up"+(i+1)+".png");
+                fireimages[4+i]=BaseApp.createImage("/Images/Fire/bomber_UpExt"+(i+1)+".png");
                 
-                fireimages[8+i]=Image.createImage("/Images/Fire/Down"+(i+1)+".gif");
-                fireimages[12+i]=Image.createImage("/Images/Fire/DownExt"+(i+1)+".gif");
+                fireimages[8+i]=BaseApp.createImage("/Images/Fire/bomber_Down"+(i+1)+".png");
+                fireimages[12+i]=BaseApp.createImage("/Images/Fire/bomber_DownExt"+(i+1)+".png");
                 
-                fireimages[16+i]=Image.createImage("/Images/Fire/Left"+(i+1)+".gif");
-                fireimages[20+i]=Image.createImage("/Images/Fire/LeftExt"+(i+1)+".gif");
+                fireimages[16+i]=BaseApp.createImage("/Images/Fire/bomber_Left"+(i+1)+".png");
+                fireimages[20+i]=BaseApp.createImage("/Images/Fire/bomber_LeftExt"+(i+1)+".png");
                 
-                fireimages[24+i]=Image.createImage("/Images/Fire/Right"+(i+1)+".gif");
-                fireimages[28+i]=Image.createImage("/Images/Fire/RightExt"+(i+1)+".gif");
+                fireimages[24+i]=BaseApp.createImage("/Images/Fire/bomber_Right"+(i+1)+".png");
+                fireimages[28+i]=BaseApp.createImage("/Images/Fire/bomber_RightExt"+(i+1)+".png");
                 
-                fireimages[32+i]=Image.createImage("/Images/Fire/Center"+(i+1)+".gif");
+                fireimages[32+i]=BaseApp.createImage("/Images/Fire/bomber_Center"+(i+1)+".png");
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -79,3 +88,4 @@ public class BombFire {
             Map.delFire(this);
     }
 }
+//#endif
