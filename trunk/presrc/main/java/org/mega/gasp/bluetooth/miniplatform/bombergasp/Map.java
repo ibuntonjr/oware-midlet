@@ -20,12 +20,20 @@
  *
  * Author: Sebire - Negre
  */
+/**
+ * This was modified no later than 2009-05-26 by Irving Bunton, Jr
+ */
+
+// Expand to define DJSR82 define
+@DJSR82@
+//#ifdef DJSR82
 package org.mega.gasp.bluetooth.miniplatform.bombergasp;
 import java.util.Random;
 import java.util.Vector;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
+import net.eiroca.j2me.app.BaseApp;
 
 /**
  *
@@ -122,14 +130,14 @@ public class Map {
     public static void loadImages() {
         cases=new Image[11];
         try {
-            cases[0]= Image.createImage("/Images/LevelUrban/Floor.gif");
-            cases[1]= Image.createImage("/Images/LevelUrban/BlocAround.gif");
-            cases[2]= Image.createImage("/Images/LevelUrban/SuperWall.gif");
-            cases[3]= Image.createImage("/Images/LevelUrban/Wall.gif");
-            cases[4]= Image.createImage("/Images/Item/Flame.gif");
-            cases[5]= Image.createImage("/Images/Item/Skull.gif");
-            cases[6]= Image.createImage("/Images/Item/Slow.gif");
-            cases[7]= Image.createImage("/Images/Item/Speed.gif");
+            cases[0]= BaseApp.createImage("/Images/LevelUrban/bomber_Floor.png");
+            cases[1]= BaseApp.createImage("/Images/LevelUrban/bomber_BlocAround.png");
+            cases[2]= BaseApp.createImage("/Images/LevelUrban/bomber_SuperWall.png");
+            cases[3]= BaseApp.createImage("/Images/LevelUrban/bomber_Wall.png");
+            cases[4]= BaseApp.createImage("/Images/Item/bomber_Flame.png");
+            cases[5]= BaseApp.createImage("/Images/Item/bomber_Skull.png");
+            cases[6]= BaseApp.createImage("/Images/Item/bomber_Slow.png");
+            cases[7]= BaseApp.createImage("/Images/Item/bomber_Speed.png");
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -376,4 +384,4 @@ public class Map {
     }
     
 }
-
+//#endif
