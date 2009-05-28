@@ -144,9 +144,10 @@ abstract public class BoardGameApp extends GameApp {
 	*/
   public static final int PD_CURR = 0;
   public static final int PD_DFLT = 1;
-  public static final int PD_INIT = 2;
-  public static final int PD_LIMIT = 3;
-  public static final int PD_INCR = 4;
+  public static final int PD_OFFS = 2;
+  public static final int PD_INIT = 3;
+  public static final int PD_LIMIT = 4;
+  public static final int PD_INCR = 5;
   public static int[] gsDepth;
   public static int[] gsRow;
   public static int[] gsCol;
@@ -156,7 +157,7 @@ abstract public class BoardGameApp extends GameApp {
   final static public int gsLevelNormal = 0;
   final static public int gsLevelDifficult = 1;
   final static public int gsLevelHard = 2;
-  public static int gsLevel = gsLevelDifficult;
+  public static int[] gsLevel;
 
 	//#ifdef DLOGGING
   private boolean fineLoggable;
@@ -235,7 +236,8 @@ abstract public class BoardGameApp extends GameApp {
 				bsavedRec = ((BoardGameScreen)game).getSavedGameRecord();
 			}
 			//#ifdef DLOGGING
-			logger.info("BaseApp.messages[AppConstants.MSG_BOARDAPP_USERDEF - 1]=" + BaseApp.messages[AppConstants.MSG_BOARDAPP_USERDEF - 1]);
+			logger.info("AppConstants.MSG_LEVELPREFIX,msg=" + AppConstants.MSG_LEVELPREFIX + "," + BaseApp.messages[AppConstants.MSG_LEVELPREFIX]);
+			logger.info("AppConstants.MSG_BOARDAPP_USERDEF - 1,BaseApp.messages[AppConstants.MSG_BOARDAPP_USERDEF - 1]=" + (AppConstants.MSG_BOARDAPP_USERDEF - 1) + "," + BaseApp.messages[AppConstants.MSG_BOARDAPP_USERDEF - 1]);
 			//#endif
 			prepGameMenu(bsavedRec.length > 0);
 		} catch (Throwable e) {
@@ -250,6 +252,7 @@ abstract public class BoardGameApp extends GameApp {
 
 	public void setGameDefaults() {
 		BoardGameApp.gsDepth[PD_CURR] = BoardGameApp.gsDepth[PD_DFLT];
+		BoardGameApp.gsLevel[PD_CURR] = BoardGameApp.gsLevel[PD_DFLT];
 		BoardGameApp.gsRow[PD_CURR] = BoardGameApp.gsRow[PD_DFLT];
 		BoardGameApp.gsCol[PD_CURR] = BoardGameApp.gsCol[PD_DFLT];
 		BoardGameApp.gsNbrPlayers[PD_CURR] = BoardGameApp.gsNbrPlayers[PD_DFLT];
@@ -425,7 +428,7 @@ abstract public class BoardGameApp extends GameApp {
 			super.doShowOptions();
 			opPlayers.setSelectedIndex(BoardGameApp.gsPlayer - 1, true);
 			if (opLevel != null) {
-				opLevel.setSelectedIndex(BoardGameApp.gsLevel, true);
+				BoardGameApp.setSelectedChoicePD(opLevel, gsLevel);
 			}
 			if (opDept != null) {
 				BoardGameApp.setSelectedChoicePD(opDept, gsDepth);
@@ -481,9 +484,8 @@ abstract public class BoardGameApp extends GameApp {
 			BoardGameApp.gsPlayer = settingsGameUpd(opPlayers.getSelectedIndex() + 1,
 				BoardGameApp.BOARD_GAME_PLAYER, BoardGameApp.gsPlayer);
 			if (opLevel != null) {
-				BoardGameApp.gsLevel = settingsGameUpd(opLevel.getSelectedIndex(),
-						BoardGameApp.BOARD_GAME_LEVEL,
-						BoardGameApp.gsLevel);
+				settingsGameUpdPD(opLevel, BoardGameApp.gsLevel,
+						BoardGameApp.BOARD_GAME_LEVEL);
 			}
 			if (opDept != null) {
 				settingsGameUpdPD(opDept, BoardGameApp.gsDepth,
@@ -757,7 +759,7 @@ abstract public class BoardGameApp extends GameApp {
 			BaseApp.settings.load();
 			BoardGameApp.gsPlayer = getIntGame(BoardGameApp.BOARD_GAME_PLAYER, BoardGameApp.gsPlayer);
 			BoardGameApp.gsFirst = getIntGame(BoardGameApp.BOARD_GAME_FIRST, BoardGameApp.gsFirst); 
-			BoardGameApp.gsLevel = getIntGame(BoardGameApp.BOARD_GAME_LEVEL, BoardGameApp.gsLevel); 
+			getIntGamePD(BoardGameApp.BOARD_GAME_LEVEL, BoardGameApp.gsLevel); 
 			getIntGamePD(BoardGameApp.BOARD_GAME_DEPT, BoardGameApp.gsDepth); 
 			getIntGamePD(BoardGameApp.BOARD_GAME_ROW, BoardGameApp.gsRow); 
 			getIntGamePD(BoardGameApp.BOARD_GAME_COL, BoardGameApp.gsCol); 
