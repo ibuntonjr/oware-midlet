@@ -39,11 +39,12 @@ import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
-import javax.microedition.lcdui.List;
-import javax.microedition.lcdui.TextBox;
 import java.util.Hashtable;
 import org.mega.gasp.bluetooth.miniplatform.GASPClient;
 import org.mega.gasp.bluetooth.miniplatform.SubApplicationInstance;
+import com.substanceofcode.rssreader.presentation.FeatureList;
+import com.substanceofcode.rssreader.presentation.FeatureTextBox;
+import com.substanceofcode.rssreader.presentation.FeatureMgr;
 
 //#ifdef DLOGGING
 import net.sf.jlogmicro.util.logging.Logger;
@@ -94,13 +95,11 @@ public class Client extends GASPClient implements CommandListener, Runnable {
     /** Array of target locations. */
     private Vector appInstances;
     /** User interface list for selection. */
-    private List list;
+    private FeatureList list;
     /** Current command to proccess. */
     private Command currentCommand;
-    /** The current command processing thread. */
-    private Thread commandThread;
     /** Message area. */
-    private TextBox t;
+    private FeatureTextBox t;
     
     protected int NumeroJoueur;
     
@@ -163,9 +162,9 @@ public class Client extends GASPClient implements CommandListener, Runnable {
     /*Perform the current command set by the method commandAction.*/
     public void run() {
 			try {
-					//#ifdef DLOGGING
-					if (finestLoggable) {logger.finest("run this.modifMode=" + this.modifMode);}
-					//#endif
+				//#ifdef DLOGGING
+				if (finestLoggable) {logger.finest("run this.modifMode=" + this.modifMode);}
+				//#endif
         if (currentCommand == joinCommand) {
             synchronized(this.modifMode){
                 setMode(2);
@@ -195,9 +194,6 @@ public class Client extends GASPClient implements CommandListener, Runnable {
                 endAI();
                 currentScreen();
             }
-        } synchronized (this) {
-            // signal that another command can be processed
-            commandThread = null;
         }
 			} catch (Throwable e) {
 				e.printStackTrace();
@@ -215,13 +211,7 @@ public class Client extends GASPClient implements CommandListener, Runnable {
 				if (finestLoggable) {logger.finest("commandAction c,s=" + c + "," + ((s == null) ? "null" : s.getClass().getName()) );}
 				//#endif
         synchronized (this) {
-            if (commandThread != null) {
-                // process only one command at a time
-                return;
-            }
             currentCommand = c;
-            commandThread = new Thread(this);
-            commandThread.start();
         }
 			} catch (Throwable e) {
 				e.printStackTrace();
@@ -270,7 +260,7 @@ public class Client extends GASPClient implements CommandListener, Runnable {
 						break;
 					default: break;
 				}
-				d.setCommandListener(this);
+				FeatureMgr.setCommandListener(d, this, false, true);
 			} catch (Throwable e) {
 				e.printStackTrace();
 				//#ifdef DLOGGING
@@ -320,7 +310,7 @@ public class Client extends GASPClient implements CommandListener, Runnable {
     }
     
     synchronized void alertScreen(String s) {
-        t = new TextBox("Alert", s, s.length(), 0);
+        t = new FeatureTextBox("Alert", s, s.length(), 0);
         display.setCurrent(t);
         try {
             Thread.sleep(1300);
@@ -747,7 +737,7 @@ public class Client extends GASPClient implements CommandListener, Runnable {
 				if (finestLoggable) {logger.finest("mainScreen");}
 				//#endif
 				String s = "Hi, click join to enter the MGP";
-				t = new TextBox("GPClientTest", s, s.length(), 0);
+				t = new FeatureTextBox("GPClientTest", s, s.length(), 0);
 				setCommands(t, 0);
 				mode=2;
 				Utils.logClientHL("mainScreen mode:"+mode);
@@ -776,15 +766,15 @@ public class Client extends GASPClient implements CommandListener, Runnable {
             currentAIIDList = new int[indexMax];
             if (indexMax == 0){
                 String s = "Currently no game sessions to join";
-                t = new TextBox("Lobby", s, s.length(), 0);
+                t = new FeatureTextBox("Lobby", s, s.length(), 0);
                 setCommands(t, 1);
-                t.setCommandListener(this);
+                t.setCommandListener(this, false, true);
                 display.setCurrent(t);
             } else{
                 int current = -1;
                 if (list!=null) current = list.getSelectedIndex();
-                list = new List("Lobby", Choice.EXCLUSIVE);
-                list.setCommandListener(this);
+                list = new FeatureList("Lobby", Choice.EXCLUSIVE);
+                list.setCommandListener(this, false, true);
                 for (int i = 0; i < appInstances.size(); i++) {
                     ApplicationInstanceInfos appInfos = (ApplicationInstanceInfos)appInstances.elementAt(i);
                     int aIID = appInfos.getApplicationInstanceID();
@@ -809,10 +799,10 @@ public class Client extends GASPClient implements CommandListener, Runnable {
 					//#ifdef DLOGGING
 					if (finestLoggable) {logger.finest("waitingRoomScreen type=" + type);}
 					//#endif
-            list = new List("Waiting Room - Players", Choice.EXCLUSIVE);
+            list = new FeatureList("Waiting Room - Players", Choice.EXCLUSIVE);
             //Nom du joueur du telephone
             list.append("You: aSID>"+aSID+"type>"+NumeroJoueur,null);
-            list.setCommandListener(this);
+            list.setCommandListener(this, false, true);
             for (int i = 0; i < gameSessionPlayers.size(); i++) {
                 Integer aSIDOf = (Integer)gameSessionPlayers.elementAt(i);
                 //Noms des joueurs dans la Waiting Room
@@ -834,9 +824,9 @@ public class Client extends GASPClient implements CommandListener, Runnable {
 					if (finestLoggable) {logger.finest("startRoomScreen");}
 					//#endif
             String s = "Vous pouvez lancer la partie";
-            t = new TextBox("Start Room", s, s.length(), 0);
+            t = new FeatureTextBox("Start Room", s, s.length(), 0);
             setCommands(t, 6);
-            t.setCommandListener(this);
+            t.setCommandListener(this, false, true);
             display.setCurrent(t);
         } catch (Exception e){e.printStackTrace();}
     }
