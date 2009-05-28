@@ -30,11 +30,12 @@ import net.eiroca.j2me.sm.data.Address;
 import net.eiroca.j2me.sm.data.AddressStore;
 import net.eiroca.j2me.sm.util.StoreException;
 import net.sf.yinlight.boardgame.oware.midlet.AppConstants;
+import com.substanceofcode.rssreader.presentation.FeatureList;
 
 /**
  * The address book screen.
  */
-public class AddressBookScreen extends List {
+public class AddressBookScreen extends FeatureList {
 
   long id;
   private long[] addressIds;
