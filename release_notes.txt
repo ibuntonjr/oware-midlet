@@ -4,6 +4,7 @@
 + Support changes in max holes captured.
 + Fix redo
 + Fix JAR URL
++ Fix JAR URL
 
 0.1 2008-12-31 Alpha 3 Version
 + Handle pointer press/drag
@@ -214,7 +215,26 @@
 + Yield from A.I. thread from time to time to allow for other threads to execute.
 + Made changes to get test program to create a file with encoded data to send to SecureSMS using WMA console.
 
+0.1.5 2009-05-27 Alpha 2 Version
++ More logging.
++ Added bomber game with Bluetooth.
++ Use feature List, TextBox and Form.
++ Allow FeatureMgr to specify that the run shoud be done, but only once which is after the commandAction.
++ Compile bluetooth only for JSR-82.
++ Oware board image.
++ Use abstract App for use with other games.
++ Start making different program versions easier.
++ Use mobilesuite utilities.
++ Fix out of memory error with remove command.
++ Use parameter definition for gsLevel.
++ Increase image sizes for Reversi.
++ Allow specification of offset from the current value for a parameter array.
++ Fix level specified on board on the right has 'Initial Seeds'.
++ Fix suffixvers.
++ Have target for SecureSMS only.
+
 Issues:
 
+Secure SMS does not work.
 Minesweeper does not work at all.
 
