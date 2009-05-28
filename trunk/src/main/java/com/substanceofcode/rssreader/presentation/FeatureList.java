@@ -122,7 +122,7 @@ public class FeatureList extends List {
 
 	final public void removeCommand(Command cmd) {
 		super.removeCommand(cmd);
-		featureMgr.removeCommand(cmd);
+		featureMgr.removePrompt(cmd);
 	}
 
 	final public void removePrompt(Command cmd) {
