@@ -132,14 +132,14 @@ public class MineSweeper extends BoardGameApp {
     GameApp.hsMaxLevel = 3;
     GameApp.hsMaxScore = 1;
     iError = BaseApp.createImage(MineSweeper.RES_ERROR);
-		BoardGameApp.gsDepth = new int[] {0, 0, 0, 0, 0};
+		BoardGameApp.gsDepth = new int[] {0, 0, 0, 0, 0, 0};
 		BoardGameApp.gsRow = new int[] {MineSweeperGame.MINE_MIN_SIZE,
-			MineSweeperGame.MINE_MIN_SIZE,
+			MineSweeperGame.MINE_MIN_SIZE, 0,
 			MineSweeperGame.MINE_MIN_SIZE, -MineSweeperGame.MINE_MAX_SIZE, 1};
 		BoardGameApp.gsCol = new int[] {MineSweeperGame.MINE_MIN_SIZE,
-			MineSweeperGame.MINE_MIN_SIZE,
+			MineSweeperGame.MINE_MIN_SIZE, 0,
 			MineSweeperGame.MINE_MIN_SIZE, -MineSweeperGame.MINE_MAX_SIZE, 1};
-		BoardGameApp.gsNbrPlayers =  new int[] {2, 2, 2, 2, 1};
+		BoardGameApp.gsNbrPlayers =  new int[] {2, 2, 0, 2, 2, 1};
 		setGameDefaults();
   }
 
