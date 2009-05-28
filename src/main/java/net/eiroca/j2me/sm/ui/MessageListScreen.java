@@ -30,11 +30,12 @@ import net.eiroca.j2me.sm.data.SecureMessage;
 import net.eiroca.j2me.sm.data.SecureMessageStore;
 import net.eiroca.j2me.sm.util.Store;
 import net.eiroca.j2me.sm.util.StoreException;
+import com.substanceofcode.rssreader.presentation.FeatureList;
 
 /**
  * The message store screen.
  */
-public class MessageListScreen extends List {
+public class MessageListScreen extends FeatureList {
 
   protected long[] messageDates;
   private final Command del;
