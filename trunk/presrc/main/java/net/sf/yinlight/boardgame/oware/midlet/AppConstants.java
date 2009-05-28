@@ -104,7 +104,9 @@ public class AppConstants {
   final public static int MSG_PASS = AppConstants.MSG_GAMEAPP_USERDEF + msgOffset++;
   final public static short MSG_SURE_END = (short)(AppConstants.MSG_GAMEAPP_USERDEF + msgOffset++);
 	// The 3 messages are used for level with offset form MSG_LEVELPREFIX
-  final public static int MSG_LEVELPREFIX = AppConstants.MSG_GAMEAPP_USERDEF + (msgOffset+=3);
+  final public static int MSG_LEVELPREFIX = AppConstants.MSG_GAMEAPP_USERDEF + msgOffset++;
+  final public static int MSG_LEVELMEDIUM = AppConstants.MSG_GAMEAPP_USERDEF + msgOffset++;
+  final public static int MSG_LEVELHARD = AppConstants.MSG_GAMEAPP_USERDEF + msgOffset++;
   final public static int MSG_BOARDAPP_USERDEF = AppConstants.MSG_GAMEAPP_USERDEF + msgOffset++;
   public static short boardMsgOffset = 0;
   final public static int MSG_OWARE_NAME = AppConstants.MSG_BOARDAPP_USERDEF + boardMsgOffset++; // 0
