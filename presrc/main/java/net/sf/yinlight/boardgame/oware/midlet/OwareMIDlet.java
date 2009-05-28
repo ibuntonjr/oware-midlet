@@ -108,14 +108,14 @@ public class OwareMIDlet extends BoardGameApp {
   final static public int LEVEL_DIFFICULT = 1;
   final static public int LEVEL_HARD = 2;
   public static int[] gsInitSeeds = new int[] {OwareTable.INIT_SEEDS,
-			OwareTable.INIT_SEEDS, 1, -9, 1};
-  public static int[] gsMultiLap = new int[] {0, 0, 0, -2, 1};
-  public static int[] gsStartFirst = new int[] {0, 0, 0, -1, 1};
-  public static int[] gsSkipStarting = new int[] {0, 0, 0, -1, 1};
-  public static int[] gsSowStore = new int[] {0, 0, 0, -1, 1};
-  public static int[] gsCapture = new int[] {1, 1, 0, -2, 1};
-  public static int[] gsMaxHouses = new int[] {6, 6, 1, -8, 1};
-  public static int[] gsGrandSlam = new int[]{ 0, 0, 0,
+			OwareTable.INIT_SEEDS, 0, 1, -9, 1};
+  public static int[] gsMultiLap = new int[] {0, 0, 0, 0, -2, 1};
+  public static int[] gsStartFirst = new int[] {0, 0, 0, 0, -1, 1};
+  public static int[] gsSkipStarting = new int[] {0, 0, 0, 0, -1, 1};
+  public static int[] gsSowStore = new int[] {0, 0, 0, 0, -1, 1};
+  public static int[] gsCapture = new int[] {1, 1, 0, 0, -2, 1};
+  public static int[] gsMaxHouses = new int[] {6, 6, 0, 1, -8, 1};
+  public static int[] gsGrandSlam = new int[]{ 0, 0, 0, 0,
 		-OwareGame.GRAND_SLAM_LEGAL_24, 1};
   public static boolean gsOpponentEmpty = true;
 
@@ -149,11 +149,14 @@ public class OwareMIDlet extends BoardGameApp {
     GameApp.hsName = "Oware";
 		GameApp.resSplash = "oware_splash.png";
 		 BoardGameApp.gsTextRow = 2;
-		BoardGameApp.gsDepth = new int[] {3, 3, 1, -14, 1};
-		BoardGameApp.gsRow =  new int[] {2, 2, 2, -4, 2};
+		BoardGameApp.gsDepth = new int[] {3, 3, 0, 1, -14, 1};
+		BoardGameApp.gsRow =  new int[] {2, 2, 0, 2, -4, 2};
 		// Unee has only 3 columns.
-		BoardGameApp.gsCol =  new int[] {6, 6, 3, -9, 1};
-		BoardGameApp.gsNbrPlayers =  new int[] {2, 2, 2, 2, 1};
+		BoardGameApp.gsCol =  new int[] {6, 6, 0, 3, -9, 1};
+		BoardGameApp.gsNbrPlayers =  new int[] {2, 2, 0, 2, 2, 1};
+		BoardGameApp.gsLevel = new int[] {BoardGameApp.gsLevelDifficult,
+			BoardGameApp.gsLevelDifficult, 0, 0, -2, 1};
+
 		setGameDefaults();
   }
 
@@ -166,7 +169,6 @@ public class OwareMIDlet extends BoardGameApp {
 		OwareMIDlet.gsSowStore[PD_CURR] = OwareMIDlet.gsSowStore[PD_DFLT];
 		OwareMIDlet.gsCapture[PD_CURR] = OwareMIDlet.gsCapture[PD_DFLT];
 		OwareMIDlet.gsInitSeeds[PD_CURR] = OwareMIDlet.gsInitSeeds[PD_DFLT];
-		BoardGameApp.gsLevel = BoardGameApp.gsLevelDifficult;
 	}
 
   public void init() {
