@@ -158,7 +158,7 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 			featureMgr.setCommandListener(BaseApp.midlet, false);
 			super.setCommandListener(featureMgr);
 			//#endif
-			featureMgr.setRunnable(this, true);
+			featureMgr.setRunnable(this, true, false);
 			ignoreKeycodes = "," + BaseApp.midlet.readAppProperty(
 					IGNORE_KEYCODES, "").trim() + ",";
 			//#ifdef DLOGGING
@@ -878,7 +878,8 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 
   public void updateSkillInfo() {
     if (!BoardGameScreen.twoplayer) {
-      infoLines[BoardGameScreen.table.nbrPlayers] = BaseApp.messages[AppConstants.MSG_LEVELPREFIX + BoardGameApp.gsLevel] + BoardGameApp.gsDepth[BoardGameApp.PD_CURR];
+      infoLines[BoardGameScreen.table.nbrPlayers] = BaseApp.messages[AppConstants.MSG_LEVELPREFIX + BoardGameApp.gsLevel[BoardGameApp.PD_CURR]] +
+				BoardGameApp.gsDepth[BoardGameApp.PD_CURR];
     }
     else {
       infoLines[BoardGameScreen.table.nbrPlayers] = null;
@@ -1058,9 +1059,9 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
     // row
     b[index++] = (byte) BoardGameScreen.table.nbrCol;
     // col
-    b[index++] = (byte) BoardGameApp.gsLevel;
+    b[index++] = (byte) BoardGameApp.gsLevel[BoardGameApp.PD_CURR];
 		//#ifdef DLOGGING
-		if (finestLoggable) {logger.finest("BoardGameApp.gsLevel,offset=" + BoardGameApp.gsLevel + "," + offset);}
+		if (finestLoggable) {logger.finest("BoardGameApp.gsLevel[BoardGameApp.PD_CURR],offset=" + BoardGameApp.gsLevel[BoardGameApp.PD_CURR] + "," + offset);}
 		//#endif
 		b[index++] = (byte) BoardGameApp.gsDepth[BoardGameApp.PD_CURR];
 		//#ifdef DLOGGING
