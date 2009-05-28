@@ -40,11 +40,12 @@ import net.eiroca.j2me.sm.data.AddressStore;
 import net.eiroca.j2me.sm.data.SecureMessage;
 import net.eiroca.j2me.sm.util.StoreException;
 import net.sf.yinlight.boardgame.oware.midlet.AppConstants;
+import com.substanceofcode.rssreader.presentation.FeatureForm;
 
 /**
  * New message screen.
  */
-public class SendNewScreen extends Form {
+public class SendNewScreen extends FeatureForm {
 
   public static final int MAX_TEXT_LENGTH = 5000;
 
