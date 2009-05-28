@@ -20,6 +20,11 @@
  /**
    * This was first changed on 2009-05-13 by Irving Bunton, Jr
    */
+/**
+	TODO
+	If connection already opened (if use emulator, exit without bringing up
+	 a new emulator, gives error.
+	 */
 // Expand to define JSR-120 test define
 @DJSR120@
 // Expand to define JMUnit test define
@@ -34,6 +39,7 @@ import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.List;
+import javax.microedition.midlet.MIDletStateChangeException;
 import net.eiroca.j2me.app.Application;
 import net.eiroca.j2me.app.BaseApp;
 import net.eiroca.j2me.rms.Settings;
@@ -243,23 +249,43 @@ public class SecureSMS extends Application implements StoreObserver {
       else {
         BaseApp.show(null, scMenu, true);
       }
-    }
-    catch (final StoreException sme) {
-      // Exit without any messages
-      try {
-        destroyApp(true);
-      }
-      catch (final Exception e) {
-      }
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("init error", e);
+			//#endif
+			if (e instanceof StoreException) {
+				// Exit without any messages
+				try {
+					destroyApp(true);
+				} catch (MIDletStateChangeException mse) {
+					e.printStackTrace();
+					//#ifdef DLOGGING
+					logger.severe("init error", mse);
+					//#endif
+				}
+			}
     }
   }
 
   protected void done() {
     try {
+			//#ifdef DLOGGING
+			if (finestLoggable) {logger.finest("done");}
+			//#endif
       handler.done();
     }
     catch (final StoreException e) {
-    }
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("done error", e);
+			//#endif
+		} catch (Throwable e) {
+			e.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("done error", e);
+			//#endif
+		}
     super.done();
   }
 
@@ -267,6 +293,9 @@ public class SecureSMS extends Application implements StoreObserver {
 
   // Implementation of the command listener interface
   public boolean handleAction(int action, final Displayable d, final Command cmd) {
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("handleAction action,d,cmd=" + action + "," + ((d == null) ? "null" : d.getClass().getName()) + "," + cmd.getLabel() );}
+		//#endif
     boolean confirmed = false;
     if (action == SecureSMS.AC_YES) {
       confirmed = true;
@@ -479,6 +508,9 @@ public class SecureSMS extends Application implements StoreObserver {
     }
     catch (final Throwable th) {
       th.printStackTrace();
+			//#ifdef DLOGGING
+			logger.severe("handleAction error", th);
+			//#endif
       // set the alert type and next displayable and show the alert
       BaseApp.showAlert(AppConstants.MSG_ERROR, errMsg, null, AlertType.ERROR, back, Alert.FOREVER);
     }
@@ -490,6 +522,12 @@ public class SecureSMS extends Application implements StoreObserver {
   public void actionDone(final int action, final Object obj, final Store store) {
     if (action == StoreObserver.ADD) {
       try {
+					//#ifdef DLOGGING
+					if (finestLoggable) {logger.finest("actionDone action,obj=" + action + "," + obj);}
+					//#endif
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("init");}
+		//#endif
         // Note: As we register to listen on the incoming message store we should
         // not check the store reference
         // Check if we need to update the current inbox view
