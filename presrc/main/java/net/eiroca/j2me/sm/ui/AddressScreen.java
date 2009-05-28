@@ -35,11 +35,12 @@ import javax.microedition.lcdui.TextField;
 import net.eiroca.j2me.app.BaseApp;
 import net.eiroca.j2me.sm.data.Address;
 import net.sf.yinlight.boardgame.oware.midlet.AppConstants;
+import com.substanceofcode.rssreader.presentation.FeatureForm;
 
 /**
  * This is the message screen. Message can not be updated and saved into the storage.
  */
-public class AddressScreen extends Form {
+public class AddressScreen extends FeatureForm {
 
   public static final int MAX_NAME_LENGTH = 50;
   public static final int MAX_NUMBER_LENGTH = 30;
