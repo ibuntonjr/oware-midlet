@@ -78,23 +78,33 @@ public class Reversi extends BoardGameApp {
 		BoardGameApp.gsSquareImages =
 			new String[] {"reversi_board12.png","reversi_board14.png",
 				"reversi_board16.png","reversi_board18.png","reversi_board20.png",
-			"reversi_board22.png","reversi_board24.png"};
+			"reversi_board22.png","reversi_board24.png",
+				"reversi_board26.png","reversi_board28.png","reversi_board30.png",
+			"reversi_board32.png","reversi_board34.png",
+				"reversi_board36.png","reversi_board38.png","reversi_board40.png"};
 		BoardGameApp.gsPiece1Images =
 			new String[] {"reversi_black_btn12.png","reversi_black_btn14.png",
 				"reversi_black_btn16.png","reversi_black_btn18.png","reversi_black_btn20.png",
-			"reversi_black_btn22.png","reversi_black_btn24.png"};
+			"reversi_black_btn22.png","reversi_black_btn24.png",
+				"reversi_black_btn26.png","reversi_black_btn28.png","reversi_black_btn30.png",
+			"reversi_black_btn32.png","reversi_black_btn34.png",
+				"reversi_black_btn36.png","reversi_black_btn38.png","reversi_black_btn40.png"};
 		BoardGameApp.gsPiece2Images =
 			new String[] {"reversi_white_btn12.png","reversi_white_btn14.png",
 				"reversi_white_btn16.png","reversi_white_btn18.png","reversi_white_btn20.png",
-			"reversi_white_btn22.png","reversi_white_btn24.png"};
+			"reversi_white_btn22.png","reversi_white_btn24.png",
+				"reversi_white_btn26.png","reversi_white_btn28.png","reversi_white_btn30.png",
+			"reversi_white_btn32.png","reversi_white_btn34.png",
+				"reversi_white_btn36.png","reversi_white_btn38.png","reversi_white_btn40.png"};
 		BoardGameApp.storeName = "REVERSI_GAME_STORE";
 		BoardGameApp.gsLevelMsg = new int[0];
+		BoardGameApp.gsLevel = new int[] {0, 0, 0, 0, 0, 1};
     GameApp.hsName = "Reversi";
 		GameApp.resSplash = "reversi_splash.png";
-		BoardGameApp.gsDepth = new int[] {3, 3, 1, -14, 1};
-		BoardGameApp.gsRow =  new int[] {8, 8, 4, 8, 1};
-		BoardGameApp.gsCol =  new int[] {8, 8, 4, 8, 1};
-		BoardGameApp.gsNbrPlayers =  new int[] {2, 2, 2, 2, 1};
+		BoardGameApp.gsDepth = new int[] {3, 3, 0, 1, -14, 1};
+		BoardGameApp.gsRow =  new int[] {8, 8, 0, 4, 8, 1};
+		BoardGameApp.gsCol =  new int[] {8, 8, 0, 4, 8, 1};
+		BoardGameApp.gsNbrPlayers =  new int[] {2, 2, 0, 2, 2, 1};
 		setGameDefaults();
   }
 
@@ -105,7 +115,7 @@ public class Reversi extends BoardGameApp {
 		try {
 			super.init();
 			//#ifdef DLOGGING
-			logger.info("BaseApp.messages[AppConstants.MSG_REVERSI_NAME]=" + BaseApp.messages[AppConstants.MSG_REVERSI_NAME]);
+			logger.info("AppConstants.MSG_REVERSI_NAME,BaseApp.messages[AppConstants.MSG_REVERSI_NAME]=" + AppConstants.MSG_REVERSI_NAME + "," + BaseApp.messages[AppConstants.MSG_REVERSI_NAME]);
 			logger.info("BaseApp.messages[AppConstants.MSG_REVERSI_USERDEF - 1]=" + BaseApp.messages[AppConstants.MSG_REVERSI_USERDEF - 1]);
 			//#endif
 			BoardGameApp.playerNames = new String[] {
