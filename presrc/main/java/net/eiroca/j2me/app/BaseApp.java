@@ -1948,14 +1948,14 @@ implements CommandListener
 					logger.fine("setup setCommandListener " + d.getTitle());
 					//#endif
 					//#endif
-					featureMgr.setCommandListener((CommandListener)d, false);
+					featureMgr.setCommandListener((CommandListener)d, false, false);
 				} else {
 					//#ifdef DMIDP20
 					//#ifdef DLOGGING
 					logger.fine("setup setCommandListener " + d.getTitle());
 					//#endif
 					//#endif
-					featureMgr.setCommandListener(BaseApp.midlet, false);
+					featureMgr.setCommandListener(BaseApp.midlet, false, false);
 				}
 				d.setCommandListener(featureMgr);
 			}
