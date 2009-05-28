@@ -86,7 +86,7 @@ public final class OwareScreen extends BoardGameScreen {
     super(midlet, false, true, AppConstants.MSG_OWARE_NAME);
     BoardGameScreen.rgame = new OwareGame();
 		// FIX for different AIs and skill
-    switch (OwareMIDlet.gsLevel) {
+    switch (OwareMIDlet.gsLevel[BoardGameApp.PD_CURR]) {
 			case OwareMIDlet.gsLevelNormal:
 				gMiniMax = new LimitedMinMax();
 				break;
