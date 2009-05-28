@@ -37,11 +37,12 @@ import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.StringItem;
 import net.eiroca.j2me.app.BaseApp;
 import net.eiroca.j2me.sm.data.SecureMessage;
+import com.substanceofcode.rssreader.presentation.FeatureForm;
 
 /**
  * The message screen. Can be extended to create specific message screens (Incoming, Outgoing).
  */
-public class MessageScreen extends Form {
+public class MessageScreen extends FeatureForm {
 
   protected StringItem address;
   protected StringItem text;
