@@ -89,23 +89,22 @@ public class FeatureForm extends Form {
 
 	final public void removeCommand(Command cmd) {
 		super.removeCommand(cmd);
-		featureMgr.removeCommand(cmd);
+		featureMgr.removePrompt(cmd);
 	}
 
 	final public void removePrompt(Command cmd) {
-		super.removeCommand(cmd);
 		featureMgr.removePrompt(cmd);
 	}
 
 	final public void setCommandListener(CommandListener cmdListener) {
 		super.setCommandListener(featureMgr);
-		featureMgr.setCommandListener(cmdListener, false);
+		featureMgr.setCommandListener(cmdListener, false, false);
 	}
 
 	final public void setCommandListener(CommandListener cmdListener,
-			boolean background) {
+			boolean background, boolean reqThread) {
 		super.setCommandListener(featureMgr);
-		featureMgr.setCommandListener(cmdListener, background);
+		featureMgr.setCommandListener(cmdListener, background, reqThread);
 	}
 
 	public FeatureMgr getFeatureMgr() {
