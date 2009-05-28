@@ -6,6 +6,7 @@ wtk.java3d.enabled = true
 wtk.bluetooth.enabled = true
 wtk.miapi.enabled  = false
 debug = debug
+lib.classpath = GASPBT.jar
 DMIDPVERS = DMIDP20
 #Don't allow Itunes to save performance and memory
 DITUNESDEF = DNOITUNES
@@ -19,7 +20,7 @@ DMEMSIZEDEF = DREGULARMEM
 DCLDCVERS = DCLDCV11
 JMIDPVERS = MIDP-2.0 
 JCLDCVERS = CLDC-1.1
-file.prefix = midp20_jsr75_jsr82_jsr135_jsr184_
-bin = ${target}/bin20jsr75jsr82jsr135jsr184
+file.prefix = midp20_cldc11_jsr75_jsr82_jsr135_jsr184_
+bin = ${target}/bin20cldc11jsr75jsr82jsr135jsr184
 MIDLETVERS = ${MIDLETVERSROOT}
 SUFFIXVERS =  2.0-cldc1.1-jsr75-jsr82-jsr135-jsr184
