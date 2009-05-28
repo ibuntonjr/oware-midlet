@@ -33,8 +33,9 @@ import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextField;
 import net.eiroca.j2me.app.BaseApp;
 import net.sf.yinlight.boardgame.oware.midlet.AppConstants;
+import com.substanceofcode.rssreader.presentation.FeatureForm;
 
-public class InsertPINScreen extends Form {
+public class InsertPINScreen extends FeatureForm {
 
   public static final int MAX_PIN_LENGTH = 8;
   public static final int MIN_PIN_LENGTH = 4;
