@@ -181,6 +181,21 @@
 			<property name="res.excludes" value="**/oware*,**/mine*,**/testsuite*,oware*,mine*,testsuite*,**/sm/*,**/bomber**" />
 	</target>
 
+	<target name="prepare.securesms" depends="prepare.no.large" >
+			<property name="release.name" value="SecureSMS" />
+			<property name="MIDLETICON" value="/sms_icon.png" />
+			<property name="MIDLETDESC" value="SecureSMS App" />
+			<property name="SecureSMS-concat.jad" value="SecureSMS-concat.jad" />
+			<property name="SecureSMS-concat.nbr" value="1" />
+			<property name="Oware-concat.jad" value="" />
+			<property name="Reversi-concat.jad" value="" />
+			<property name="Minesweeper-concat.jad" value="" />
+			<property name="Bomber-concat.jad" value="" />
+			<property name="Testsuite-concat.jad" value="" />
+			<property name="src.excludes" value="**/testsuite/**,**/minesweeper/**,**/Oware*,**/Mine*,testsuite/**,minesweeper/**,Oware*,Mine*,**/j2se/*,**/bombergasp/**,**/reversi,**/Reversi*" />
+			<property name="res.excludes" value="**/oware*,**/mine*,**/testsuite*,oware*,mine*,testsuite*,**/reversi*,**/bomber**" />
+	</target>
+
 	<target name="prepare.testsuite" depends="prepare.large" >
 			<property name="release.name" value="TestSuite" />
 			<property name="MIDLETICON" value="/testsuite_icon.png" />
@@ -316,6 +331,15 @@
 		<property name="file.prefix.jsr135" value="" />
 		<property name="file.prefix.jsr184" value="" />
 		<property name="file.prefix" value="${file.prefix.midp1.0}${file.prefix.midp2.0}${file.prefix.cldc1.0}${file.prefix.cldc1.1}${file.prefix.jsr75}${file.prefix.jsr82}${file.prefix.jsr120}${file.prefix.jsr135}${file.prefix.jsr184}" />
+		<property name="SUFFIXVERS.midp1.0" value="" />
+		<property name="SUFFIXVERS.midp2.0" value="" />
+		<property name="SUFFIXVERS.cldc1.0" value="" />
+		<property name="SUFFIXVERS.cldc1.1" value="" />
+		<property name="SUFFIXVERS.jsr75" value="" />
+		<property name="SUFFIXVERS.jsr82" value="" />
+		<property name="SUFFIXVERS.jsr120" value="" />
+		<property name="SUFFIXVERS.jsr135" value="" />
+		<property name="SUFFIXVERS.jsr184" value="" />
 		<property name="SUFFIXVERS" value="${SUFFIXVERS.midp1.0}${SUFFIXVERS.midp2.0}${SUFFIXVERS.cldc1.0}${SUFFIXVERS.cldc1.1}${SUFFIXVERS.jsr75}${SUFFIXVERS.jsr82}${SUFFIXVERS.jsr120}${SUFFIXVERS.jsr135}${SUFFIXVERS.jsr184}" />
 		<!-- Use an invalid value.  The extra 0's mean that it will not match -->
 		<!-- anything in the code. -->
@@ -1294,6 +1318,14 @@
 		</antcall>
 	</target>
 
+	<target name="compile.securesms.2.0.cldc1.1.jsr75.jsr82.jsr120.jsr135.jsr184" depends="prepare.midp2.0,prepare.cldc1.1,prepare.jsr75,prepare.jsr82,prepare.jsr120,prepare.jsr135,prepare.jsr184,prepare.securesms" >
+		<antcall target="compile" >
+			<param name="wtk.properties" value="boguswtk2.0cldc1.1.jsr135.properties${wtk.template}" />
+			<param name="no.staging" value="true" />
+			<param name="no.release" value="true" />
+		</antcall>
+	</target>
+
 	<!-- Compile using WTK with MIDP-2.0, CLDC 1.1 and JSR-120 and test -->
 	<target name="compile.2.0.cldc1.1.jsr120" >
 		<antcall target="compile" >
@@ -1563,6 +1595,10 @@
 			<param name="no.test" value="true" />
 			<param name="no.staging" value="true" />
 		</antcall>
+	</target>
+
+	<target name="dist.midp.2.0.reversi" unless="no.2.0.reversi" depends="prepare.reversi" >
+		<antcall target="dist.midp.2.0" inheritAll="yes" />
 	</target>
 
 	<target name="dist.midp.2.0.large" unless="no.2.0.large" >
