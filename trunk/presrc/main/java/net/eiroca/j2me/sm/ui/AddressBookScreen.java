@@ -61,7 +61,7 @@ public class AddressBookScreen extends FeatureList {
    */
   public long getSelectedAddressId() {
     // Get the list's selected index and map it into the mesage id
-    final int selectedIndex = getSelectedIndex();
+    final int selectedIndex = super.getSelectedIndex();
     if ((addressIds != null) && (selectedIndex >= 0) && (selectedIndex < addressIds.length)) {
       // Note: We add addresses in the reverse order (always to the first
       // position in list)
@@ -76,10 +76,10 @@ public class AddressBookScreen extends FeatureList {
    */
   public void updateAddressList(final AddressStore addressStore) throws StoreException {
     id = getSelectedAddressId();
-    deleteAll();
+    super.deleteAll();
     addressIds = null;
     // Delete the command
-    removeCommand(SecureSMS.cADRDEL);
+    super.removeCommand(SecureSMS.cADRDEL);
     // Get the list of the Ids
     addressIds = addressStore.listIds(null);
     final int addressIdsLength = addressIds.length;
@@ -95,11 +95,11 @@ public class AddressBookScreen extends FeatureList {
         // Automatically select the message that has been selected the last time
         // user left the list
         if (address.id == id) {
-          setSelectedIndex(i, true);
+          super.setSelectedIndex(i, true);
         }
       }
       // Add command
-      addCommand(SecureSMS.cADRDEL);
+      super.addCommand(SecureSMS.cADRDEL);
     }
   }
 
