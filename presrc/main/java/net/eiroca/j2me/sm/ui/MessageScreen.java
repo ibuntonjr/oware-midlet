@@ -55,10 +55,10 @@ public class MessageScreen extends FeatureForm {
     // Create the string items
     address = new StringItem(BaseApp.messages[addressTitle], "");
     text = new StringItem(BaseApp.messages[textTitle], "");
-    append(address);
-    append(text);
+    super.append(address);
+    super.append(text);
     // Add commands
-    addCommand(BaseApp.cBACK);
+    super.addCommand(BaseApp.cBACK);
     BaseApp.setup(this, cmd1, cmd2);
   }
 
