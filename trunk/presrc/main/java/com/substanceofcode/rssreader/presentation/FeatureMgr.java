@@ -84,6 +84,7 @@ public class FeatureMgr implements CommandListener, Runnable {
 	private Logger logger = Logger.getLogger("FeatureMgr");
 	private boolean fineLoggable = logger.isLoggable(Level.FINE);
 	private boolean finestLoggable = logger.isLoggable(Level.FINEST);
+	private boolean traceLoggable = logger.isLoggable(Level.TRACE);
 	//#endif
 
 	private CommandListener cmdFeatureUser = null;
@@ -350,9 +351,9 @@ public class FeatureMgr implements CommandListener, Runnable {
 	/* Prompt if command is in prompt camands.  */
 	public void commandAction(Command cmd, Displayable cdisp) {
 		synchronized(this) {
-			if (!foundDisp && !foundPrompt) {
+			if (!foundDisp) {
 				foundDisp = (cdisp == disp);
-				foundPrompt = (cdisp != promptDisp1) &&
+				foundPrompt = !foundDisp &&
 					((cdisp == promptDisp1) || (cdisp == promptDisp2));
 				this.exCmd = cmd;
 				this.exDisp = cdisp;
