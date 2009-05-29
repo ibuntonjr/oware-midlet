@@ -34,10 +34,22 @@ import net.eiroca.j2me.sm.util.StoreException;
 import net.eiroca.j2me.sm.util.StoreFilterByID;
 import net.eiroca.j2me.sm.util.StoreObserver;
 
+//#ifdef DLOGGING
+import net.sf.jlogmicro.util.logging.Logger;
+import net.sf.jlogmicro.util.logging.Level;
+//#endif
+
 /**
  * Implementation of the MessageStore interface. Note: this implementation may be platform-specific even if it uses the RMS.
  */
 public final class SecureMessageStore extends Store {
+
+  //#ifdef DLOGGING
+  private Logger logger = Logger.getLogger("SecureMessageStore");
+  private boolean fineLoggable = logger.isLoggable(Level.FINE);
+  private boolean finestLoggable = logger.isLoggable(Level.FINEST);
+  private boolean traceLoggable = logger.isLoggable(Level.TRACE);
+  //#endif
 
   /**
    * Creates new <code>MessageStoreImpl</code> instance. The additional string parameter allows us to create different MessageStores (different folders).
@@ -48,6 +60,9 @@ public final class SecureMessageStore extends Store {
   }
 
   public void store(final SecureMessage message) throws StoreException {
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("store message.date,message.number,message.date,message.unread=" + message.date + "," + message.number + "," + message.date + "," + message.unread);}
+		//#endif
     replaceFirst(new StoreFilterByID(message.date), message.serialize());
     notifyAction(StoreObserver.ADD, message);
   }
@@ -62,6 +77,9 @@ public final class SecureMessageStore extends Store {
   public SecureMessage getById(final long id) throws StoreException {
     final byte[] res = findFirst(new StoreFilterByID(id));
     if (res == null) { throw new MessageHandlerException(MessageHandlerException.ERR_NOMESSAGE); }
+		//#ifdef DLOGGING
+		if (finestLoggable) {SecureMessage msg = new SecureMessage(res);logger.finest("getById id,msg.number,msg.date,msg.unread=" + id + "," + msg.number + "," + msg.date + "," + msg.unread);}
+		//#endif
     return new SecureMessage(res);
   }
 
