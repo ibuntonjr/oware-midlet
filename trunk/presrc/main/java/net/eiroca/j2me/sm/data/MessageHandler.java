@@ -117,7 +117,7 @@ public class MessageHandler implements MessageListener, StoreObserver {
   public synchronized void send(final SecureMessage msg) throws StoreException {
     MessageSender sender;
     // Use the key supplied to transcode the message and send it
-    // Encode the message using the key
+    // Encode the message using the key.  Other fields not sent.
     byte[] key = null;
     final Address address = addressBookStore.getByNumber(msg.number, false);
 		//#ifdef DLOGGING
@@ -164,7 +164,7 @@ public class MessageHandler implements MessageListener, StoreObserver {
     // data = PackerHelper.decompress(data);
     final String msg = Store.decodeData(data);
     // Create new message
-    final SecureMessage message = new SecureMessage(aDate, address.number, msg, 0);
+    final SecureMessage message = new SecureMessage(aDate, address.number, msg, 0, true);
     inboxStore.store(message);
   }
 
@@ -229,6 +229,12 @@ public class MessageHandler implements MessageListener, StoreObserver {
 		}
   }
 
+	/**
+		For the given secure message, get the name in the address book that
+		has the number in the secure message.  In this case return the
+		address name.  If there is no address for that message, return the
+		number stored in the message.
+		*/
   public String addressName(final SecureMessage message) {
     String number = message.number;
     Address address = null;
