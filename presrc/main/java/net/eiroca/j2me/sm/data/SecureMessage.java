@@ -48,12 +48,13 @@ public final class SecureMessage {
   public String number;
   public String text;
   public int status;
+  public boolean unread;
 
   /**
    * Creates new <code>Message</code> instance
    */
 
-  public SecureMessage(final Long aDate, final String messageNumber, final String messageText, final int messageStatus) {
+  public SecureMessage(final Long aDate, final String messageNumber, final String messageText, final int messageStatus, final boolean messageUnread) {
     if (aDate == null) {
       date = System.currentTimeMillis();
     }
@@ -63,6 +64,7 @@ public final class SecureMessage {
     number = messageNumber;
     text = messageText;
     status = messageStatus;
+    unread = messageUnread;
   }
 
   /**
@@ -78,6 +80,15 @@ public final class SecureMessage {
       number = din.readUTF();
       text = din.readUTF();
       status = din.readInt();
+			// Ignore error as we may be getting a message from a previous version
+			// of the program.
+			try {
+				unread = din.readBoolean();
+			}
+			catch (final IOException e) {
+				unread = true;
+				e.printStackTrace();
+			}
     }
     catch (final IOException e) {
       throw new StoreException(StoreException.ERR_STOREREAD);
@@ -103,6 +114,7 @@ public final class SecureMessage {
       dout.writeUTF(number);
       dout.writeUTF(text);
       dout.writeInt(status);
+      dout.writeBoolean(unread);
       dout.flush();
     }
     catch (final IOException e) {
