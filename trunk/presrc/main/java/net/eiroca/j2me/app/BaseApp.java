@@ -1835,7 +1835,9 @@ implements CommandListener
   }
 
   /**
-   * Register the action for the given list.
+   * Register the action for the given list.  This is the action done if
+	 * the other items in the list are not registerd.  This action is done
+	 * if the list select is done.
    *
    * @param list
    * @param action
