@@ -41,6 +41,7 @@ import net.eiroca.j2me.sm.data.SecureMessageStore;
 import net.eiroca.j2me.sm.util.Store;
 import net.eiroca.j2me.sm.util.StoreException;
 import com.substanceofcode.rssreader.presentation.FeatureList;
+import net.sf.yinlight.boardgame.oware.midlet.AppConstants;
 
 /**
  * The message store screen.
@@ -68,7 +69,7 @@ public class MessageListScreen extends FeatureList {
    * Returns the Id of the currently selected message.
    */
   public long getSelectedMessageDate() {
-    final int selectedIndex = getSelectedIndex();
+    final int selectedIndex = super.getSelectedIndex();
     if ((messageDates != null) && (selectedIndex >= 0) && (selectedIndex < messageDates.length)) {
       // Note: We add addresses in the reverse order (always to the first
       // position in list)
@@ -112,21 +113,22 @@ public class MessageListScreen extends FeatureList {
         sb = new StringBuffer(32);
         app.formatDate(c, sb).append(' ').append(name);
         // Add the element to the list
-        insert(0, sb.toString(), null);
+        super.insert(0, sb.toString(),
+						(message.unread ? SecureSMS.unreadImage : SecureSMS.readImage));
         // Automatically select the message that has been selected the last time user left the list
         if (message.date == date) {
-          setSelectedIndex(i, true);
+          super.setSelectedIndex(i, true);
         }
       }
       // Add the DELETE command if at least one message has been found
       if (del != null) {
-        super.addCommand(del);
+        super.addPromptCommand(del, AppConstants.MSG_ARESURE);
       }
       if (reply != null) {
         super.addCommand(reply);
       }
       if (invalid != null) {
-        super.addCommand(invalid);
+        super.addPromptCommand(invalid, AppConstants.MSG_ARESURE);
       }
     }
   }
