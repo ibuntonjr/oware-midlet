@@ -276,7 +276,7 @@ public abstract class Application extends BaseApp implements CommandListener
    * @param cmd
    * @return
    */
-  public static List getMenu(final String title, final int menuID, final int special, final Command cmd) {
+  public static FeatureList getMenu(final String title, final int menuID, final int special, final Command cmd) {
 		//#ifdef DLOGGING
 		Logger logger = Logger.getLogger("Application");
 		boolean traceLoggable = logger.isLoggable(Level.TRACE);
