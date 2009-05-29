@@ -38,6 +38,7 @@ import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Displayable;
+import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.List;
 import javax.microedition.midlet.MIDletStateChangeException;
 import net.eiroca.j2me.app.Application;
@@ -61,6 +62,7 @@ import net.eiroca.j2me.sm.util.Store;
 import net.eiroca.j2me.sm.util.StoreException;
 import net.eiroca.j2me.sm.util.StoreObserver;
 import net.eiroca.j2me.util.CipherDES;
+import com.substanceofcode.rssreader.presentation.FeatureList;
 import net.sf.yinlight.boardgame.oware.midlet.AppConstants;
 
 //#ifdef DLOGGING
@@ -136,8 +138,8 @@ public class SecureSMS extends Application implements StoreObserver {
   private Address address;
 
   // Messenger screens
-  private List scMenu;
-  private List scMenuCleanUp;
+  private FeatureList scMenu;
+  private FeatureList scMenuCleanUp;
   private SendNewScreen scSendNew;
   private AddressScreen scAddress;
   private AddressBookScreen scAddressBook;
@@ -150,6 +152,11 @@ public class SecureSMS extends Application implements StoreObserver {
   private static String STS_PIN = "PIN";
 
   short[][] menuCleanUp;
+
+	final public static String RES_UNREAD = "sm_unread.png";
+	final public static String RES_READ = "sm_read.png";
+  public static Image unreadImage;
+  public static Image readImage;
 
 	//#ifdef DLOGGING
   private boolean fineLoggable;
@@ -225,6 +232,8 @@ public class SecureSMS extends Application implements StoreObserver {
 			logger.info("BaseApp.messages[AppConstants.MSG_SECURESMS_NAME]=" + BaseApp.messages[AppConstants.MSG_SECURESMS_NAME]);
 			logger.info("BaseApp.messages[AppConstants.MSG_SECURESMS_USERDEF - 1]=" + BaseApp.messages[AppConstants.MSG_SECURESMS_USERDEF - 1]);
 			//#endif
+			unreadImage = BaseApp.createImage(SecureSMS.RES_UNREAD);
+			readImage   = BaseApp.createImage(SecureSMS.RES_READ);
       // Initialize everything
       // Initialize the address book and two message stores
       addressBook = new AddressStore(SecureSMS.ADDRESS_BOOK_STORE_NAME);
@@ -321,7 +330,7 @@ public class SecureSMS extends Application implements StoreObserver {
         case AC_SHOWSENDNEW:
           errMsg = AppConstants.MSG_ADDRESSBOOKEMPTY;
           back = scMenu;
-          message = new SecureMessage(null, null, "", 0);
+          message = new SecureMessage(null, null, "", 0, true);
           scSendNew = new SendNewScreen();
           final boolean valid = scSendNew.updateMessage(message, addressBook);
           if (valid) {
@@ -394,6 +403,8 @@ public class SecureSMS extends Application implements StoreObserver {
           message = inbox.getById(id);
           scMessage = new MessageScreen(AppConstants.MSG_MESSAGE, AppConstants.MSG_FROM, AppConstants.MSG_TEXT, SecureSMS.cINBOXREPLY, SecureSMS.cINBOXDEL);
           scMessage.updateMessage(this, message);
+					message.unread = false;
+          inbox.store(message);
           BaseApp.show(null, scMessage, false);
           break;
         case AC_INBOXDELETE:
