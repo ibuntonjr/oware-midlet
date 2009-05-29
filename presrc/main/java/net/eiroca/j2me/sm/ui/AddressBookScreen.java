@@ -99,7 +99,7 @@ public class AddressBookScreen extends FeatureList {
         }
       }
       // Add command
-      super.addCommand(SecureSMS.cADRDEL);
+      super.addPromptCommand(SecureSMS.cADRDEL, AppConstants.MSG_ARESURE);
     }
   }
 
