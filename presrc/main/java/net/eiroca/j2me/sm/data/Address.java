@@ -51,7 +51,9 @@ public final class Address {
   public String key;
 
   /**
-   * Creates new <code>Address</code> instance.
+   * Creates new <code>Address</code> instance.  The id is set to the current
+	 * milliseconds.
+	 *
    * @param addressId Address ID in the AddressStore
    * @param addressName Name on the address
    * @param addressNumber Address MSISDN
