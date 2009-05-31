@@ -233,8 +233,18 @@
 + Fix suffixvers.
 + Have target for SecureSMS only.
 
+0.1.5 2009-05-29 Alpha 3 Version
++ Have read/unread images.
++ Prompt to delete or make invalid.
++ Use FeatureList for menu.
++ Fix prompt code.
++ Have read of message in inbox/sent items go back to inbox/sent items when back pressed.
++ If more than one message is sent from the same phone, it will now store the message instead of giving null pointer.
++ Correct spelling of unknown for unknown address.
+
 Issues:
 
-Secure SMS does not work.
+Secure SMS works if there are no errors with the message store.  It also
+requires JSR-120 or JSR-205.
 Minesweeper does not work at all.
 
