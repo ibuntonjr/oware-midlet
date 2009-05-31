@@ -51,6 +51,7 @@ public class MessageHandler implements MessageListener, StoreObserver {
   MessageConnection connection;
 
   private static final int port = 9087;
+  private static final String UNKNOWN_NAME = "Unknown";
 
   public CipherDES chiper;
   public SecureMessageStore inboxStore;
@@ -193,11 +194,14 @@ public class MessageHandler implements MessageListener, StoreObserver {
 			if (finestLoggable) {logger.finest("receive number=" + number);}
 			//#endif
       Address address = addressBookStore.getByNumber(number, false);
-      if (address == null) {
+			// If no address, or no key it's the unknown address.
+      if ((address == null) || address.name.equals(UNKNOWN_NAME)) {
 				//#ifdef DLOGGING
-				if (finestLoggable) {logger.finest("receive Unkwnon address=null");}
+				if (finestLoggable) {logger.finest("receive Unkwnon address,address=" + address + "," + ((address == null) ? "null" : address.name));}
 				//#endif
-        address = new Address("Unkwnon", number, "");
+				if (address == null) {
+					address = new Address(UNKNOWN_NAME, number, "");
+				}
         addressBookStore.store(address);
         final UnknownMessage mes = new UnknownMessage(number, ((BinaryMessage) wmaMessage).getPayloadData());
         unknownStore.store(mes);
