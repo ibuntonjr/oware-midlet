@@ -363,7 +363,7 @@
 		<property name="Bomber-concat.jad" value="Bomber-concat.jad" />
 		<property name="Bomber-concat.nbr" value="4" />
 		<property name="SecureSMS-concat.jad" value="SecureSMS-concat.jad" />
-		<property name="SecureSMS--concat.nbr" value="5" />
+		<property name="SecureSMS-concat.nbr" value="5" />
 		<property name="Testsuite-concat.jad" value="Testsuite-concat.jad" />
 		<property name="Testsuite-concat.nbr" value="6" />
 		<!-- undo
