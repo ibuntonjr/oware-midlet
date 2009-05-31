@@ -155,7 +155,7 @@ abstract public class BoardGameScreen extends GameScreen implements Runnable {
 		} finally {
 			featureMgr = new FeatureMgr(this);
 			//#ifdef DMIDP10
-			featureMgr.setCommandListener(BaseApp.midlet, false);
+			featureMgr.setCommandListener(BaseApp.midlet, false, false);
 			super.setCommandListener(featureMgr);
 			//#endif
 			featureMgr.setRunnable(this, true, false);
