@@ -405,7 +405,7 @@ public class SecureSMS extends Application implements StoreObserver {
           scMessage.updateMessage(this, message);
 					message.unread = false;
           inbox.store(message);
-          BaseApp.show(null, scMessage, false);
+          BaseApp.show(null, scMessage, true);
           break;
         case AC_INBOXDELETE:
           errMsg = AppConstants.MSG_MESSAGEHASNOTBEENDELETED;
@@ -438,7 +438,7 @@ public class SecureSMS extends Application implements StoreObserver {
           message = sentItems.getById(id);
           scMessage = new MessageScreen(AppConstants.MSG_MESSAGE, AppConstants.MSG_TO, AppConstants.MSG_TEXT, SecureSMS.cSENTDEL, null);
           scMessage.updateMessage(this, message);
-          BaseApp.show(null, scMessage, false);
+          BaseApp.show(null, scMessage, true);
           break;
         case AC_SENTDELETE:
           errMsg = AppConstants.MSG_MESSAGEHASNOTBEENDELETED;
