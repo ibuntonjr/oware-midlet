@@ -233,7 +233,7 @@
 + Fix suffixvers.
 + Have target for SecureSMS only.
 
-0.1.5 2009-05-29 Alpha 3 Version
+0.1.5 2009-05-31 Beta 1 Version
 + Have read/unread images.
 + Prompt to delete or make invalid.
 + Use FeatureList for menu.
@@ -241,6 +241,7 @@
 + Have read of message in inbox/sent items go back to inbox/sent items when back pressed.
 + If more than one message is sent from the same phone, it will now store the message instead of giving null pointer.
 + Correct spelling of unknown for unknown address.
++ Fix BoardGameScreen for MIDP 1.0 changes for threads.
 
 Issues:
 
