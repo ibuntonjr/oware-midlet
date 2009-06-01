@@ -242,6 +242,10 @@
 + If more than one message is sent from the same phone, it will now store the message instead of giving null pointer.
 + Correct spelling of unknown for unknown address.
 + Fix BoardGameScreen for MIDP 1.0 changes for threads.
++ Fix targets that have SMS to use the correct midlet number.
++ Workaround nextInt(int) not in CLDC 1.0.
++ Workaround interrupt not in CLDC 1.0.
++ Better handle multiple versions.
 
 Issues:
 
