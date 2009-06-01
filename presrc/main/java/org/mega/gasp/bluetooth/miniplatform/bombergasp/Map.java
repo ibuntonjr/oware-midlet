@@ -26,6 +26,8 @@
 
 // Expand to define DJSR82 define
 @DJSR82@
+// Expand to define CLDC define
+@DCLDCVERS@
 //#ifdef DJSR82
 package org.mega.gasp.bluetooth.miniplatform.bombergasp;
 import java.util.Random;
@@ -344,17 +346,25 @@ public class Map {
         int m,n;
         while(nbrFIRE>0){
             n=0;
+						//#ifdef DCLDCV11
             m=r.nextInt(nbr);
+						//#else
+            m=r.nextInt() % nbr;
+						//#endif
             for(int i=0;i<Map.map.length;i++){
                 if(n>=m) break;
                 for(int j=0;j<Map.map[i].length;j++){
                     if(map[i][j]==3)
                         n++;
                     if(n==m){
-                        if(itemmap[i][j]==0){
-                            itemmap[i][j]=r.nextInt(4)+4;
-                            nbrFIRE--;
-                        }
+											if(itemmap[i][j]==0){
+												//#ifdef DCLDCV11
+												itemmap[i][j]=r.nextInt(4)+4;
+												//#else
+												itemmap[i][j]=(r.nextInt() % 4) +4;
+												//#endif
+												nbrFIRE--;
+											}
                         break;
                     }
                 }
