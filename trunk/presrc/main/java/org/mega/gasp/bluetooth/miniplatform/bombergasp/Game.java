@@ -56,6 +56,8 @@ public class Game extends GameCanvas implements Runnable{
     private static int offx=0,offy=0;
     Thread t;
     public static SendData sd;
+    private boolean process = true;
+
     public Game() {
         super(false);
         
@@ -108,7 +110,7 @@ public class Game extends GameCanvas implements Runnable{
 //	    this.midlet.dataflu.myVectorClockManager = new VectorClockManager(midlet.gc.NumeroJoueur);
 //
         
-        while(true){
+        while(process){
             
 //            if (syncMode){
 //                // chech if synchronization is finished
@@ -269,7 +271,7 @@ public class Game extends GameCanvas implements Runnable{
         t.start();
     }
     protected synchronized void quit() {
-        t.interrupt();
+				process = false;
         t=null;
         sd.releaseAll();
     }
