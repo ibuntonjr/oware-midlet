@@ -324,6 +324,7 @@
 		<property file="${basedir}/optional.properties${optional.template}" />
 		<property name="propdir" value="${basedir}" />
 		<property file="${basedir}/${wtk.properties}" />
+		<property name="MIDLETVERS" value="${MIDLETVERSROOT}" />
 		<property name="PERMISSIONS" value="" />
 		<property name="DMEMSIZEDEF" value="DREGULARMEM" />
 		<property name="DJSR75" value="DNOJSR75" />
@@ -418,7 +419,9 @@
 			</else>
 		</if>
 		<property name="stage" value="" />
+		<echo message="file.prefix=${file.prefix}" />
 		<property name="build.prefix" value="${file.prefix}${stage}" />
+		<echo message="build.prefix=${build.prefix}" />
 		<property name="build.file.root" value="${build.prefix}${release.name}-${FMIDLETVERSROOT}" />
 		<property name="alx.build.file.root" value="${build.prefix}${release.name}_${FMIDLETVERSROOT}" />
 		<property name="buildinfo" value="${SUFFIXVERS}-${stage}b${build.number}" />
@@ -459,6 +462,7 @@
 			<filter token="CLDCVERS" value="${wtk.cldc.version}" />
 			<filter token="MIDLETVERS" value="${MIDLETVERS}" />
 			<filter token="PERMISSIONS" value="${PERMISSIONS}" />
+			<filter token="DEFAULTCOUNTRYCODE" value="${DEFAULTCOUNTRYCODE}" />
 			<filter token="IGNOREKEYS" value="${IGNOREKEYS}" />
 			<filter token="MIDLETDESC" value="${MIDLETDESC}" />
 			<filter token="GRAPHICS" value="${GRAPHICS}" />
@@ -1731,7 +1735,7 @@
 		</antcall>
 	</target>
 
-	<target name="dist.midp.2.0.jsr75.jsr184.largemem" depends="prepare.midp2.0,prepare.cldc1.0,prepare.jsr75,prepare.jsr184,prepare.large" unless="no.2.0.jsr75.jsr184.largemem" >
+	<target name="dist.midp.2.0.cldc.1.1.jsr75.jsr184.large" depends="prepare.midp2.0,prepare.cldc1.1,prepare.jsr75,prepare.jsr184" unless="no.2.0.cldc.1.1.jsr75.jsr184.largemem" >
 		<antcall target="dist.version" inheritAll="true" >
 			<param name="wtk.properties" value="wtk2.0large.cldc1.1.jsr75.jsr184.properties${wtk.template}" />
 			<param name="no.test" value="true" />
@@ -1757,7 +1761,6 @@
 
 	<target name="dist.midp.2.0.cldc.1.1.jsr75.jsr82.jsr120.jsr135.jsr184" depends="prepare.midp2.0,prepare.cldc1.1,prepare.jsr75,prepare.jsr82,prepare.jsr120,prepare.jsr135,prepare.jsr184" unless="no.2.0.cldc.1.1.jsr75.jsr82.jsr120.jsr135.jsr184" >
 		<antcall target="dist.version" inheritAll="true" >
-			<param name="wtk.properties" value="wtk2.0cldc1.1.jsr75.jsr82.jsr135.jsr184.properties${wtk.template}" />
 			<param name="no.test" value="true" />
 			<param name="no.staging" value="true" />
 		</antcall>
@@ -1889,7 +1892,7 @@
 			<param name="release.buildno" value="true" />
 		</antcall>
 		-->
-		<antcall target="dist.midp.2.0.jsr75.jsr184.largemem" >
+		<antcall target="dist.midp.2.0.cldc.1.1.jsr75.jsr184.large" >
 			<param name="build.number" value="${build.number}" />
 			<param name="release.buildno" value="true" />
 		</antcall>
@@ -1937,7 +1940,7 @@
 			<param name="no.2.0.jsr135.large" value="true" />
 			<param name="no.2.0.cldc.1.1.jsr75.largemem" value="true" />
 			<param name="no.2.0.cldc.1.1.largemem" value="true" />
-			<param name="no.2.0.jsr75.jsr184.largemem" value="true" />
+			<param name="no.2.0.cldc.1.1.jsr75.jsr184.largemem" value="true" />
 			<param name="no.2.0.cldc.1.1.jsr75.jsr82.jsr135.jsr184.largemem" value="true" />
 			<param name="src.excludes" value="**/testsuite/**,testsuite/**,**/j2se/*" />
 			<param name="res.excludes" value="**/testsuite*,testsuite*" />
