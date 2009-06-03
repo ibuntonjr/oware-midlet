@@ -73,27 +73,28 @@ public class LimitedMinMax extends GameMinMax {
 			int maxPoint = -GameMinMax.MAX_POINT; /* -Integer.MIN_VALUE ?? */
 			int bestNum = 0;
 			final GameMove pMoves[] = tpg.possibleMoves(state, player);
-			if ((pMoves == null) || (pMoves.length == 0)) {
+			final int pmoveLen = pMoves.length;
+			if ((pMoves == null) || (pmoveLen == 0)) {
 				// game ended or player cannot move.
 				return null;
 			}
 			//#ifdef DLOGGING
-			if (finestLoggable) {logger.finest("minimax depth,player,pMoves.length=" + depth + "," + player + "," + player + "," + pMoves.length);}
+			if (finestLoggable) {logger.finest("minimax depth,player,pMoves.length=" + depth + "," + player + "," + player + "," + pmoveLen);}
 			//#endif
-			final int[] bestMoves = new int[pMoves.length];
+			final int[] bestMoves = new int[pmoveLen];
 			final GameTable newState = state.copyFrom();
-			if ((depth > 2) && order && (pMoves.length > 1)) {
+			if ((depth > 2) && order && (pmoveLen > 1)) {
 				/* For each potential move, get the points for that move after
 					 the turn is taken. */
-				final int points[] = new int[pMoves.length];
-				for (int oindex = 0; oindex < pMoves.length; ++oindex) {
+				final int points[] = new int[pmoveLen];
+				for (int oindex = 0; oindex < pmoveLen; ++oindex) {
 					tpg.turn(state, player, pMoves[oindex], newState);
 					points[oindex] = tpg.getTblPoint(newState, player);
 				}
 				int oindex3 = 0;
-				for (int oindex1 = 0; oindex1 < pMoves.length - 1; ++oindex1) {
+				for (int oindex1 = 0; oindex1 < pmoveLen - 1; ++oindex1) {
 					// Get the index of the move with max points
-					for (int oindex2 = oindex1; oindex2 < pMoves.length; ++oindex2) {
+					for (int oindex2 = oindex1; oindex2 < pmoveLen; ++oindex2) {
 						if ((oindex2 == oindex1) || (points[oindex2] > points[oindex3])) {
 							oindex3 = oindex2;
 						}
@@ -105,12 +106,12 @@ public class LimitedMinMax extends GameMinMax {
 					}
 				}
 			}
-			if (kill && (killerMove != null) && (pMoves.length > 1)) {
+			if (kill && (killerMove != null) && (pmoveLen > 1)) {
 				int kindex = 0;
-				while ((kindex < pMoves.length) && !pMoves[kindex].equals(killerMove)) {
+				while ((kindex < pmoveLen) && !pMoves[kindex].equals(killerMove)) {
 					++kindex;
 				}
-				if ((kindex < pMoves.length) && (kindex != 0)) {
+				if ((kindex < pmoveLen) && (kindex != 0)) {
 					// we have a killermove, but it's not the first one
 					final GameMove swapMove = pMoves[0];
 					pMoves[0] = pMoves[kindex];
@@ -118,7 +119,7 @@ public class LimitedMinMax extends GameMinMax {
 				}
 			}
 			actMove = null;
-			for (int i = 0; !cut && (i < pMoves.length); ++i) {
+			for (int i = 0; !cut && (i < pmoveLen); ++i) {
 				tpg.turn(state, player, pMoves[i], newState);
 				if (depth <= 1) {
 					actPoint = tpg.getTblPoint(newState, player);
