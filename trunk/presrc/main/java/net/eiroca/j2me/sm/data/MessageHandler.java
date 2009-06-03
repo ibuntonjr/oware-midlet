@@ -258,12 +258,27 @@ public class MessageHandler implements MessageListener, StoreObserver {
   }
 
   public void actionDone(final int action, final Object obj, final Store store) {
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("actionDone action,obj=" + action + "," + obj);}
+		//#endif
     if (action == StoreObserver.ADD) {
-      final Address address = (Address) obj;
-      final byte[] key = address.getKeyData();
-      final String number = address.number;
-      if ((key != null) && (number != null)) {
-        unknownStore.recoverMessages(this, address);
+			try {
+				//#ifdef DLOGGING
+				if (finestLoggable) {logger.finest("action action=StoreObserver.ADD");}
+				//#endif
+				final Address address = (Address) obj;
+				final byte[] key = address.getKeyData();
+				final String number = address.number;
+				if ((key != null) && (number != null)) {
+					unknownStore.recoverMessages(this, address);
+				}
+			}
+      catch (final Throwable th) {
+        // Ignored
+				th.printStackTrace();
+				//#ifdef DLOGGING
+				logger.warning("actionDone error", th);
+				//#endif
       }
     }
   }
