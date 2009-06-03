@@ -247,6 +247,14 @@
 + Workaround interrupt not in CLDC 1.0.
 + Better handle multiple versions.
 
+0.1.6 2009-05-31 Beta 1 Version
++ More logging.
++ More error reporting.
++ Catch error.
++ Allow for non-default international prefix.
++ Very minor performance improvement.
++ Fix version number.
+
 Issues:
 
 Secure SMS works if there are no errors with the message store.  It also
