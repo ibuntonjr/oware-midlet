@@ -153,7 +153,7 @@ Clear Message Sent
 Clear Address Book
 Delete data
 Are you sure?
-+39
+@DEFAULTCOUNTRYCODE@
 Invalid
 Message marked as invalid. Please change the password key of the sender.
 Address book is empty
