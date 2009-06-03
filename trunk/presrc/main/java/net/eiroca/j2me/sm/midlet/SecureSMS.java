@@ -229,6 +229,7 @@ public class SecureSMS extends Application implements StoreObserver {
     try {
 			super.init();
 			//#ifdef DLOGGING
+			logger.info("BaseApp.messages.length=" + BaseApp.messages.length);
 			logger.info("BaseApp.messages[AppConstants.MSG_SECURESMS_NAME]=" + BaseApp.messages[AppConstants.MSG_SECURESMS_NAME]);
 			logger.info("BaseApp.messages[AppConstants.MSG_SECURESMS_USERDEF - 1]=" + BaseApp.messages[AppConstants.MSG_SECURESMS_USERDEF - 1]);
 			//#endif
@@ -531,14 +532,14 @@ public class SecureSMS extends Application implements StoreObserver {
   // -----------------------------------------------------------------------
   // Implementation of the StoreObserver interface
   public void actionDone(final int action, final Object obj, final Store store) {
+		//#ifdef DLOGGING
+		if (finestLoggable) {logger.finest("actionDone action,obj=" + action + "," + obj);}
+		//#endif
     if (action == StoreObserver.ADD) {
       try {
-					//#ifdef DLOGGING
-					if (finestLoggable) {logger.finest("actionDone action,obj=" + action + "," + obj);}
-					//#endif
-		//#ifdef DLOGGING
-		if (finestLoggable) {logger.finest("init");}
-		//#endif
+				//#ifdef DLOGGING
+				if (finestLoggable) {logger.finest("action action=StoreObserver.ADD");}
+				//#endif
         // Note: As we register to listen on the incoming message store we should
         // not check the store reference
         // Check if we need to update the current inbox view
@@ -553,6 +554,10 @@ public class SecureSMS extends Application implements StoreObserver {
       }
       catch (final Throwable th) {
         // Ignored
+				th.printStackTrace();
+				//#ifdef DLOGGING
+				logger.warning("actionDone error", th);
+				//#endif
       }
     }
   }
