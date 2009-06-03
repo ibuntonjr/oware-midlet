@@ -86,8 +86,8 @@ public class AddressScreen extends FeatureForm {
       if (numTel.startsWith("00")) {
         numTel = "+" + numTel.substring(2);
       }
-      if (!numTel.startsWith("+")) {
-        numTel = prefix + numTel;
+      if (!numTel.startsWith("+") && !prefix.equals("+")) {
+        numTel = prefix.trim() + numTel;
       }
     }
     number.setString(numTel);
