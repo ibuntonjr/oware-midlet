@@ -85,11 +85,11 @@ midlet.home = ${wtk.workspace.proj}/apps/${project.name}
 prc.creater = OURI
 prc.longname = Oware/Reversi
 MIDLETURL_ROOT = http://oware-midlet.googlecode.com/files
-MIDLETVERSROOT = 0.1.5
+MIDLETVERSROOT = 0.1.6
 separator = /
 #Need vers with '_' to allow uploading to sites that get confused by to
 #many '.'
-FMIDLETVERSROOT = 0_1_5
+FMIDLETVERSROOT = 0_1_6
 #Location of manifest source
 manifestsrc = ../manifestsrc
 #? src = src
@@ -124,6 +124,7 @@ wtk.src = ${env.j2mewtk}/${project.name}/src
 wtk.res = ${env.j2mewtk}/${project.name}/res
 zipdir = ../zipedsrc
 need.svn.preprocessed = true
+DEFAULTCOUNTRYCODE = +
 #svn.home = C:\\PROGRA~1\\COLLAB~1
 svn.url =  https://oware-midlet.googlecode.com/svn/trunk/
 svn.src =  oware-midlet
