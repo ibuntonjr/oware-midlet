@@ -197,7 +197,57 @@
   * Put in small wait to help threads other than turn/A.I. get time.
   * Add target for MIDP 1.0 reversi for testing on MIDP 1.0.
 
+=0.1.5 2009-05-15 Alpha 1 Version=
+  * More logging.
+  * Change messages to go into AppConstants to better share.
+  * Add in secure SMS code and share messages with the others.
+  * Conditional compile for JSR120.
+  * Put in JSR-120 SMS code.
+  * Fix logging for all midlets.
+  * Changes to speed up A.I..
+  * Yield from A.I. thread from time to time to allow for other threads to execute.
+  * Made changes to get test program to create a file with encoded data to send to SecureSMS using WMA console.
+
+=0.1.5 2009-05-27 Alpha 2 Version=
+  * More logging.
+  * Added bomber game with Bluetooth.
+  * Use feature List, TextBox and Form.
+  * Allow FeatureMgr to specify that the run shoud be done, but only once which is after the commandAction.
+  * Compile bluetooth only for JSR-82.
+  * Oware board image.
+  * Use abstract App for use with other games.
+  * Start making different program versions easier.
+  * Use mobilesuite utilities.
+  * Fix out of memory error with remove command.
+  * Use parameter definition for gsLevel.
+  * Increase image sizes for Reversi.
+  * Allow specification of offset from the current value for a parameter array.
+  * Fix level specified on board on the right has 'Initial Seeds'.
+  * Fix suffixvers.
+  * Have target for SecureSMS only.
+
+=0.1.5 2009-05-31 Beta 1 Version=
+  * Have read/unread images.
+  * Prompt to delete or make invalid.
+  * Use FeatureList for menu.
+  * Fix prompt code.
+  * Have read of message in inbox/sent items go back to inbox/sent items when back pressed.
+  * If more than one message is sent from the same phone, it will now store the message instead of giving null pointer.
+  * Correct spelling of unknown for unknown address.
+  * Fix BoardGameScreen for MIDP 1.0 changes for threads.
+  * Fix targets that have SMS to use the correct midlet number.
+  * Workaround nextInt(int) not in CLDC 1.0.
+  * Workaround interrupt not in CLDC 1.0.
+  * Better handle multiple versions.
+
+=0.1.6 2009-05-31 Beta 1 Version=
+  * More logging.
+  * More error reporting.
+  * Catch error.
+  * Allow for non-default international prefix.
+  * Very minor performance improvement.
+  * Fix version number.
+
 Issues:
 
-Highlighting of lower player is not the right place for Oware.
 Minesweeper does not work at all.
