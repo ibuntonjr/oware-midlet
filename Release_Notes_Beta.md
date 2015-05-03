@@ -1,0 +1,252 @@
+#Release notes for Beta Releases
+# 1.0 2008-12-27 Alpha 2 Version #
+  * Handle grand slam variations.
+  * Don't allow move if opponent has no seeds.
+  * Support changes in max holes captured.
+  * Fix redo
+  * Fix JAR URL
+
+# 1.0 2008-12-31 Alpha 3 Version #
+  * Handle pointer press/drag
+  * Future font support
+  * Fix top piece above board not shown
+  * Fix JAD jar size problem
+
+# 1.0 2009-01-04 Alpha 4 Version #
+  * Some setup to use JMUnit
+  * Fix problems with screen on N80, etc
+  * Some more logging
+  * Put text files under jar root in addition to locale dir
+  * Fix problems with undo/redo changing the user to move next
+  * Prepare for prompts using message number
+  * Allow removal of prompt for command without removing the command
+  * Make sure we don't get infinate loop if no depth.
+  * Fix scoring.
+  * Fix top piece above table not showing up.
+  * Fix grand slam variations
+  * Fix display of skill and depth
+  * Fix skill settings
+  * Allow testing with JMUnit
+  * Allow interactive testing.
+
+# 1.0 2009-02-03 Alpha 5 Version #
+  * Handle if opponent get seeds if they cannot make a move or the player gets
+> them
+  * Allow settings of initial seeds
+  * Have separate large version of the program.
+  * Parameterize rows, columns, tables, players to support more Mancala/Oware games
+  * Optional piece/cup images inside squares/rectangles
+  * Have CLDC 1.1 thread name start with T
+  * More changes for MIDP 1.0
+  * Have images for undo/redo
+  * New grand slam variation if captured >= 24, is legal
+  * Don't write past the end of array to hold images if they don't match
+  * Call desroy app before quiting
+  * Have separate splash for Oware and Reversi.
+  * Have Reversi game.
+  * Make Reversi thread safe.
+  * Have board game classes to allow making board games easier and add undo/redo and save of game parms.
+  * Smaller images for Oware and (future) Mancala
+  * Allow customization of columns, initial seeds, (future) rows
+  * Save game parms (e.g. 1 or 2 players) separate from game state (e.g. score)
+  * Make changes to allow future > 2 player for Mancala
+  * Show last move for each player with black strip over piece for Reversi (Oware/Mancala already had an indicator)
+  * Added comments
+  * More logging
+  * Fix saving/loading of initial seeds for Oware
+
+# 1.0 2009-02-04 Alpha 6 Version #
+  * Fix exception when setting options
+  * Optionally modify game parameters based on limit < 0
+  * More logging
+  * Don't produce versions that are functionally the same as others (i.e. have JSR's that are not used)
+  * Fix JSR75 properties file (Not used)
+
+# 1.0 2009-02-16 Alpha 7 Version #
+  * Add end game so people can decide to end the game.
+  * Make Reversi more thread safe
+  * Share more code with BoardGameScreen.
+  * Fix end of game scoring
+  * Allow prompt command from list used as command menu (not finished).
+
+# 1.0 2009-02-27 Beta 1 Version #
+  * Fixed introduced bug where Oware no longer works due to problems with precalculate.  Now, precalculation is turned off for Oware.
+  * Support feature form for logging report.
+  * Simplify support concatenation of Reversi and logging in build file.
+  * Simplify build file.
+  * Introduced bug where marking of last move on Reversi does not work.
+  * Changed initial and current option variables so that they are not negative, only the limit needs to be set negative to indicate that it can be customized.
+  * Fixed code to prevent infinite loop.
+  * Fix null pointer with updating options.
+  * Make some log statements trace instead of finest.
+  * Fixed problem where logger report did not do the backward command after the second try.
+  * Have Reversi use images of squares, light, and dark pieces.
+  * Prevent infinite loop if the computer has no move.
+  * Take logging out of jad/manifest for releases.
+  * Optionally pre calculate moves based on manifest/jad.
+  * Allow user to end the game optionally.  Also, have test option to end the game and set a player to be the computer.
+  * Fix display of winner/loser
+  * More logging.
+  * Workaround synchronized problem in VM of Sony Ericsson.
+  * More space for numbers in Oware squares.
+  * Fix Reversi problem where if the screen was too small for the images, they are not substituted for circles.
+  * Fix placement of scores.
+  * Reset undo/redo for new game.
+  * Fix MIDP 1.0 not having pause.
+  * Have logging form for form append.
+  * Reduce height for rectangles and increase size of icons.
+  * Refer to players as upper/lower
+  * Allow setting of defaults.
+  * Skill level message for dept.
+  * Make game AI thread safe.
+  * Allow both midlets to have optional graphics.
+  * Allow change of rows/columns for Reversi.
+  * Remove tick as it matches what's in BoardGameScreen
+  * Remove drawSelectionBox as it matches what's in BoardGameScreen
+  * Allow more players in the future.
+  * Fix bug where player vs player did a computer move.
+  * Remove unnecessary code.
+  * Concatenate logging midlet.
+  * Remove logging entries from manifest/jad.
+  * Workedaround exceptions with pre calculate on for Reversi.  Pre calculcate needs to be disabled as it has bugs.
+
+# 1.0 2009-04-17 Beta 2 Version #
+  * Highlight pieces in verticle bar.
+  * Start of minesweeper app.  This is only available for test version.
+  * Remove unneeded declaratoins.
+  * Remove unneeded logging.
+  * Remove unneeded space for Reversi.
+  * Fix computer moves not working with Reversi.
+  * Fix problem where icons were not appearing for Reversi if they need to be smaller than the icons in the JAR file.
+  * More logging.
+  * Mark last Reversi pieces moves
+  * Allow creation of release file with different names.
+  * Allow creation of JAR without Oware.
+  * Use JAD for obfuscate.
+  * Use drawRegion to split images for menu as this is documented to do so for MIDP 2.0.
+  * Put in help text for Reversi.
+  * Allow creating a program with just one app.
+# 0.1 2009-04-21 Beta 3 Version #
+  * Check in missing classes.
+  * Set up for test suite.
+  * Use large memory define for test classes.
+  * Fix copyrights.
+  * Remove empty directories.
+
+# 0.1.1 2009-04-24 Beta 1 Version #
+  * Fix image references in Oware.
+  * Fix creation of games only release to allow Oware and Minsweeper.
+  * Change Reversi applet icon.
+  * Fix testsuite bug where if joy stick or 4 way navigation used, the key code and game action will be shown.
+  * Change txt/image names to have testsuite_as a prefix.
+  * Fix problem for testsuite where txt files were not put into the jar.
+  * Make changes to have changes in rows/columns for Reversi/MineSweeper, but needs work before release.
+  * Better handling of game parameters.
+  * Use readAppProperty instead of getAppProperty for defaults handling.
+  * Fix creation of Reversi game copy for heurMatrix.
+  * Have separate about for test suite.
+  * Change test suite classes and templates to use CLDC 1.1 as this must be used for 3D.
+  * Support multi-lap the first place that last seed lands.  This needs testing.
+  * Support capture of empty, 2 or 3 or 4 in house.  This needs testing._
+
+# 0.1.2 2009-04-25 Beta 1 Version #
+  * Fix Oware board images and text.
+  * Fix references to MIDP 2.0, Bluethooth (JSR-82), Multi Media API (JSR-135), 3D Graphics (JSR-184) so that they are only used the right JSR is enabled for compile.
+  * Add test suite JAD concatenation .
+  * Add properties and build targets to make test suite (large memory) for MIDP 1.0 and MIDP 2.0.
+  * Fix possibl problems with feature manager with hangs.
+  * Fix possible hangs in test suite.
+  * Allow ignoring key codes in the JAD file.
+  * Put store of board, in it's own method.
+
+# 0.1.3 2009-05-04 Beta 1 Version #
+  * More logging.
+  * More comments.
+  * Support repeat (another turn) if seed lands in store.
+  * Allow 9 seeds / hole to start.
+  * Optional starting at the first hole or the next hole.
+  * Optional skip initial hole or sow in it after going around the board.
+  * Optional sow in the store.
+  * Fix messages with a specified delay not being shown.
+  * Ignore some keys to allow screen shots or customization.
+  * Fix highlighting of players store.
+  * Shorten time that message is shown.
+  * Fix Reversi A.I. so that it uses heuristic vs only actual points.
+  * Add target for MIDP 2.0, CLDC 1.1, JSR-75, JSR-85, JSR-135, and JSR-184.
+  * Copy table with game for better A.I.
+  * Fix index out of range for A.I.
+  * Change evaluate to use parameter's point to prevent corruption of score.
+  * Show pass if last move by putting black bar over pieces on the side.
+  * Use pass if there is no computer move.
+  * Allow multiple passes.
+  * Make sure that rPlayer is copied.  End game if pass is >= 2 to make sure that we do not end if pass is > 2.
+  * Fix target to copy resources for English to replace midlet vers and prog vers with actual midlet/prog vers.
+  * Use more more parameters for isGameEnded as it is more accurate.
+
+# 0.1.4 2009-05-08 Beta 1 Version #
+  * More logging.
+  * Minor performance improvement in calculating best move.
+  * Wake up after each move to show the pieces flipping.
+  * Fix MIDP 1.0 program failing after splash screen on Sony T637.
+  * Change logging to not write out string version of the table.
+  * Fix skill levels going up by 2 instead of 1.
+  * Build file changes to simplify targets.
+  * Try to show move and thinking message after move.  Sometimes, for higher levels, this is not shown.
+  * Get value of table synchronized so that we can avoid contention.
+  * Put in small wait to help threads other than turn/A.I. get time.
+  * Add target for MIDP 1.0 reversi for testing on MIDP 1.0.
+
+# 0.1.5 2009-05-15 Alpha 1 Version #
+  * More logging.
+  * Change messages to go into AppConstants to better share.
+  * Add in secure SMS code and share messages with the others.
+  * Conditional compile for JSR120.
+  * Put in JSR-120 SMS code.
+  * Fix logging for all midlets.
+  * Changes to speed up A.I..
+  * Yield from A.I. thread from time to time to allow for other threads to execute.
+  * Made changes to get test program to create a file with encoded data to send to SecureSMS using WMA console.
+
+# 0.1.5 2009-05-27 Alpha 2 Version #
+  * More logging.
+  * Added bomber game with Bluetooth.
+  * Use feature List, TextBox and Form.
+  * Allow FeatureMgr to specify that the run shoud be done, but only once which is after the commandAction.
+  * Compile bluetooth only for JSR-82.
+  * Oware board image.
+  * Use abstract App for use with other games.
+  * Start making different program versions easier.
+  * Use mobilesuite utilities.
+  * Fix out of memory error with remove command.
+  * Use parameter definition for gsLevel.
+  * Increase image sizes for Reversi.
+  * Allow specification of offset from the current value for a parameter array.
+  * Fix level specified on board on the right has 'Initial Seeds'.
+  * Fix suffixvers.
+  * Have target for SecureSMS only.
+
+# 0.1.5 2009-05-31 Beta 1 Version #
+  * Have read/unread images.
+  * Prompt to delete or make invalid.
+  * Use FeatureList for menu.
+  * Fix prompt code.
+  * Have read of message in inbox/sent items go back to inbox/sent items when back pressed.
+  * If more than one message is sent from the same phone, it will now store the message instead of giving null pointer.
+  * Correct spelling of unknown for unknown address.
+  * Fix BoardGameScreen for MIDP 1.0 changes for threads.
+  * Fix targets that have SMS to use the correct midlet number.
+  * Workaround nextInt(int) not in CLDC 1.0.
+  * Workaround interrupt not in CLDC 1.0.
+  * Better handle multiple versions.
+
+# 0.1.6 2009-05-31 Beta 1 Version #
+  * More logging.
+  * More error reporting.
+  * Catch error.
+  * Allow for non-default international prefix.
+  * Very minor performance improvement.
+  * Fix version number.
+
+Issues:
+
+Minesweeper does not work at all.
